@@ -1,0 +1,15 @@
+[package]
+name = "readline-sys"
+version = "0.0.1"
+authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
+links = "readline"
+build = "build.rs"
+repository = "https://github.com/rustyhorde/readline.git"
+license = "MIT"
+description = "Native bindings to the readline library"
+
+[lib]
+name = "readline-sys"
+
+[build-dependencies]
+pkg-config = "0.1"
