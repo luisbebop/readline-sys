@@ -10,6 +10,3 @@ description = "Native bindings to the readline library"
 
 [lib]
 name = "readline-sys"
-
-[build-dependencies]
-pkg-config = "0.1"

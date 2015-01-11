@@ -33,3 +33,14 @@ pub fn readline(prompt: String) -> Option<String> {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::readline;
+
+    #[test]
+    fn test_readline() {
+        let blah = readline("rh >".to_string()).unwrap();
+        println!("test {}", blah);
+    }
+}
