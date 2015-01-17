@@ -2,6 +2,8 @@
 extern crate libc;
 
 use std::ffi::{c_str_to_bytes,CString};
+use std::io::{Append,BufferedReader,File,Truncate,Write};
+use std::io::fs::PathExtensions;
 use std::str;
 
 mod ext_readline {
@@ -32,6 +34,28 @@ pub fn readline(prompt: String) -> Option<String> {
             Some(res.to_string())
         }
     }
+}
+
+pub fn preload_history(file: &Path) {
+    if file.exists() {
+        let mut file = BufferedReader::new(File::open(file));
+        for opt in file.lines() {
+            let line = opt.unwrap();
+            let trimmed = line.trim_right();
+            add_history(trimmed.to_string());
+        }
+    }
+}
+
+pub fn add_history_persist(line: String, file: &Path) {
+    let mut file = if file.exists() {
+        File::open_mode(file, Append, Write)
+    } else {
+        File::open_mode(file, Truncate, Write)
+    };
+
+    let _ = file.write_line(line.as_slice());
+    add_history(line);
 }
 
 #[cfg(test)]
