@@ -16,7 +16,7 @@ fn main() {
         let dst = Path::new(os::getenv("OUT_DIR").unwrap()).join("build");
         let _ = fs::mkdir(&dst, io::USER_DIR);
 
-        run(Command::new("configure")
+        run(Command::new("./configure")
             .cwd(&src.join("readline"))
             .arg("--disable-shared"));
 
