@@ -32,12 +32,16 @@ fn main() {
             cflags.push_str(" -fPIC");
         }
 
-        run(Command::new("./configure").cwd(&src).arg("--disable-shared"));
+        run(Command::new("./configure").cwd(&src));
         run(Command::new("make").env("CFLAGS", cflags.as_slice()).cwd(&src));
 
-        let _ = fs::copy(&src.join("libreadline.a"), &dst.join("libreadline.a"));
-        let _ = fs::copy(&src.join("libhistory.a"), &dst.join("libhistory.a"));
-        println!("cargo:rustc-flags=-l static=readline");
+        let shlib = src.join("shlib");
+        let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
+                         &dst.join("libreadline.so.6.3"));
+        let _ = fs::copy(&shlib.join("libhistory.so.6.3"),
+                         &dst.join("libhistory.so.6.3"));
+
+        println!("cargo:rustc-flags=-l readline");
         println!("cargo:rustc-flags=-L {}", dst.display());
     }
 }
