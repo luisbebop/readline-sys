@@ -1,6 +1,7 @@
 #![allow(unstable)]
 use std::io::{self, fs, Command};
 use std::io::fs::PathExtensions;
+use std::io::process::InheritFd;
 use std::os;
 
 fn main() {
@@ -11,26 +12,28 @@ fn main() {
     } else if libpath.join("libreadline.so").exists() {
         println!("cargo:rustc-flags=-l readline");
     } else {
-        let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap())
-            .join("readline");
+        let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap());
         let dst = Path::new(os::getenv("OUT_DIR").unwrap()).join("build");
         let _ = fs::mkdir(&dst, io::USER_DIR);
 
         run(Command::new("configure")
-            .cwd(&src)
+            .cwd(&src.join("readline"))
             .arg("--disable-shared"));
 
         run(Command::new("make")
-            .cwd(&src));
+            .cwd(&src.join("readline")));
 
-        let _ = fs::copy(&src.join("libreadline.a"), &dst.join("libreadline.a"));
-        let _ = fs::copy(&src.join("libhistory.a"), &dst.join("libhistory.a"));
+        let _ = fs::copy(&src.join("readline").join("libreadline.a"), &dst.join("libreadline.a"));
+        let _ = fs::copy(&src.join("readline").join("libhistory.a"), &dst.join("libhistory.a"));
         println!("cargo:rustc-flags=-l static=readline");
         println!("cargo:rustc-flags=-L {}", dst.display());
     }
 }
 
 fn run(cmd: &mut Command) {
-    println!("running: {}", cmd);
-    assert!(cmd.status().unwrap().success());
+    assert!(cmd.stdout(InheritFd(1))
+            .stderr(InheritFd(2))
+            .status()
+            .unwrap()
+            .success());
 }
