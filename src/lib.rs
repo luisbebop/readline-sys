@@ -60,11 +60,10 @@ pub fn add_history_persist(line: String, file: &Path) {
 
 #[cfg(test)]
 mod test {
-    use super::readline;
+    use super::add_history;
 
     #[test]
     fn test_readline() {
-        let blah = readline("rh >".to_string()).unwrap();
-        println!("test {}", blah);
+        add_history("test".to_string());
     }
 }
