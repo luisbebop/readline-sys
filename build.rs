@@ -12,23 +12,31 @@ fn main() {
     } else if libpath.join("libreadline.so").exists() {
         println!("cargo:rustc-flags=-l readline");
     } else {
-        let mut cflags = os::getenv("CFLAGS").unwrap_or(String::new());
-        let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap());
+        let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap())
+            .join("readline");
         let dst = Path::new(os::getenv("OUT_DIR").unwrap()).join("build");
         let _ = fs::mkdir(&dst, io::USER_DIR);
 
-        cflags.push_str("-fPIC");
+        let mut cflags = os::getenv("CFLAGS").unwrap_or(String::new());
+        let target = os::getenv("TARGET").unwrap();
+        let mingw = target.contains("windows-gnu");
 
-        run(Command::new("./configure")
-            .cwd(&src.join("readline"))
-            .arg("--disable-shared"));
+        cflags.push_str(" -ffunction-sections -fdata-sections");
 
-        run(Command::new("make")
-            .env("CFLAGS", cflags.as_slice())
-            .cwd(&src.join("readline")));
+        if target.contains("i686") {
+            cflags.push_str(" -m32");
+        } else if target.as_slice().contains("x86_64") {
+            cflags.push_str(" -m64");
+        }
+        if !target.contains("i686") {
+            cflags.push_str(" -fPIC");
+        }
 
-        let _ = fs::copy(&src.join("readline").join("libreadline.a"), &dst.join("libreadline.a"));
-        let _ = fs::copy(&src.join("readline").join("libhistory.a"), &dst.join("libhistory.a"));
+        run(Command::new("./configure").cwd(&src).arg("--disable-shared"));
+        run(Command::new("make").env("CFLAGS", cflags.as_slice()).cwd(&src));
+
+        let _ = fs::copy(&src.join("libreadline.a"), &dst.join("libreadline.a"));
+        let _ = fs::copy(&src.join("libhistory.a"), &dst.join("libhistory.a"));
         println!("cargo:rustc-flags=-l static=readline");
         println!("cargo:rustc-flags=-L {}", dst.display());
     }
