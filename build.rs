@@ -19,7 +19,6 @@ fn main() {
 
         let mut cflags = os::getenv("CFLAGS").unwrap_or(String::new());
         let target = os::getenv("TARGET").unwrap();
-        let mingw = target.contains("windows-gnu");
 
         cflags.push_str(" -ffunction-sections -fdata-sections");
 
