@@ -14,10 +14,12 @@ fn main() {
         Path::new("/usr/lib")
     };
 
-    if libpath.join("libreadline.a").exists() {
+    if !mingw && libpath.join("libreadline.a").exists() {
+        println!("cargo:rustc-flags=-l static=readline");
+        println!("cargo:rustc-flags=-L {}", libpath.display());
+    } else if !mingw && libpath.join("libreadline.so").exists() {
         println!("cargo:rustc-flags=-l readline");
-    } else if libpath.join("libreadline.so").exists() {
-        println!("cargo:rustc-flags=-l readline");
+        println!("cargo:rustc-flags=-L {}", libpath.display());
     } else {
         let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap())
             .join("readline");
@@ -37,8 +39,27 @@ fn main() {
             cflags.push_str(" -fPIC");
         }
 
-        run(Command::new("./configure").cwd(&src));
-        run(Command::new("make").env("CFLAGS", cflags.as_slice()).cwd(&src));
+        if mingw {
+            run(Command::new("sh")
+                .arg("-c")
+                .arg("configure")
+                .env("CFLAGS", "-D_POSIX")
+                .cwd(&src));
+        } else {
+            run(Command::new("configure").cwd(&src));
+        }
+
+        if mingw {
+            run(Command::new("sh")
+                .arg("-c")
+                .arg("make")
+                .env("CFLAGS", cflags.as_slice())
+                .cwd(&src));
+        } else {
+            run(Command::new("make")
+                .env("CFLAGS", cflags.as_slice())
+                .cwd(&src));
+        }
 
         let shlib = src.join("shlib");
         let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
