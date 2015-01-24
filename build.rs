@@ -35,7 +35,7 @@ fn main() {
                 .env("CFLAGS", "-D_POSIX")
                 .cwd(&src));
         } else {
-            run(Command::new("configure").cwd(&src));
+            run(Command::new("./configure").cwd(&src));
         }
 
         if mingw {
