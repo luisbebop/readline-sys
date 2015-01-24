@@ -5,10 +5,17 @@ use std::io::process::InheritFd;
 use std::os;
 
 fn main() {
-    let libpath = Path::new("/usr/lib");
+    let target = os::getenv("TARGET").unwrap();
+    let mingw = target.contains("windows-gnu");
+
+    let libpath = if mingw {
+        Path::new("C:/msys64/usr/lib")
+    } else {
+        Path::new("/usr/lib")
+    };
 
     if libpath.join("libreadline.a").exists() {
-        println!("cargo:rustc-flags=-l static=readline");
+        println!("cargo:rustc-flags=-l readline");
     } else if libpath.join("libreadline.so").exists() {
         println!("cargo:rustc-flags=-l readline");
     } else {
@@ -18,7 +25,6 @@ fn main() {
         let _ = fs::mkdir(&dst, io::USER_DIR);
 
         let mut cflags = os::getenv("CFLAGS").unwrap_or(String::new());
-        let target = os::getenv("TARGET").unwrap();
 
         cflags.push_str(" -ffunction-sections -fdata-sections");
 
