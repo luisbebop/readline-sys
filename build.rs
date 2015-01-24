@@ -26,18 +26,7 @@ fn main() {
         let dst = Path::new(os::getenv("OUT_DIR").unwrap()).join("build");
         let _ = fs::mkdir(&dst, io::USER_DIR);
 
-        let mut cflags = os::getenv("CFLAGS").unwrap_or(String::new());
-
-        cflags.push_str(" -ffunction-sections -fdata-sections");
-
-        if target.contains("i686") {
-            cflags.push_str(" -m32");
-        } else if target.as_slice().contains("x86_64") {
-            cflags.push_str(" -m64");
-        }
-        if !target.contains("i686") {
-            cflags.push_str(" -fPIC");
-        }
+        let cflags = os::getenv("CFLAGS").unwrap_or(String::new());
 
         if mingw {
             run(Command::new("sh")
@@ -62,10 +51,21 @@ fn main() {
         }
 
         let shlib = src.join("shlib");
-        let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
-                         &dst.join("libreadline.so.6.3"));
-        let _ = fs::copy(&shlib.join("libhistory.so.6.3"),
-                         &dst.join("libhistory.so.6.3"));
+        if mingw {
+            let _ = fs::copy(&shlib.join("libreadline6.dll"),
+                             &dst.join("libreadline.dll"));
+            let _ = fs::copy(&shlib.join("libhistory6.dll"),
+                             &dst.join("libhistory.dll"));
+            let _ = fs::copy(&shlib.join("libreadline6.dll.a"),
+                             &dst.join("libreadline.dll.a"));
+            let _ = fs::copy(&shlib.join("libhistory6.dll.a"),
+                             &dst.join("libhistory.dll.a"));
+        } else {
+            let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
+                             &dst.join("libreadline.so.6.3"));
+            let _ = fs::copy(&shlib.join("libhistory.so.6.3"),
+                             &dst.join("libhistory.so.6.3"));
+        }
 
         println!("cargo:rustc-flags=-l readline");
         println!("cargo:rustc-flags=-L {}", dst.display());
