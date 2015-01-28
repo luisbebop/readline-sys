@@ -1,7 +1,7 @@
-#![allow(unstable)]
-use std::io::{self, fs, Command};
-use std::io::fs::PathExtensions;
-use std::io::process::InheritFd;
+#![feature(core,io,os,path)]
+use std::old_io::{self, fs, Command};
+use std::old_io::fs::PathExtensions;
+use std::old_io::process::InheritFd;
 use std::os;
 
 fn main() {
@@ -24,7 +24,7 @@ fn main() {
         let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap())
             .join("readline");
         let dst = Path::new(os::getenv("OUT_DIR").unwrap()).join("build");
-        let _ = fs::mkdir(&dst, io::USER_DIR);
+        let _ = fs::mkdir(&dst, old_io::USER_DIR);
 
         let cflags = os::getenv("CFLAGS").unwrap_or(String::new());
 

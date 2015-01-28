@@ -1,9 +1,9 @@
-#![allow(unstable)]
+#![feature(collections,core,io,libc,std_misc)]
 extern crate libc;
 
 use std::ffi::{c_str_to_bytes,CString};
-use std::io::{Append,BufferedReader,File,Truncate,Write};
-use std::io::fs::PathExtensions;
+use std::old_io::{Append,BufferedReader,File,Truncate,Write};
+use std::old_io::fs::PathExtensions;
 use std::str;
 
 mod ext_readline {
