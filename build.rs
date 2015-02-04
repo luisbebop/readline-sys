@@ -9,13 +9,13 @@ fn main() {
     let mingw = target.contains("windows-gnu");
 
     let libpath = if mingw {
-        Path::new("C:/mingw64/lib")
+        Path::new("C:/mingw64/bin")
     } else {
         Path::new("/usr/lib")
     };
 
-    if mingw && libpath.join("libreadline.a").exists() {
-        println!("cargo:rustc-flags=-l static=readline");
+    if mingw && libpath.join("libreadline6.dll").exists() {
+        println!("cargo:rustc-flags=-l readline6");
         println!("cargo:rustc-flags=-L {}", libpath.display());
     } else if !mingw && libpath.join("libreadline.a").exists() {
         println!("cargo:rustc-flags=-l static=readline");
