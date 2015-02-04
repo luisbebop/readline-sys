@@ -1,4 +1,4 @@
-#![feature(collections,core,io,libc,std_misc)]
+#![feature(core,io,libc,std_misc)]
 extern crate libc;
 
 use std::ffi::{c_str_to_bytes,CString};
