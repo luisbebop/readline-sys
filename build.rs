@@ -32,7 +32,6 @@ fn main() {
             run(Command::new("sh")
                 .arg("-c")
                 .arg("configure")
-                .env("CFLAGS", "-D_POSIX")
                 .cwd(&src));
         } else {
             run(Command::new("./configure").cwd(&src));
