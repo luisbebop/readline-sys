@@ -39,8 +39,14 @@ pub fn readline(prompt: String) -> Option<String> {
 pub fn preload_history(file: &Path) {
     if file.exists() {
         let mut file = BufferedReader::new(File::open(file));
+        let mut lines = Vec::new();
         for opt in file.lines() {
-            let line = opt.unwrap();
+            lines.push(opt.unwrap());
+        }
+
+        lines.dedup();
+
+        for line in lines.iter() {
             let trimmed = line.trim_right();
             add_history(trimmed.to_string());
         }
