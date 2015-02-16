@@ -2,7 +2,14 @@
 extern crate libc;
 
 use std::ffi::{c_str_to_bytes,CString};
-use std::old_io::{Append,BufferedReader,File,Truncate,Write};
+use std::old_io::{
+    Append,
+    BufferedReader,
+    File,
+    LineBufferedWriter,
+    Truncate,
+    Write
+};
 use std::old_io::fs::PathExtensions;
 use std::str;
 
@@ -54,14 +61,24 @@ pub fn preload_history(file: &Path) {
 }
 
 pub fn add_history_persist(line: String, file: &Path) {
-    let mut file = if file.exists() {
-        File::open_mode(file, Append, Write)
-    } else {
-        File::open_mode(file, Truncate, Write)
-    };
+    let mut write = LineBufferedWriter::new(
+        if file.exists() {
+            File::open_mode(file, Append, Write)
+        } else {
+            File::open_mode(file, Truncate, Write)
+        });
 
-    let _ = file.write_line(line.as_slice());
-    add_history(line);
+    // Only add the line to the history file if it doesn't already
+    // contain the line to add.
+    let mut read = BufferedReader::new(File::open(file));
+    let cmds: Vec<String> = read.lines().map(|l| l.unwrap()).collect();
+    let mut trimmed: Vec<&str> = cmds.iter().map(|c| c.trim_right()).collect();
+    trimmed.dedup();
+
+    if !trimmed.contains(&line.trim_right()) {
+        let _ = write.write_line(line.as_slice());
+        add_history(line);
+    }
 }
 
 #[cfg(test)]
