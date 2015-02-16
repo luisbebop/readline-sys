@@ -1,11 +1,11 @@
-#![feature(core,io,os,path)]
-use std::os;
+#![feature(core,env,io,path)]
+use std::env;
 use std::old_io::{self, fs, Command};
 use std::old_io::fs::PathExtensions;
 use std::old_io::process::InheritFd;
 
 fn main() {
-    let target = os::getenv("TARGET").unwrap();
+    let target = env::var("TARGET").unwrap();
 
     let mingw = target.contains("windows-gnu");
 
@@ -25,12 +25,12 @@ fn main() {
         println!("cargo:rustc-flags=-l readline");
         println!("cargo:rustc-flags=-L {}", libpath.display());
     } else {
-        let src = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap())
+        let src = Path::new(env::var("CARGO_MANIFEST_DIR").unwrap())
             .join("readline");
-        let dst = Path::new(os::getenv("OUT_DIR").unwrap()).join("build");
+        let dst = Path::new(env::var("OUT_DIR").unwrap()).join("build");
         let _ = fs::mkdir(&dst, old_io::USER_DIR);
 
-        let cflags = os::getenv("CFLAGS").unwrap_or(String::new());
+        let cflags = env::var("CFLAGS").unwrap_or(String::new());
 
         if mingw {
             run(Command::new("sh")
