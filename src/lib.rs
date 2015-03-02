@@ -1,16 +1,11 @@
-#![feature(core,io,libc,path,std_misc)]
+#![feature(core,fs,io,libc,path,std_misc)]
 extern crate libc;
 
-use std::ffi::{c_str_to_bytes,CString};
-use std::old_io::{
-    Append,
-    BufferedReader,
-    File,
-    LineBufferedWriter,
-    Truncate,
-    Write
-};
-use std::old_io::fs::PathExtensions;
+use std::ffi::{CStr,CString};
+use std::io::prelude::*;
+use std::fs::{File,OpenOptions};
+use std::io::{BufReader,LineWriter};
+use std::path::Path;
 use std::str;
 
 mod ext_readline {
@@ -24,20 +19,21 @@ mod ext_readline {
 
 pub fn add_history(line: String) {
     unsafe {
-        let cline = CString::from_slice(line.as_bytes().as_slice());
+        let cline = CString::new(line.as_bytes().as_slice()).unwrap();
         ext_readline::add_history(cline.as_ptr());
     }
 }
 
 pub fn readline(prompt: String) -> Option<String> {
-    let cprmt = CString::from_slice(prompt.as_bytes().as_slice());
+    let cprmt = CString::new(prompt.as_bytes().as_slice()).unwrap();
     unsafe {
         let ret = ext_readline::readline(cprmt.as_ptr());
         if ret.is_null() {  // user pressed Ctrl-D
             None
         } else {
-            let slice = c_str_to_bytes(&ret);
-            let res = str::from_utf8(slice).ok().expect("Failed to parse utf-8");
+            let slice = CStr::from_ptr(ret);
+            let res = str::from_utf8(slice.to_bytes())
+                .ok().expect("Failed to parse utf-8");
             Some(res.to_string())
         }
     }
@@ -45,7 +41,7 @@ pub fn readline(prompt: String) -> Option<String> {
 
 pub fn preload_history(file: &Path) {
     if file.exists() {
-        let mut file = BufferedReader::new(File::open(file));
+        let file = BufReader::new(File::open(file).unwrap());
         let mut lines = Vec::new();
         for opt in file.lines() {
             lines.push(opt.unwrap());
@@ -61,22 +57,28 @@ pub fn preload_history(file: &Path) {
 }
 
 pub fn add_history_persist(line: String, file: &Path) {
-    let mut write = LineBufferedWriter::new(
+    let mut write = LineWriter::new(
         if file.exists() {
-            File::open_mode(file, Append, Write)
+            let mut oo = OpenOptions::new();
+            oo.append(true);
+            oo.write(true);
+            oo.open(file)
         } else {
-            File::open_mode(file, Truncate, Write)
-        });
+            let mut oo = OpenOptions::new();
+            oo.truncate(true);
+            oo.write(true);
+            oo.open(file)
+        }.unwrap());
 
     // Only add the line to the history file if it doesn't already
     // contain the line to add.
-    let mut read = BufferedReader::new(File::open(file));
+    let read = BufReader::new(File::open(file).unwrap());
     let cmds: Vec<String> = read.lines().map(|l| l.unwrap()).collect();
     let mut trimmed: Vec<&str> = cmds.iter().map(|c| c.trim_right()).collect();
     trimmed.dedup();
 
     if !trimmed.contains(&line.trim_right()) {
-        let _ = write.write_line(line.as_slice());
+        let _ = write.write(line.as_bytes());
         add_history(line);
     }
 }
