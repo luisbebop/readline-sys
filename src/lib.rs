@@ -68,7 +68,7 @@ pub fn add_history_persist(line: String, file: &Path) {
     if !cmds.contains(&trimmed) {
         println!("Writing {} to history", trimmed);
         let _ = write.write(line.as_bytes());
-        add_history(line);
+        add_history(trimmed);
     }
 }
 
