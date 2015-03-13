@@ -3,7 +3,7 @@ extern crate libc;
 
 use std::ffi::{CStr,CString};
 use std::io::prelude::*;
-use std::fs::File;
+use std::fs::{File,OpenOptions};
 use std::io::{BufReader,LineWriter};
 use std::path::Path;
 use std::str;
@@ -49,7 +49,14 @@ pub fn preload_history(file: &Path) {
 }
 
 pub fn add_history_persist(line: String, file: &Path) {
-    let mut write = LineWriter::new(File::create(file).unwrap());
+    let mut write = LineWriter::new(if file.exists() {
+        let mut oo = OpenOptions::new();
+        oo.append(true);
+        oo.write(true);
+        oo.open(file).unwrap()
+    } else {
+        File::create(file).unwrap()
+    });
 
     // Only add the line to the history file if it doesn't already
     // contain the line to add.
