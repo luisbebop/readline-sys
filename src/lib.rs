@@ -65,7 +65,8 @@ pub fn add_history_persist(line: String, file: &Path) {
     let cmds: Vec<String> = read.lines().map(|l| l.unwrap()).collect();
     let trimmed = line.trim_right().to_string();
 
-    if !cmds.contains(&trimmed) {
+    // Only add the line to history if it doesn't exist already and isn't empty.
+    if !cmds.contains(&trimmed) && !trimmed.is_empty() {
         // Write the line with the trailing '\n' to the file.
         let _ = write.write(line.as_bytes());
         // Add the line witout the trailing '\n' to the readline history.
