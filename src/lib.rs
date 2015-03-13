@@ -1,9 +1,9 @@
-#![feature(core,fs,io,libc,path,std_misc)]
+#![feature(core,io,libc,path,path_ext)]
 extern crate libc;
 
 use std::ffi::{CStr,CString};
 use std::io::prelude::*;
-use std::fs::{File,OpenOptions};
+use std::fs::File;
 use std::io::{BufReader,LineWriter};
 use std::path::Path;
 use std::str;
@@ -57,18 +57,7 @@ pub fn preload_history(file: &Path) {
 }
 
 pub fn add_history_persist(line: String, file: &Path) {
-    let mut write = LineWriter::new(
-        if file.exists() {
-            let mut oo = OpenOptions::new();
-            oo.append(true);
-            oo.write(true);
-            oo.open(file)
-        } else {
-            let mut oo = OpenOptions::new();
-            oo.truncate(true);
-            oo.write(true);
-            oo.open(file)
-        }.unwrap());
+    let mut write = LineWriter::new(File::create(file).unwrap());
 
     // Only add the line to the history file if it doesn't already
     // contain the line to add.

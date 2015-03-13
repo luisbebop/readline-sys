@@ -1,4 +1,4 @@
-#![feature(core,fs,path,process)]
+#![feature(core,path,path_ext)]
 use std::env;
 use std::fs::{self,PathExt};
 use std::path::{Path,PathBuf};
