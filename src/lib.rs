@@ -55,10 +55,12 @@ pub fn add_history_persist(line: String, file: &Path) {
     // contain the line to add.
     let read = BufReader::new(File::open(file).unwrap());
     let cmds: Vec<String> = read.lines().map(|l| l.unwrap()).collect();
+    let mut trimmed = line.trim_right().to_string();
 
-    if !cmds.contains(&line.trim_right().to_string()) {
-        println!("Writing {} to history", line);
-        let _ = write.write(line.as_bytes());
+    if !cmds.contains(&trimmed) {
+        println!("Writing {} to history", trimmed);
+        trimmed.push('\n');
+        let _ = write.write(trimmed.as_bytes());
         add_history(line);
     }
 }
