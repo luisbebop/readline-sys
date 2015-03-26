@@ -1,5 +1,5 @@
 [package]
-name = "rl-sys"
+name = "rl_sys"
 version = "0.0.4-pre"
 authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
 links = "readline"
@@ -9,4 +9,4 @@ license = "MIT"
 description = "Native bindings to the readline library"
 
 [lib]
-name = "rl-sys"
+name = "rl_sys"

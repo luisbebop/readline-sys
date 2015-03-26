@@ -1,4 +1,4 @@
-#![feature(core,io,libc,path,path_ext)]
+#![feature(libc,path_ext)]
 extern crate libc;
 
 use std::ffi::{CStr,CString};
@@ -19,13 +19,13 @@ mod ext_readline {
 
 pub fn add_history(line: String) {
     unsafe {
-        let cline = CString::new(line.as_bytes().as_slice()).unwrap();
+        let cline = CString::new(&(line.as_bytes())[..]).unwrap();
         ext_readline::add_history(cline.as_ptr());
     }
 }
 
 pub fn readline(prompt: String) -> Option<String> {
-    let cprmt = CString::new(prompt.as_bytes().as_slice()).unwrap();
+    let cprmt = CString::new(&(prompt.as_bytes())[..]).unwrap();
     unsafe {
         let ret = ext_readline::readline(cprmt.as_ptr());
         if ret.is_null() {  // user pressed Ctrl-D

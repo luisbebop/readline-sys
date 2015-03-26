@@ -1,4 +1,4 @@
-#![feature(core,path,path_ext)]
+#![feature(convert,path_ext)]
 use std::env;
 use std::fs::{self,PathExt};
 use std::path::{Path,PathBuf};
@@ -25,9 +25,9 @@ fn main() {
         println!("cargo:rustc-flags=-l readline");
         println!("cargo:rustc-flags=-L {}", libpath.display());
     } else {
-        let src = PathBuf::new(&env::var_os("CARGO_MANIFEST_DIR").unwrap())
+        let src = PathBuf::from(&env::var_os("CARGO_MANIFEST_DIR").unwrap())
             .join("readline");
-        let dst = PathBuf::new(&env::var_os("OUT_DIR").unwrap()).join("build");
+        let dst = PathBuf::from(&env::var_os("OUT_DIR").unwrap()).join("build");
         let _ = fs::create_dir(&dst);
 
         let cflags = env::var("CFLAGS").unwrap_or(String::new());
@@ -45,11 +45,11 @@ fn main() {
             run(Command::new("sh")
                 .arg("-c")
                 .arg("make")
-                .env("CFLAGS", cflags.as_slice())
+                .env("CFLAGS", &cflags[..])
                 .current_dir(&src));
         } else {
             run(Command::new("make")
-                .env("CFLAGS", cflags.as_slice())
+                .env("CFLAGS", &cflags[..])
                 .current_dir(&src));
         }
 
