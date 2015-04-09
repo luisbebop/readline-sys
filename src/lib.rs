@@ -69,9 +69,10 @@ pub fn add_history_persist(line: String, file: &Path) {
     if !cmds.contains(&trimmed) && !trimmed.is_empty() {
         // Write the line with the trailing '\n' to the file.
         let _ = write.write(line.as_bytes());
-        // Add the line witout the trailing '\n' to the readline history.
-        add_history(trimmed);
     }
+
+    // Add the line witout the trailing '\n' to the readline history.
+    add_history(trimmed);
 }
 
 #[cfg(test)]

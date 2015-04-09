@@ -1,4 +1,4 @@
-#![feature(convert,path_ext)]
+#![feature(path_ext)]
 use std::env;
 use std::fs::{self,PathExt};
 use std::path::{Path,PathBuf};
