@@ -1,5 +1,5 @@
 [package]
-name = "rl_sys"
+name = "rl-sys"
 version = "0.0.5"
 authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
 links = "readline"
