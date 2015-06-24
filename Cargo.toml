@@ -8,5 +8,8 @@ repository = "https://github.com/rustyhorde/readline.git"
 license = "MIT"
 description = "Native bindings to the readline library"
 
+[dependencies]
+libc = "*"
+
 [lib]
 name = "rl_sys"

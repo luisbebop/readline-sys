@@ -1,6 +1,5 @@
-#![feature(path_ext)]
 use std::env;
-use std::fs::{self,PathExt};
+use std::fs;
 use std::path::{Path,PathBuf};
 use std::process::{Command,Stdio};
 
@@ -15,13 +14,28 @@ fn main() {
         Path::new("/usr/lib")
     };
 
-    if mingw && libpath.join("libreadline6.dll").exists() {
+    let dll = match fs::metadata(libpath.join("libreadline6.dll")) {
+        Ok(meta) => meta.is_file(),
+        Err(_)   => false,
+    };
+
+    let statik = match fs::metadata(libpath.join("libreadline.a")) {
+        Ok(meta) => meta.is_file(),
+        Err(_)   => false,
+    };
+
+    let dyn = match fs::metadata(libpath.join("libreadline.so")) {
+        Ok(meta) => meta.is_file(),
+        Err(_)   => false,
+    };
+
+    if mingw && dll {
         println!("cargo:rustc-flags=-l readline6");
         println!("cargo:rustc-flags=-L {}", libpath.display());
-    } else if !mingw && libpath.join("libreadline.a").exists() {
+    } else if !mingw && statik {
         println!("cargo:rustc-flags=-l static=readline");
         println!("cargo:rustc-flags=-L {}", libpath.display());
-    } else if !mingw && libpath.join("libreadline.so").exists() {
+    } else if !mingw && dyn {
         println!("cargo:rustc-flags=-l readline");
         println!("cargo:rustc-flags=-L {}", libpath.display());
     } else {

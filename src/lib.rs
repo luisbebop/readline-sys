@@ -1,9 +1,8 @@
-#![feature(libc,path_ext)]
 extern crate libc;
 
 use std::ffi::{CStr,CString};
 use std::io::prelude::*;
-use std::fs::{File,OpenOptions};
+use std::fs::{self,File,OpenOptions};
 use std::io::{BufReader,LineWriter};
 use std::path::Path;
 use std::str;
@@ -40,7 +39,12 @@ pub fn readline(prompt: String) -> Option<String> {
 }
 
 pub fn preload_history(file: &Path) {
-    if file.exists() {
+    let exists = match fs::metadata(file) {
+        Ok(meta) => meta.is_file(),
+        Err(_)   => false,
+    };
+
+    if exists {
         let file = BufReader::new(File::open(file).unwrap());
         for opt in file.lines() {
             add_history(opt.unwrap());
@@ -49,7 +53,12 @@ pub fn preload_history(file: &Path) {
 }
 
 pub fn add_history_persist(line: String, file: &Path) {
-    let mut write = LineWriter::new(if file.exists() {
+    let exists = match fs::metadata(file) {
+        Ok(meta) => meta.is_file(),
+        Err(_)   => false,
+    };
+
+    let mut write = LineWriter::new(if exists {
         let mut oo = OpenOptions::new();
         oo.append(true);
         oo.write(true);
