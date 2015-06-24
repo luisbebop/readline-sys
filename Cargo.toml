@@ -1,6 +1,6 @@
 [package]
 name = "rl-sys"
-version = "0.1.1-pre"
+version = "0.1.2-pre"
 authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
 links = "readline"
 build = "build.rs"
