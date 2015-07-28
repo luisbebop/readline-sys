@@ -32,8 +32,9 @@ pub fn readline(prompt: String) -> Option<String> {
         } else {
             let slice = CStr::from_ptr(ret);
             let res = str::from_utf8(slice.to_bytes())
-                .ok().expect("Failed to parse utf-8");
-            Some(res.to_string())
+                .ok().expect("Failed to parse utf-8").to_owned();
+            libc::free(slice.as_ptr() as *mut libc::c_void);
+            Some(res)
         }
     }
 }
