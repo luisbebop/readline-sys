@@ -18,13 +18,13 @@ mod ext_readline {
 
 pub fn add_history(line: String) {
     unsafe {
-        let cline = CString::new(&(line.as_bytes())[..]).unwrap();
+        let cline = CString::new(line).unwrap();
         ext_readline::add_history(cline.as_ptr());
     }
 }
 
 pub fn readline(prompt: String) -> Option<String> {
-    let cprmt = CString::new(&(prompt.as_bytes())[..]).unwrap();
+    let cprmt = CString::new(prompt).unwrap();
     unsafe {
         let ret = ext_readline::readline(cprmt.as_ptr());
         if ret.is_null() {  // user pressed Ctrl-D
