@@ -4,7 +4,7 @@ version = "0.1.1-pre"
 authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
 links = "readline"
 build = "build.rs"
-repository = "https://github.com/rustyhorde/readline.git"
+repository = "https://github.com/rustyhorde/readline-sys.git"
 license = "MIT"
 description = "Native bindings to the readline library"
 
