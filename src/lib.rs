@@ -20,12 +20,13 @@ pub use version::version;
 
 mod error;
 mod ext_readline {
-    use libc::c_char;
+    use libc::{c_char, c_int};
 
     extern {
         pub fn readline(p: *const c_char) -> *const c_char;
         pub fn add_history(line: *const c_char);
         pub fn clear_history();
+        pub fn stifle_history(max: c_int);
     }
 }
 mod version;
@@ -198,6 +199,13 @@ pub fn add_history_persist(
 pub fn clear_history() {
     unsafe {
         ext_readline::clear_history();
+    }
+}
+
+/// Stifle the history list, remembering only the last *max* entries.
+pub fn stifle_history(max: i32) {
+    unsafe {
+        ext_readline::stifle_history(max as libc::c_int);
     }
 }
 
