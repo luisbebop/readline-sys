@@ -23,8 +23,9 @@ mod ext_readline {
     use libc::c_char;
 
     extern {
-        pub fn add_history(line: *const c_char);
         pub fn readline(p: *const c_char) -> *const c_char;
+        pub fn add_history(line: *const c_char);
+        pub fn clear_history();
     }
 }
 mod version;
@@ -191,6 +192,13 @@ pub fn add_history_persist(
     // Add the line witout the trailing '\n' to the readline history.
     try!(add_history(&trimmed[..]));
     Ok(())
+}
+
+/// Clear the history list by deleting all the entries.
+pub fn clear_history() {
+    unsafe {
+        ext_readline::clear_history();
+    }
 }
 
 #[cfg(test)]
