@@ -44,5 +44,9 @@ fn main() {
 
 Check out the `cat` and `shell` examples in the [examples directory](examples).
 
+## Development
+To work on this crate, remember to `git clone --recursive` or `git submodule
+init && git submodule update`.
+
 ## License
 Distributed under the [MIT License](LICENSE).
