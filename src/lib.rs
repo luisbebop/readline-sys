@@ -83,7 +83,15 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
         } else {
             let slice = CStr::from_ptr(ret);
             let res = try!(str::from_utf8(slice.to_bytes()));
-            Ok(Some(res.to_string()))
+        } if ret.is_null() {
+            // user pressed Ctrl-D
+            None
+        } else {
+            let slice = CStr::from_ptr(ret);
+            let res = str::from_utf8(slice.to_bytes())
+                          .ok()
+                          .expect("Failed to parse utf-8");
+            Some(res.to_string())
         }
     }
 }
