@@ -27,6 +27,8 @@ mod ext_readline {
         pub fn add_history(line: *const c_char);
         pub fn clear_history();
         pub fn stifle_history(max: c_int);
+        pub fn unstifle_history() -> c_int;
+        pub fn history_is_stifled() -> c_int;
     }
 }
 mod version;
@@ -217,12 +219,68 @@ pub fn stifle_history(max: i32) {
     }
 }
 
+/// Stop stifling the history.
+///
+/// This returns the previously-set maximum number of history entries (as set by stifle_history()).
+/// The value is positive if the history was stifled, negative if it wasn't.
+///
+/// # Examples
+///
+/// ```
+/// # extern crate rl_sys;
+/// # fn main() {
+/// assert!(rl_sys::unstifle_history().is_negative());
+///
+/// let max = 5;
+/// rl_sys::stifle_history(max);
+/// assert_eq!(max, rl_sys::unstifle_history());
+/// # }
+/// ```
+pub fn unstifle_history() -> i32 {
+    unsafe {
+        ext_readline::unstifle_history() as i32
+    }
+}
+
+/// Is the history stifled?
+///
+/// # Examples
+///
+/// ```
+/// # extern crate rl_sys;
+/// # fn main() {
+/// assert!(!rl_sys::history_is_stifled());
+/// rl_sys::stifle_history(1);
+/// assert!(rl_sys::history_is_stifled());
+/// # }
+/// ```
+pub fn history_is_stifled() -> bool {
+    unsafe {
+        ext_readline::history_is_stifled() != 0
+    }
+}
+
 #[cfg(test)]
 mod test {
-    #[test]
-    fn test_addhistory() {
-        use super::add_history;
+    use super::*;
 
-        assert!(add_history("test").is_ok());
+    #[test]
+    fn test_add_history() {
+        add_history("test".to_owned());
+    }
+
+    #[test]
+    fn test_stifle() {
+        // History should not begin stifled.
+        assert!(!history_is_stifled());
+        assert!(unstifle_history().is_negative());
+
+        let max = 5;
+        stifle_history(max);
+        assert!(history_is_stifled());
+
+        assert_eq!(max, unstifle_history());
+        assert!(!history_is_stifled());
+        assert!(unstifle_history().is_negative());
     }
 }
