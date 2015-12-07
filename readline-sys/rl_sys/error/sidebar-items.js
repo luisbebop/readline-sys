@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ReadlineError","Represents an error that has occurred within the API."]]});
