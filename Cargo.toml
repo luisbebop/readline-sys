@@ -1,6 +1,6 @@
 [package]
 name = "rl-sys"
-version = "0.2.1-pre"
+version = "0.2.1"
 authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
 description = "Native bindings to libreadline."
 documentation = "https://github.com/rustyhorde/readline-sys.git"
