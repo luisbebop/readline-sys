@@ -1,6 +1,6 @@
 # readline-sys
 ## Version
-[![Crates.io](https://img.shields.io/crates/v/rustc-serialize.svg?style=plastic)](https://crates.io/crates/rl-sys)
+[![Crates.io](https://img.shields.io/crates/v/rl-sys.svg)](https://crates.io/crates/rl-sys)
 [![Build
 Status](https://travis-ci.org/rustyhorde/readline-sys.svg?branch=master)](https://travis-ci.org/rustyhorde/readline-sys)
 
