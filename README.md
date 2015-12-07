@@ -26,8 +26,8 @@ fn main() {
     let prompt = String::from("$ ");
     loop {
         let response = match rl_sys::readline(prompt) {
-            Some(s) => s,
-            None => break,
+            Ok(s)  => s,
+            Err(_) => break,
         };
         println!("{}", response);
     }

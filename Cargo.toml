@@ -9,7 +9,7 @@ license = "MIT"
 description = "Native bindings to the readline library"
 
 [dependencies]
-libc = "*"
+libc = "~0.2.2"
 
 [lib]
 name = "rl_sys"
