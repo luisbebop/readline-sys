@@ -24,4 +24,4 @@ script:
   - cargo test --verbose
   - cargo doc --verbose
 after_success:
-  - curl https://raw.githubusercontent.com/kmcallister/travis-doc-upload/master/travis-doc-upload.sh | sh
+  - ./scripts/travis-doc-upload.sh
