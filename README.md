@@ -17,7 +17,7 @@ Add `rl-sys` as a dependency in `Cargo.toml`
 
 ```toml
 [dependencies]
-rl-sys = "0.2.1"
+rl-sys = "0.2.2"
 ```
 
 A simple implementation of `echo` using `rl_sys::readline`
