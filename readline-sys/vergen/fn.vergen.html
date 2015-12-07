@@ -49,7 +49,7 @@
 <pre class='rust fn'>pub fn vergen(flags: <a class='struct' href='../vergen/struct.Flags.html' title='vergen::Flags'>Flags</a>)</pre><div class='docblock'><p>Create the <code>version.rs</code> file in OUT_DIR, and write three functions into it.</p>
 
 <h1 id="now" class='section-header'><a
-                           href="#now">now</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#now">now</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>now</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// Output of the system cmd &#39;date &#39;--rfc-3339=ns&#39;</span>
     <span class='string'>&quot;2015-02-13 11:24:23.613994142-0500&quot;</span>
@@ -57,7 +57,7 @@
 </pre>
 
 <h1 id="short_now" class='section-header'><a
-                           href="#short_now">short_now</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#short_now">short_now</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>short_now</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// Output of the system cmd &#39;date &#39;--rfc-3339=date&#39;</span>
     <span class='string'>&quot;2015-04-07&quot;</span>
@@ -65,7 +65,7 @@
 </pre>
 
 <h1 id="sha" class='section-header'><a
-                           href="#sha">sha</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#sha">sha</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>sha</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// Output of the system cmd &#39;git rev-parse HEAD&#39;</span>
     <span class='string'>&quot;002735cb66437b96cee2a948fcdfc79d9bf96c94&quot;</span>
@@ -73,7 +73,7 @@
 </pre>
 
 <h1 id="short_sha" class='section-header'><a
-                           href="#short_sha">short_sha</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#short_sha">short_sha</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>short_sha</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// Output of the system cmd &#39;git rev-parse --short HEAD&#39;</span>
     <span class='string'>&quot;002735c&quot;</span>
@@ -81,7 +81,7 @@
 </pre>
 
 <h1 id="commit_date" class='section-header'><a
-                           href="#commit_date">commit_date</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#commit_date">commit_date</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>commit_date</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// Output of the system cmd</span>
     <span class='comment'>// &#39;git log --pretty=format:&quot;%ad&quot; -n1 --date=short&#39;</span>
@@ -90,7 +90,7 @@
 </pre>
 
 <h1 id="target" class='section-header'><a
-                           href="#target">target</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#target">target</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>target</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// env::var(&quot;TARGET&quot;), set by cargo</span>
     <span class='string'>&quot;x86_64-unknown-linux-gnu&quot;</span>
@@ -98,7 +98,7 @@
 </pre>
 
 <h1 id="semver" class='section-header'><a
-                           href="#semver">semver</a></h1><pre id='rust-example-rendered' class='rust '>
+                           href="#semver">semver</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>semver</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='comment'>// Output of the system cmd &#39;git describe&#39;</span>
     <span class='comment'>// Note this works best if you create a tag</span>
