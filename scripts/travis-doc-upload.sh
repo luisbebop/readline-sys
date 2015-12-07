@@ -7,13 +7,13 @@ set -ev
 
 . ./scripts/travis-doc-upload.cfg
 
-[ "$TRAVIS_BRANCH" = master ]
+[ "${TRAVIS_BRANCH}" = "master" ]
 
-[ "$TRAVIS_PULL_REQUEST" = false ]
+[ "${TRAVIS_PULL_REQUEST}" = false ]
 
-[ "$TRAVIS_RUST_VERSION" = stable ]
+[ "${TRAVIS_OS_NAME}" = "linux" ]
 
-[ "$TRAVIS_OS_NAME" = linux ]
+echo "TRAVIS_RUST_VERSION: ${TRAVIS_RUST_VERSION}"
 
 eval key=\$encrypted_${SSH_KEY_TRAVIS_ID}_key
 eval iv=\$encrypted_${SSH_KEY_TRAVIS_ID}_iv
