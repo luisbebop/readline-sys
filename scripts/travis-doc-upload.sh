@@ -13,7 +13,7 @@ set -ev
 
 [ "${TRAVIS_OS_NAME}" = "linux" ]
 
-echo "TRAVIS_RUST_VERSION: ${TRAVIS_RUST_VERSION}"
+[ "${TRAVIS_RUST_VERSION}" = "stable" ]
 
 eval key=\$encrypted_${SSH_KEY_TRAVIS_ID}_key
 eval iv=\$encrypted_${SSH_KEY_TRAVIS_ID}_iv
