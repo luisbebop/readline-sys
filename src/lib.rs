@@ -264,9 +264,7 @@ pub fn stifle_history(max: i32) {
 /// # }
 /// ```
 pub fn unstifle_history() -> i32 {
-    unsafe {
-        ext_readline::unstifle_history() as i32
-    }
+    unsafe { ext_readline::unstifle_history() as i32 }
 }
 
 /// Is the history stifled?
@@ -282,9 +280,7 @@ pub fn unstifle_history() -> i32 {
 /// # }
 /// ```
 pub fn history_is_stifled() -> bool {
-    unsafe {
-        ext_readline::history_is_stifled() != 0
-    }
+    unsafe { ext_readline::history_is_stifled() != 0 }
 }
 
 #[cfg(test)]
