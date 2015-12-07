@@ -24,10 +24,10 @@
 
     
 
-    <nav class="sidebar">
+    <section class="sidebar">
         
         <p class='location'><a href='index.html'>rl_sys</a></p><script>window.sidebarCurrent = {name: 'add_history', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
-    </nav>
+    </section>
 
     <nav class="sub">
         <form class="search-form js-only">
@@ -45,11 +45,12 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-83' class='srclink' href='../src/rl_sys/lib.rs.html#45-51' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn add_history(line: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Wraps the libreadline add_history functionality.  The argument is the line
+        </span><a id='src-473' class='srclink' href='../src/rl_sys/lib.rs.html#45-51' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn add_history(line: &amp;<a href='http://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Wraps the libreadline add_history functionality.  The argument is the line
 to add to history.</p>
 
-<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
+<h1 id="examples" class='section-header'><a
+                           href="#examples">Examples</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rl_sys</span>;
 
 <span class='kw'>match</span> <span class='ident'>rl_sys</span>::<span class='ident'>add_history</span>(<span class='string'>&quot;ls -al&quot;</span>) {
@@ -61,12 +62,10 @@ to add to history.</p>
 
     <section class="footer"></section>
 
-    <aside id="help" class="hidden">
+    <div id="help" class="hidden">
         <div>
-            <h1 class="hidden">Help</h1>
-
             <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
+                <h1>Keyboard Shortcuts</h1>
 
                 <dl>
                     <dt>?</dt>
@@ -83,7 +82,7 @@ to add to history.</p>
             </div>
 
             <div class="infos">
-                <h2>Search Tricks</h2>
+                <h1>Search Tricks</h1>
 
                 <p>
                     Prefix searches with a type followed by a colon (e.g.
@@ -93,8 +92,8 @@ to add to history.</p>
                 <p>
                     Accepted types are: <code>fn</code>, <code>mod</code>,
                     <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
+                    <code>trait</code>, <code>typedef</code> (or
+                    <code>tdef</code>).
                 </p>
 
                 <p>
@@ -103,7 +102,7 @@ to add to history.</p>
                 </p>
             </div>
         </div>
-    </aside>
+    </div>
 
     
 
