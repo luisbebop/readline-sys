@@ -13,6 +13,7 @@ build = "build.rs"
 
 [dependencies]
 libc = "~0.2.2"
+log = "~0.3.4"
 
 [lib]
 name = "rl_sys"

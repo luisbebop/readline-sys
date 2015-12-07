@@ -1,4 +1,5 @@
 extern crate libc;
+#[macro_use] extern crate log;
 
 use std::ffi::{CStr, CString};
 use std::fmt;
@@ -63,16 +64,17 @@ pub fn add_history(line: String) -> Result<(), ReadlineError> {
     }
 }
 
-pub fn readline(prompt: String) -> Result<String, ReadlineError> {
+pub fn readline(prompt: String) -> Result<Option<String>, ReadlineError> {
     let cprmt = try!(CString::new(&(prompt.as_bytes())[..]));
+
     unsafe {
         let ret = ext_readline::readline(cprmt.as_ptr());
         if ret.is_null() {  // user pressed Ctrl-D
-            Err(ReadlineError::new("Break", "null on readline, should break."))
+            Ok(None)
         } else {
             let slice = CStr::from_ptr(ret);
             let res = try!(str::from_utf8(slice.to_bytes()));
-            Ok(res.to_string())
+            Ok(Some(res.to_string()))
         }
     }
 }
@@ -80,7 +82,10 @@ pub fn readline(prompt: String) -> Result<String, ReadlineError> {
 pub fn preload_history(file: &Path) -> Result<(), ReadlineError> {
     let exists = match fs::metadata(file) {
         Ok(meta) => meta.is_file(),
-        Err(_)   => false,
+        Err(e)   => {
+            error!("{:?}", e);
+            false
+        },
     };
 
     if exists {
@@ -88,7 +93,8 @@ pub fn preload_history(file: &Path) -> Result<(), ReadlineError> {
         for opt in file.lines() {
             match opt {
                 Ok(o) => try!(add_history(o)),
-                Err(_) => {
+                Err(e) => {
+                    error!("{:?}", e);
                     return Err(ReadlineError::new(
                         "ReadlineError",
                         "Unable to preload history!"
@@ -107,7 +113,10 @@ pub fn add_history_persist(
 ) -> Result<(), ReadlineError> {
     let exists = match fs::metadata(file) {
         Ok(meta) => meta.is_file(),
-        Err(_)   => false,
+        Err(e)   => {
+            error!("{:?}", e);
+            false
+        },
     };
 
     let mut write = LineWriter::new(if exists {
@@ -127,11 +136,14 @@ pub fn add_history_persist(
 
     for line in read.lines() {
         match line {
-            Ok(l) => cmds.push(l),
-            Err(_) => return Err(ReadlineError {
-                desc: String::from("ReadlineError"),
-                detail: String::from("Unable to parse history file!"),
-            }),
+            Ok(l)  => cmds.push(l),
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(ReadlineError {
+                    desc: String::from("ReadlineError"),
+                    detail: String::from("Unable to parse history file!"),
+                })
+            },
         }
     }
 

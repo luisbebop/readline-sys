@@ -28,8 +28,11 @@ fn main() {
     let prompt = String::from("$ ");
     loop {
         let response = match rl_sys::readline(prompt) {
-            Ok(s)  => s,
-            Err(_) => break,
+            Ok(o) => match o {
+                Some(s) => s,
+                None    => break,
+            },
+            None    => break,
         };
         println!("{}", response);
     }
