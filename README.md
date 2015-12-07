@@ -12,12 +12,15 @@ Native bindings to
 - write history line to file: `add_history_persist`
 - load history from file: `preload_history`
 
+## API Documentation
+[Rustdocs](https://rustyhorde.github.io/readline-sys/readline-sys/rl_sys/index.html)
+
 ## Usage
 Add `rl-sys` as a dependency in `Cargo.toml`
 
 ```toml
 [dependencies]
-rl-sys = "0.2.2"
+rl-sys = "~0.2.2"
 ```
 
 A simple implementation of `echo` using `rl_sys::readline`
