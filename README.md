@@ -1,4 +1,6 @@
 # readline-sys
+## Version
+[![Crates.io](https://img.shields.io/crates/v/rustc-serialize.svg?style=plastic)](https://crates.io/crates/rl-sys)
 [![Build
 Status](https://travis-ci.org/rustyhorde/readline-sys.svg?branch=master)](https://travis-ci.org/rustyhorde/readline-sys)
 
@@ -15,7 +17,7 @@ Add `rl-sys` as a dependency in `Cargo.toml`
 
 ```toml
 [dependencies]
-rl-sys = "0.1.2"
+rl-sys = "0.2.0"
 ```
 
 A simple implementation of `echo` using `rl_sys::readline`
