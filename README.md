@@ -42,5 +42,7 @@ fn main() {
 }
 ```
 
+Check out the `cat` and `shell` examples in the [examples directory](examples).
+
 ## License
 Distributed under the [MIT License](LICENSE).
