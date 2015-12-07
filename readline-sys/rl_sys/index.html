@@ -41,9 +41,11 @@
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>rl_sys</a><wbr></span><span class='out-of-band'><a href='stability.html'>[stability]</a> <span id='render-detail'>
-            <a id="collapse-all" href="#">[-]</a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-0' href='../src/rl_sys/lib.rs.html#1-204'>[src]</a></span></h1>
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>rl_sys</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/rl_sys/lib.rs.html#1-204' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>This library provides native bindings for the GNU readline library.</p>
 
 <p>The GNU Readline library provides a set of functions for use by applications
@@ -54,52 +56,64 @@ and perhaps reedit those lines, and perform csh-like history expansion on
 previous commands.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.ReadlineError.html'
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.ReadlineError.html'
                                title='rl_sys::ReadlineError'>ReadlineError</a></td>
-                        <td class='docblock short'><p>Represents an error that has occurred within the API.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Represents an error that has occurred within the API.</p>
+
+                        </td>
                     </tr>
                 </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.add_history.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.add_history.html'
                                title='rl_sys::add_history'>add_history</a></td>
-                        <td class='docblock short'><p>Wraps the libreadline add_history functionality.  The argument is the line
+                        <td class='docblock short'>
+                             <p>Wraps the libreadline add_history functionality.  The argument is the line
 to add to history.</p>
-</td>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.add_history_persist.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.add_history_persist.html'
                                title='rl_sys::add_history_persist'>add_history_persist</a></td>
-                        <td class='docblock short'><p>Add the given line to readline history and persistently to a file at the
+                        <td class='docblock short'>
+                             <p>Add the given line to readline history and persistently to a file at the
 given path.  This is useful in conjunction with the <em>preload_history</em>
 function for keeping a useful history for your application.</p>
-</td>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.preload_history.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.preload_history.html'
                                title='rl_sys::preload_history'>preload_history</a></td>
-                        <td class='docblock short'><p>Preload the readline history with lines from the given file.  This is often
+                        <td class='docblock short'>
+                             <p>Preload the readline history with lines from the given file.  This is often
 use in conjunction with the <em>add_history_persist</em> api to maintain a readline
 history persistently.</p>
-</td>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.readline.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.readline.html'
                                title='rl_sys::readline'>readline</a></td>
-                        <td class='docblock short'><p>Wraps the libreadline readline function.  The argument is the prompt to use.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Wraps the libreadline readline function.  The argument is the prompt to use.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.version.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.version.html'
                                title='rl_sys::version'>version</a></td>
-                        <td class='docblock short'><p>Generate a version string.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Generate a version string.</p>
+
+                        </td>
                     </tr>
                 </table></section>
     <section id='search' class="content hidden"></section>
@@ -133,6 +147,10 @@ history persistently.</p>
                 <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
             </p>
         </div>
     </div>
