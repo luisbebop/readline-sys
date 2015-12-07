@@ -1,4 +1,6 @@
-//! This library provides native bindings for the GNU readline library.
+//! This library provides native bindings for the [GNU readline library][1].
+//!
+//! [1]: https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
 //!
 //! The GNU Readline library provides a set of functions for use by applications
 //! that allow users to edit command lines as they are typed in. Both Emacs and
@@ -6,6 +8,28 @@
 //! functions to maintain a list of previously-entered command lines, to recall
 //! and perhaps reedit those lines, and perform csh-like history expansion on
 //! previous commands.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! # extern crate rl_sys;
+//! # fn main() {
+//! loop {
+//!     let input = rl_sys::readline("$ ") {
+//!         Some(s) => s,
+//!         Some("clear".to_owned()) => {
+//!             rl_sys::clear_history();
+//!             continue;
+//!         }
+//!         None => break,  // EOF encountered
+//!     };
+//!     println!("{}", input);
+//!
+//!     // Add input to history.
+//!     rl_sys::add_history(input);
+//! }
+//! # }
+//! ```
 extern crate libc;
 #[macro_use] extern crate log;
 #[cfg(test)] extern crate sodium_sys;
@@ -55,6 +79,9 @@ pub fn add_history(line: &str) -> Result<(), ReadlineError> {
 }
 
 /// Wraps the libreadline readline function.  The argument is the prompt to use.
+///
+/// If readline encounters an `EOF` while reading the line, and the line is empty at that point,
+/// then `Ok(None)` is returned. Otherwise, the line is ended just as if a newline has been typed.
 ///
 /// # Examples
 ///
