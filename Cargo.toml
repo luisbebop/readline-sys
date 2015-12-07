@@ -11,6 +11,12 @@ license = "MIT"
 links = "readline"
 build = "build.rs"
 
+[build-dependencies]
+vergen = "~0.0.16"
+
+[dev-dependencies]
+sodium-sys = "~0.0.4"
+
 [dependencies]
 libc = "~0.2.2"
 log = "~0.3.4"

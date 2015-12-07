@@ -25,9 +25,8 @@ A simple implementation of `echo` using `rl_sys::readline`
 extern crate rl_sys;
 
 fn main() {
-    let prompt = String::from("$ ");
     loop {
-        let response = match rl_sys::readline(prompt) {
+        let response = match rl_sys::readline("$ ") {
             Ok(o) => match o {
                 Some(s) => s,
                 None    => break,

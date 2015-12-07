@@ -1,11 +1,20 @@
+extern crate vergen;
+
 use std::env;
 use std::fs;
 use std::path::{Path,PathBuf};
 use std::process::{Command,Stdio};
+use vergen::*;
 
 fn main() {
-    let target = env::var("TARGET").unwrap();
-
+    let mut flags = Flags::all();
+    flags.toggle(NOW);
+    vergen(flags);
+    
+    let target = match env::var("TARGET") {
+        Ok(t)  => t,
+        Err(e) => panic!("Unable to read TARGET env: {}", e),
+    };
     let mingw = target.contains("windows-gnu");
 
     let libpath = if mingw {
@@ -39,9 +48,16 @@ fn main() {
         println!("cargo:rustc-flags=-l readline");
         println!("cargo:rustc-flags=-L {}", libpath.display());
     } else {
-        let src = PathBuf::from(&env::var_os("CARGO_MANIFEST_DIR").unwrap())
-            .join("readline");
-        let dst = PathBuf::from(&env::var_os("OUT_DIR").unwrap()).join("build");
+        let manifest_dir = match env::var_os("CARGO_MANIFEST_DIR") {
+            Some(d) => d,
+            None    => panic!("Unable to read manifest dir"),
+        };
+        let out_dir = match env::var_os("OUT_DIR") {
+            Some(d) => d,
+            None    => panic!("Unable to read output dir"),
+        };
+        let src = PathBuf::from(&manifest_dir).join("readline");
+        let dst = PathBuf::from(&out_dir).join("build");
         let _ = fs::create_dir(&dst);
 
         let cflags = env::var("CFLAGS").unwrap_or(String::new());

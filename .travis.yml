@@ -1,3 +1,5 @@
 language: rust
 before_install:
   - git submodule update --init --recursive
+after_success:
+  - curl https://raw.githubusercontent.com/kmcallister/travis-doc-upload/master/travis-doc-upload.sh | sh

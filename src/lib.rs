@@ -1,52 +1,24 @@
+//! This library provides native bindings for the GNU readline library.
+//!
+//! The GNU Readline library provides a set of functions for use by applications
+//! that allow users to edit command lines as they are typed in. Both Emacs and
+//! vi editing modes are available. The Readline library includes additional
+//! functions to maintain a list of previously-entered command lines, to recall
+//! and perhaps reedit those lines, and perform csh-like history expansion on
+//! previous commands.
 extern crate libc;
 #[macro_use] extern crate log;
+#[cfg(test)] extern crate sodium_sys;
 
+pub use error::ReadlineError;
 use std::ffi::{CStr, CString};
-use std::fmt;
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, LineWriter, Write};
 use std::path::Path;
 use std::str;
+pub use version::version;
 
-#[derive(Debug)]
-pub struct ReadlineError {
-    desc: String,
-    detail: String,
-}
-
-impl ReadlineError {
-    pub fn new<T>(desc: &str, detail: T) -> ReadlineError where T: fmt::Debug {
-        ReadlineError {
-            desc: String::from(desc),
-            detail: format!("{:?}", detail),
-        }
-    }
-}
-
-impl From<std::ffi::NulError> for ReadlineError {
-    fn from(e: std::ffi::NulError) -> ReadlineError {
-        ReadlineError::new("NulError", e)
-    }
-}
-
-impl From<std::str::Utf8Error> for ReadlineError {
-    fn from(e: std::str::Utf8Error) -> ReadlineError {
-        ReadlineError::new("FromUtf8Error", e)
-    }
-}
-
-impl From<std::io::Error> for ReadlineError {
-    fn from(e: std::io::Error) -> ReadlineError {
-        ReadlineError::new("I/O Error", e)
-    }
-}
-
-impl fmt::Display for ReadlineError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}: {}", self.desc, self.detail)
-    }
-}
-
+mod error;
 mod ext_readline {
     use libc::c_char;
 
@@ -55,17 +27,52 @@ mod ext_readline {
         pub fn readline(p: *const c_char) -> *const c_char;
     }
 }
+mod version;
 
-pub fn add_history(line: String) -> Result<(), ReadlineError> {
+/// Wraps the libreadline add_history functionality.  The argument is the line
+/// to add to history.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys;
+///
+/// match rl_sys::add_history("ls -al") {
+///     Ok(_)  => println!("Success!"),
+///     Err(e) => println!("{}", e),
+/// }
+/// ```
+pub fn add_history(line: &str) -> Result<(), ReadlineError> {
     unsafe {
-        let cline = try!(CString::new(&(line.as_bytes())[..]));
+        let cline = try!(CString::new(line.as_bytes()));
         ext_readline::add_history(cline.as_ptr());
         Ok(())
     }
 }
 
-pub fn readline(prompt: String) -> Result<Option<String>, ReadlineError> {
-    let cprmt = try!(CString::new(&(prompt.as_bytes())[..]));
+/// Wraps the libreadline readline function.  The argument is the prompt to use.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys;
+///
+/// loop {
+///     match rl_sys::readline("$ ") {
+///         Ok(o) => match o {
+///             Some(s) => println!("{}", s),
+///             None    => break,
+///         },
+///        Err(e) => {
+///            println!("{}", e);
+///            break
+///        },
+///     }
+///
+/// }
+/// ```
+pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
+    let cprmt = try!(CString::new(prompt.as_bytes()));
 
     unsafe {
         let ret = ext_readline::readline(cprmt.as_ptr());
@@ -79,6 +86,22 @@ pub fn readline(prompt: String) -> Result<Option<String>, ReadlineError> {
     }
 }
 
+/// Preload the readline history with lines from the given file.  This is often
+/// use in conjunction with the *add_history_persist* api to maintain a readline
+/// history persistently.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys;
+/// use std::path::Path;
+///
+/// let history_file = Path::new("/home/user/.app-hist");
+/// match rl_sys::preload_history(&history_file) {
+///     Ok(_)  => println!("Success!"),
+///     Err(e) => println!("{}", e),
+/// }
+/// ```
 pub fn preload_history(file: &Path) -> Result<(), ReadlineError> {
     let exists = match fs::metadata(file) {
         Ok(meta) => meta.is_file(),
@@ -92,13 +115,10 @@ pub fn preload_history(file: &Path) -> Result<(), ReadlineError> {
         let file = BufReader::new(File::open(file).unwrap());
         for opt in file.lines() {
             match opt {
-                Ok(o) => try!(add_history(o)),
+                Ok(o) => try!(add_history(&o[..])),
                 Err(e) => {
                     error!("{:?}", e);
-                    return Err(ReadlineError::new(
-                        "ReadlineError",
-                        "Unable to preload history!"
-                    ))
+                    return Err(ReadlineError::new("ReadlineError", e))
                 },
             }
         }
@@ -107,8 +127,27 @@ pub fn preload_history(file: &Path) -> Result<(), ReadlineError> {
     Ok(())
 }
 
+/// Add the given line to readline history and persistently to a file at the
+/// given path.  This is useful in conjunction with the *preload_history*
+/// function for keeping a useful history for your application.
+///
+/// Note that this function will only add the line to the readline history and
+/// the file history if it doesn't already exist there.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys;
+/// use std::path::Path;
+///
+/// let history_file = Path::new("/home/user/.app-hist");
+/// match rl_sys::add_history_persist("ls -al", &history_file) {
+///     Ok(_)  => println!("Success!"),
+///     Err(e) => println!("{}", e),
+/// }
+/// ```
 pub fn add_history_persist(
-    line: String,
+    line: &str,
     file: &Path
 ) -> Result<(), ReadlineError> {
     let exists = match fs::metadata(file) {
@@ -120,10 +159,7 @@ pub fn add_history_persist(
     };
 
     let mut write = LineWriter::new(if exists {
-        let mut oo = OpenOptions::new();
-        oo.append(true);
-        oo.write(true);
-        try!(oo.open(file))
+        try!(OpenOptions::new().append(true).write(true).open(file))
     } else {
         try!(File::create(file))
     });
@@ -139,10 +175,7 @@ pub fn add_history_persist(
             Ok(l)  => cmds.push(l),
             Err(e) => {
                 error!("{:?}", e);
-                return Err(ReadlineError {
-                    desc: String::from("ReadlineError"),
-                    detail: String::from("Unable to parse history file!"),
-                })
+                return Err(ReadlineError::new("ReadlineError", e))
             },
         }
     }
@@ -156,16 +189,16 @@ pub fn add_history_persist(
     }
 
     // Add the line witout the trailing '\n' to the readline history.
-    try!(add_history(trimmed));
+    try!(add_history(&trimmed[..]));
     Ok(())
 }
 
 #[cfg(test)]
 mod test {
-    use super::add_history;
-
     #[test]
-    fn test_readline() {
-        assert!(add_history("test".to_string()).is_ok());
+    fn test_addhistory() {
+        use super::add_history;
+
+        assert!(add_history("test").is_ok());
     }
 }
