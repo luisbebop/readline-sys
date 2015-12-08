@@ -31,11 +31,11 @@ extern crate rl_sys;
 fn main() {
     loop {
         let response = match rl_sys::readline("$ ") {
-            Ok(o) => match o {
+            Ok(o)  => match o {
                 Some(s) => s,
                 None    => break,
             },
-            None    => break,
+            Err(_) => break,
         };
         println!("{}", response);
     }
