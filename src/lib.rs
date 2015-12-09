@@ -15,18 +15,24 @@
 //! # extern crate rl_sys;
 //! # fn main() {
 //! loop {
-//!     let input = rl_sys::readline("$ ") {
-//!         Some(s) => s,
-//!         Some("clear".to_owned()) => {
-//!             rl_sys::clear_history();
+//!     let input = match rl_sys::readline("$ ") {
+//!         Ok(Some(s)) => match &*s {
+//!             "clear" => {
+//!                 rl_sys::clear_history();
+//!                 continue;
+//!             }
+//!             _ => s
+//!         },
+//!         Ok(None) => break,  // EOF encountered
+//!         Err(e) => {
+//!             println!("{}", e);
 //!             continue;
 //!         }
-//!         None => break,  // EOF encountered
 //!     };
 //!     println!("{}", input);
 //!
 //!     // Add input to history.
-//!     rl_sys::add_history(input);
+//!     let _ = rl_sys::add_history(&input);
 //! }
 //! # }
 //! ```
@@ -281,7 +287,7 @@ mod test {
 
     #[test]
     fn test_add_history() {
-        add_history("test".to_owned());
+        assert!(add_history("test").is_ok());
     }
 
     #[test]

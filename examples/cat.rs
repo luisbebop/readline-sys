@@ -4,9 +4,13 @@ extern crate rl_sys;
 
 fn main() {
     loop {
-        let input: String = match rl_sys::readline("".to_owned()) {
-            Some(s) => s,
-            None => break,  // EOF, ctrl-d
+        let input: String = match rl_sys::readline("") {
+            Ok(Some(s)) => s,
+            Ok(None) => break,  // EOF, ctrl-d
+            Err(e) => {
+                println!("{}", e);
+                continue;
+            }
         };
         println!("{}", input);
     }

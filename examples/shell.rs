@@ -17,9 +17,13 @@ fn main() {
     let mut counter = 0;
     loop {
         let prompt = format!("{}$ ", counter);
-        let input: String = match rl_sys::readline(prompt) {
-            Some(s) => s,
-            None => break,  // EOF, ctrl-d
+        let input: String = match rl_sys::readline(&prompt) {
+            Ok(Some(s)) => s,
+            Ok(None) => break,
+            Err(e) => {
+                println!("{}", e);
+                continue;
+            }
         };
 
         // Ignore empty input.
@@ -28,7 +32,7 @@ fn main() {
         }
 
         // Add user input to history.
-        rl_sys::add_history(input.clone());
+        let _ = rl_sys::add_history(&input);
 
         if input.starts_with("history") {
             let argv: Vec<&str> = input.split_whitespace().collect();
