@@ -91,21 +91,18 @@ pub fn add_history(line: &str) -> Result<(), ReadlineError> {
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// use rl_sys;
 ///
 /// loop {
 ///     match rl_sys::readline("$ ") {
-///         Ok(o) => match o {
-///             Some(s) => println!("{}", s),
-///             None    => break,
-///         },
-///        Err(e) => {
-///            println!("{}", e);
-///            break
+///         Ok(Some(s)) => s,
+///         Ok(None) => break,
+///         Err(e) => {
+///             println!("{}", e);
+///             break
 ///        },
 ///     }
-///
 /// }
 /// ```
 pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
