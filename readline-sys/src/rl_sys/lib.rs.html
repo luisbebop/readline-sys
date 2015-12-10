@@ -244,8 +244,124 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
 </pre><pre class='rust '>
-<span class='doccomment'>//! This library provides native bindings for the GNU readline library.</span>
+<span class='doccomment'>//! This library provides native bindings for the [GNU readline library][1].</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! [1]: https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The GNU Readline library provides a set of functions for use by applications</span>
 <span class='doccomment'>//! that allow users to edit command lines as they are typed in. Both Emacs and</span>
@@ -253,6 +369,34 @@
 <span class='doccomment'>//! functions to maintain a list of previously-entered command lines, to recall</span>
 <span class='doccomment'>//! and perhaps reedit those lines, and perform csh-like history expansion on</span>
 <span class='doccomment'>//! previous commands.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! # Examples</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ```no_run</span>
+<span class='doccomment'>//! # extern crate rl_sys;</span>
+<span class='doccomment'>//! # fn main() {</span>
+<span class='doccomment'>//! loop {</span>
+<span class='doccomment'>//!     let input = match rl_sys::readline(&quot;$ &quot;) {</span>
+<span class='doccomment'>//!         Ok(Some(s)) =&gt; match &amp;*s {</span>
+<span class='doccomment'>//!             &quot;clear&quot; =&gt; {</span>
+<span class='doccomment'>//!                 rl_sys::clear_history();</span>
+<span class='doccomment'>//!                 continue;</span>
+<span class='doccomment'>//!             }</span>
+<span class='doccomment'>//!             _ =&gt; s</span>
+<span class='doccomment'>//!         },</span>
+<span class='doccomment'>//!         Ok(None) =&gt; break,  // EOF encountered</span>
+<span class='doccomment'>//!         Err(e) =&gt; {</span>
+<span class='doccomment'>//!             println!(&quot;{}&quot;, e);</span>
+<span class='doccomment'>//!             continue;</span>
+<span class='doccomment'>//!         }</span>
+<span class='doccomment'>//!     };</span>
+<span class='doccomment'>//!     println!(&quot;{}&quot;, input);</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//!     // Add input to history.</span>
+<span class='doccomment'>//!     let _ = rl_sys::add_history(&amp;input);</span>
+<span class='doccomment'>//! }</span>
+<span class='doccomment'>//! # }</span>
+<span class='doccomment'>//! ```</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>sodium_sys</span>;
@@ -263,18 +407,33 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufRead</span>, <span class='ident'>BufReader</span>, <span class='ident'>LineWriter</span>, <span class='ident'>Write</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::{<span class='ident'>Once</span>, <span class='ident'>ONCE_INIT</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>version</span>::<span class='ident'>version</span>;
 
 <span class='kw'>mod</span> <span class='ident'>error</span>;
 <span class='kw'>mod</span> <span class='ident'>ext_readline</span> {
-    <span class='kw'>use</span> <span class='ident'>libc</span>::<span class='ident'>c_char</span>;
+    <span class='kw'>use</span> <span class='ident'>libc</span>::{<span class='ident'>c_char</span>, <span class='ident'>c_int</span>};
 
     <span class='kw'>extern</span> {
-        <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_history</span>(<span class='ident'>line</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>);
         <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>readline</span>(<span class='ident'>p</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>;
+        <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_history</span>(<span class='ident'>line</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>);
+        <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>clear_history</span>();
+        <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>stifle_history</span>(<span class='ident'>max</span>: <span class='ident'>c_int</span>);
+        <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unstifle_history</span>() <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
+        <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>history_is_stifled</span>() <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
     }
 }
+<span class='kw'>mod</span> <span class='ident'>init</span>;
 <span class='kw'>mod</span> <span class='ident'>version</span>;
+
+<span class='kw'>static</span> <span class='ident'>START</span>: <span class='ident'>Once</span> <span class='op'>=</span> <span class='ident'>ONCE_INIT</span>;
+
+<span class='kw'>fn</span> <span class='ident'>init</span>() {
+    <span class='ident'>START</span>.<span class='ident'>call_once</span>(<span class='op'>||</span> {
+        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;readline_sys initialized&quot;</span>);
+        <span class='ident'>init</span>::<span class='ident'>using_history</span>();
+    });
+}
 
 <span class='doccomment'>/// Wraps the libreadline add_history functionality.  The argument is the line</span>
 <span class='doccomment'>/// to add to history.</span>
@@ -292,6 +451,7 @@
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_history</span>(<span class='ident'>line</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>ReadlineError</span><span class='op'>&gt;</span> {
     <span class='kw'>unsafe</span> {
         <span class='kw'>let</span> <span class='ident'>cline</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>line</span>.<span class='ident'>as_bytes</span>()));
+        <span class='ident'>init</span>();
         <span class='ident'>ext_readline</span>::<span class='ident'>add_history</span>(<span class='ident'>cline</span>.<span class='ident'>as_ptr</span>());
         <span class='prelude-val'>Ok</span>(())
     }
@@ -299,23 +459,23 @@
 
 <span class='doccomment'>/// Wraps the libreadline readline function.  The argument is the prompt to use.</span>
 <span class='doccomment'>///</span>
+<span class='doccomment'>/// If readline encounters an `EOF` while reading the line, and the line is empty at that point,</span>
+<span class='doccomment'>/// then `Ok(None)` is returned. Otherwise, the line is ended just as if a newline has been typed.</span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// ```no_run</span>
 <span class='doccomment'>/// use rl_sys;</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// loop {</span>
 <span class='doccomment'>///     match rl_sys::readline(&quot;$ &quot;) {</span>
-<span class='doccomment'>///         Ok(o) =&gt; match o {</span>
-<span class='doccomment'>///             Some(s) =&gt; println!(&quot;{}&quot;, s),</span>
-<span class='doccomment'>///             None    =&gt; break,</span>
-<span class='doccomment'>///         },</span>
-<span class='doccomment'>///        Err(e) =&gt; {</span>
-<span class='doccomment'>///            println!(&quot;{}&quot;, e);</span>
-<span class='doccomment'>///            break</span>
+<span class='doccomment'>///         Ok(Some(s)) =&gt; println!(&quot;{}&quot;, s),</span>
+<span class='doccomment'>///         Ok(None) =&gt; break,</span>
+<span class='doccomment'>///         Err(e) =&gt; {</span>
+<span class='doccomment'>///             println!(&quot;{}&quot;, e);</span>
+<span class='doccomment'>///             break;</span>
 <span class='doccomment'>///        },</span>
 <span class='doccomment'>///     }</span>
-<span class='doccomment'>///</span>
 <span class='doccomment'>/// }</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>readline</span>(<span class='ident'>prompt</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>ReadlineError</span><span class='op'>&gt;</span> {
@@ -328,7 +488,7 @@
         } <span class='kw'>else</span> {
             <span class='kw'>let</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='ident'>CStr</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ret</span>);
             <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>str</span>::<span class='ident'>from_utf8</span>(<span class='ident'>slice</span>.<span class='ident'>to_bytes</span>()));
-            <span class='prelude-val'>Ok</span>(<span class='prelude-val'>Some</span>(<span class='ident'>res</span>.<span class='ident'>to_string</span>()))
+            <span class='prelude-val'>Ok</span>(<span class='prelude-val'>Some</span>(<span class='ident'>res</span>.<span class='ident'>to_owned</span>()))
         }
     }
 }
@@ -440,13 +600,81 @@
     <span class='prelude-val'>Ok</span>(())
 }
 
+<span class='doccomment'>/// Clear the history list by deleting all the entries.</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>clear_history</span>() {
+    <span class='kw'>unsafe</span> {
+        <span class='ident'>ext_readline</span>::<span class='ident'>clear_history</span>();
+    }
+}
+
+<span class='doccomment'>/// Stifle the history list, remembering only the last *max* entries.</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>stifle_history</span>(<span class='ident'>max</span>: <span class='ident'>i32</span>) {
+    <span class='kw'>unsafe</span> {
+        <span class='ident'>init</span>();
+        <span class='ident'>ext_readline</span>::<span class='ident'>stifle_history</span>(<span class='ident'>max</span> <span class='kw'>as</span> <span class='ident'>libc</span>::<span class='ident'>c_int</span>);
+    }
+}
+
+<span class='doccomment'>/// Stop stifling the history.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// This returns the previously-set maximum number of history entries (as set by stifle_history()).</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// # extern crate rl_sys;</span>
+<span class='doccomment'>/// # fn main() {</span>
+<span class='doccomment'>/// let max = 5;</span>
+<span class='doccomment'>/// rl_sys::stifle_history(max);</span>
+<span class='doccomment'>/// assert_eq!(max, rl_sys::unstifle_history());</span>
+<span class='doccomment'>/// # }</span>
+<span class='doccomment'>/// ```</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unstifle_history</span>() <span class='op'>-&gt;</span> <span class='ident'>i32</span> {
+    <span class='kw'>unsafe</span> {
+        <span class='ident'>init</span>();
+        <span class='ident'>ext_readline</span>::<span class='ident'>unstifle_history</span>()
+    }
+}
+
+<span class='doccomment'>/// Is the history stifled?</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// # extern crate rl_sys;</span>
+<span class='doccomment'>/// # fn main() {</span>
+<span class='doccomment'>/// assert!(!rl_sys::history_is_stifled());</span>
+<span class='doccomment'>/// rl_sys::stifle_history(1);</span>
+<span class='doccomment'>/// assert!(rl_sys::history_is_stifled());</span>
+<span class='doccomment'>/// # }</span>
+<span class='doccomment'>/// ```</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>history_is_stifled</span>() <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+    <span class='kw'>unsafe</span> {
+        <span class='ident'>init</span>();
+        <span class='ident'>ext_readline</span>::<span class='ident'>history_is_stifled</span>() <span class='op'>!=</span> <span class='number'>0</span>
+    }
+}
+
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_addhistory</span>() {
-        <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>add_history</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='op'>*</span>;
 
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_add_history</span>() {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>add_history</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>is_ok</span>());
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_stifle</span>() {
+        <span class='comment'>// History should not begin stifled.</span>
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>history_is_stifled</span>());
+
+        <span class='kw'>let</span> <span class='ident'>max</span> <span class='op'>=</span> <span class='number'>5</span>;
+        <span class='ident'>stifle_history</span>(<span class='ident'>max</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>history_is_stifled</span>());
+
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>max</span>, <span class='ident'>unstifle_history</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>history_is_stifled</span>());
     }
 }
 </pre>
