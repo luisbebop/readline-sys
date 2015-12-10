@@ -24,23 +24,33 @@ Add `rl-sys` as a dependency in `Cargo.toml`
 rl-sys = "~0.3.0"
 ```
 
-A simple implementation of `echo` using `rl_sys::readline`
+A simple implementation of `cat` using `rl_sys::readline`
 ```rust
 extern crate rl_sys;
 
 fn main() {
     loop {
-        let response = match rl_sys::readline("$ ") {
-            Ok(o)  => match o {
-                Some(s) => s,
-                None    => break,
-            },
-            Err(_) => break,
+        let input: String = match rl_sys::readline("") {
+            Ok(Some(s)) => s,
+            Ok(None) => break,  // user entered ctrl-d
+            Err(e) => {
+                println!("{}", e);
+                continue;
+            }
         };
-        println!("{}", response);
+        println!("{}", input);
+
+        // Enables up/down arrow scrolling through history
+        rl_sys::add_history(&input);
     }
 }
 ```
+
+Check out the more comprehensive `shell` example in the [examples directory](examples).
+
+## Development
+To work on this crate, remember to `git clone --recursive` or `git submodule
+init && git submodule update`.
 
 ## License
 Distributed under the [MIT License](LICENSE).

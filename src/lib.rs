@@ -1,4 +1,6 @@
-//! This library provides native bindings for the GNU readline library.
+//! This library provides native bindings for the [GNU readline library][1].
+//!
+//! [1]: https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
 //!
 //! The GNU Readline library provides a set of functions for use by applications
 //! that allow users to edit command lines as they are typed in. Both Emacs and
@@ -6,6 +8,34 @@
 //! functions to maintain a list of previously-entered command lines, to recall
 //! and perhaps reedit those lines, and perform csh-like history expansion on
 //! previous commands.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! # extern crate rl_sys;
+//! # fn main() {
+//! loop {
+//!     let input = match rl_sys::readline("$ ") {
+//!         Ok(Some(s)) => match &*s {
+//!             "clear" => {
+//!                 rl_sys::clear_history();
+//!                 continue;
+//!             }
+//!             _ => s
+//!         },
+//!         Ok(None) => break,  // EOF encountered
+//!         Err(e) => {
+//!             println!("{}", e);
+//!             continue;
+//!         }
+//!     };
+//!     println!("{}", input);
+//!
+//!     // Add input to history.
+//!     let _ = rl_sys::add_history(&input);
+//! }
+//! # }
+//! ```
 extern crate libc;
 #[macro_use] extern crate log;
 #[cfg(test)] extern crate sodium_sys;
@@ -16,18 +46,33 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, LineWriter, Write};
 use std::path::Path;
 use std::str;
+use std::sync::{Once, ONCE_INIT};
 pub use version::version;
 
 mod error;
 mod ext_readline {
-    use libc::c_char;
+    use libc::{c_char, c_int};
 
     extern {
-        pub fn add_history(line: *const c_char);
         pub fn readline(p: *const c_char) -> *const c_char;
+        pub fn add_history(line: *const c_char);
+        pub fn clear_history();
+        pub fn stifle_history(max: c_int);
+        pub fn unstifle_history() -> c_int;
+        pub fn history_is_stifled() -> c_int;
     }
 }
+mod init;
 mod version;
+
+static START: Once = ONCE_INIT;
+
+fn init() {
+    START.call_once(|| {
+        debug!("readline_sys initialized");
+        init::using_history();
+    });
+}
 
 /// Wraps the libreadline add_history functionality.  The argument is the line
 /// to add to history.
@@ -45,6 +90,7 @@ mod version;
 pub fn add_history(line: &str) -> Result<(), ReadlineError> {
     unsafe {
         let cline = try!(CString::new(line.as_bytes()));
+        init();
         ext_readline::add_history(cline.as_ptr());
         Ok(())
     }
@@ -52,23 +98,23 @@ pub fn add_history(line: &str) -> Result<(), ReadlineError> {
 
 /// Wraps the libreadline readline function.  The argument is the prompt to use.
 ///
+/// If readline encounters an `EOF` while reading the line, and the line is empty at that point,
+/// then `Ok(None)` is returned. Otherwise, the line is ended just as if a newline has been typed.
+///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// use rl_sys;
 ///
 /// loop {
 ///     match rl_sys::readline("$ ") {
-///         Ok(o) => match o {
-///             Some(s) => println!("{}", s),
-///             None    => break,
-///         },
-///        Err(e) => {
-///            println!("{}", e);
-///            break
+///         Ok(Some(s)) => println!("{}", s),
+///         Ok(None) => break,
+///         Err(e) => {
+///             println!("{}", e);
+///             break;
 ///        },
 ///     }
-///
 /// }
 /// ```
 pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
@@ -81,7 +127,7 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
         } else {
             let slice = CStr::from_ptr(ret);
             let res = try!(str::from_utf8(slice.to_bytes()));
-            Ok(Some(res.to_string()))
+            Ok(Some(res.to_owned()))
         }
     }
 }
@@ -193,12 +239,80 @@ pub fn add_history_persist(
     Ok(())
 }
 
+/// Clear the history list by deleting all the entries.
+pub fn clear_history() {
+    unsafe {
+        ext_readline::clear_history();
+    }
+}
+
+/// Stifle the history list, remembering only the last *max* entries.
+pub fn stifle_history(max: i32) {
+    unsafe {
+        init();
+        ext_readline::stifle_history(max as libc::c_int);
+    }
+}
+
+/// Stop stifling the history.
+///
+/// This returns the previously-set maximum number of history entries (as set by stifle_history()).
+///
+/// # Examples
+///
+/// ```
+/// # extern crate rl_sys;
+/// # fn main() {
+/// let max = 5;
+/// rl_sys::stifle_history(max);
+/// assert_eq!(max, rl_sys::unstifle_history());
+/// # }
+/// ```
+pub fn unstifle_history() -> i32 {
+    unsafe {
+        init();
+        ext_readline::unstifle_history()
+    }
+}
+
+/// Is the history stifled?
+///
+/// # Examples
+///
+/// ```
+/// # extern crate rl_sys;
+/// # fn main() {
+/// assert!(!rl_sys::history_is_stifled());
+/// rl_sys::stifle_history(1);
+/// assert!(rl_sys::history_is_stifled());
+/// # }
+/// ```
+pub fn history_is_stifled() -> bool {
+    unsafe {
+        init();
+        ext_readline::history_is_stifled() != 0
+    }
+}
+
 #[cfg(test)]
 mod test {
-    #[test]
-    fn test_addhistory() {
-        use super::add_history;
+    use super::*;
 
+    #[test]
+    fn test_add_history() {
         assert!(add_history("test").is_ok());
+    }
+
+    #[test]
+    fn test_stifle() {
+        // History should not begin stifled.
+        assert!(!history_is_stifled());
+
+        let max = 5;
+        stifle_history(max);
+        assert!(history_is_stifled());
+
+        assert_eq!(max, unstifle_history());
+        assert!(!history_is_stifled());
     }
 }
