@@ -46,6 +46,7 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, LineWriter, Write};
 use std::path::Path;
 use std::str;
+use std::sync::{Once, ONCE_INIT};
 pub use version::version;
 
 mod error;
@@ -61,7 +62,17 @@ mod ext_readline {
         pub fn history_is_stifled() -> c_int;
     }
 }
+mod init;
 mod version;
+
+static START: Once = ONCE_INIT;
+
+fn init() {
+    START.call_once(|| {
+        debug!("readline_sys initialized");
+        init::using_history();
+    });
+}
 
 /// Wraps the libreadline add_history functionality.  The argument is the line
 /// to add to history.
@@ -79,6 +90,7 @@ mod version;
 pub fn add_history(line: &str) -> Result<(), ReadlineError> {
     unsafe {
         let cline = try!(CString::new(line.as_bytes()));
+        init();
         ext_readline::add_history(cline.as_ptr());
         Ok(())
     }
@@ -96,11 +108,11 @@ pub fn add_history(line: &str) -> Result<(), ReadlineError> {
 ///
 /// loop {
 ///     match rl_sys::readline("$ ") {
-///         Ok(Some(s)) => s,
+///         Ok(Some(s)) => println!("{}", s),
 ///         Ok(None) => break,
 ///         Err(e) => {
 ///             println!("{}", e);
-///             break
+///             break;
 ///        },
 ///     }
 /// }
@@ -237,6 +249,7 @@ pub fn clear_history() {
 /// Stifle the history list, remembering only the last *max* entries.
 pub fn stifle_history(max: i32) {
     unsafe {
+        init();
         ext_readline::stifle_history(max as libc::c_int);
     }
 }
@@ -244,22 +257,22 @@ pub fn stifle_history(max: i32) {
 /// Stop stifling the history.
 ///
 /// This returns the previously-set maximum number of history entries (as set by stifle_history()).
-/// The value is positive if the history was stifled, negative if it wasn't.
 ///
 /// # Examples
 ///
 /// ```
 /// # extern crate rl_sys;
 /// # fn main() {
-/// assert!(rl_sys::unstifle_history().is_negative());
-///
 /// let max = 5;
 /// rl_sys::stifle_history(max);
 /// assert_eq!(max, rl_sys::unstifle_history());
 /// # }
 /// ```
 pub fn unstifle_history() -> i32 {
-    unsafe { ext_readline::unstifle_history() as i32 }
+    unsafe {
+        init();
+        ext_readline::unstifle_history()
+    }
 }
 
 /// Is the history stifled?
@@ -275,7 +288,10 @@ pub fn unstifle_history() -> i32 {
 /// # }
 /// ```
 pub fn history_is_stifled() -> bool {
-    unsafe { ext_readline::history_is_stifled() != 0 }
+    unsafe {
+        init();
+        ext_readline::history_is_stifled() != 0
+    }
 }
 
 #[cfg(test)]
@@ -291,7 +307,6 @@ mod test {
     fn test_stifle() {
         // History should not begin stifled.
         assert!(!history_is_stifled());
-        assert!(unstifle_history().is_negative());
 
         let max = 5;
         stifle_history(max);
@@ -299,6 +314,5 @@ mod test {
 
         assert_eq!(max, unstifle_history());
         assert!(!history_is_stifled());
-        assert!(unstifle_history().is_negative());
     }
 }
