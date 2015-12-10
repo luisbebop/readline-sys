@@ -21,7 +21,7 @@ Add `rl-sys` as a dependency in `Cargo.toml`
 
 ```toml
 [dependencies]
-rl-sys = "~0.3.0"
+rl-sys = "~0.4.0"
 ```
 
 A simple implementation of `cat` using `rl_sys::readline`
