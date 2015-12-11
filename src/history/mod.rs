@@ -1,40 +1,132 @@
 //! Readline History API
-use libc::c_int;
-use std::ffi::CString;
+use libc::{c_char, c_int, c_void};
+use std::clone::Clone;
+use std::default::Default;
+use std::ffi::{CStr, CString};
+use std::fmt;
 // use std::fs::{self, File, OpenOptions};
 // use std::io::{BufRead, BufReader, LineWriter, Write};
 // use std::path::Path;
 use std::sync::{ONCE_INIT, Once};
+use time;
 
 mod ext_history {
-    use libc::{c_char, c_int};
+    use super::{HistoryEntry, HistoryState};
+    use libc::{
+        c_char,
+        c_int,
+        // c_long,
+        // c_void
+    };
 
     extern {
-        pub fn add_history(line: *const c_char);
-        pub fn clear_history();
-        pub fn history_is_stifled() -> c_int;
-        pub fn stifle_history(max: c_int);
+        pub fn using_history() -> ();
+        pub fn history_get_history_state() -> *mut HistoryState;
+        // pub fn history_set_history_state(arg1: *mut HistoryState) -> ();
+        pub fn add_history(arg1: *const c_char) -> ();
+        pub fn add_history_time(arg1: *const c_char) -> ();
+        // pub fn remove_history(arg1: c_int) -> *mut HistoryEntry;
+        // pub fn free_history_entry(arg1: *mut HistoryEntry) -> *mut c_void;
+        // pub fn replace_history_entry(arg1: c_int,
+        //                              arg2: *const c_char,
+        //                              arg3: *mut c_void) -> *mut HistoryEntry;
+        pub fn clear_history() -> ();
+        pub fn stifle_history(arg1: c_int) -> ();
         pub fn unstifle_history() -> c_int;
-        pub fn using_history();
+        pub fn history_is_stifled() -> c_int;
+        // pub fn history_list() -> *mut *mut HistoryEntry;
+        // pub fn where_history() -> c_int;
+        pub fn current_history() -> *mut HistoryEntry;
+        // pub fn history_get(arg1: c_int) -> *mut HistoryEntry;
+        // pub fn history_get_time(arg1: *mut HistoryEntry) -> c_long;
+        // pub fn history_total_bytes() -> c_int;
+        // pub fn history_set_pos(arg1: c_int) -> c_int;
+        // pub fn previous_history() -> *mut HistoryEntry;
+        pub fn next_history() -> *mut HistoryEntry;
+        // pub fn history_search(arg1: *const c_char, arg2: c_int) -> c_int;
+        // pub fn history_search_prefix(arg1: *const c_char,
+        //                              arg2: c_int) -> c_int;
+        // pub fn history_search_pos(arg1: *const c_char,
+        //                           arg2: c_int, arg3: c_int) -> c_int;
+        // pub fn read_history(arg1: *const c_char) -> c_int;
+        // pub fn read_history_range(arg1: *const c_char,
+        //                           arg2: c_int, arg3: c_int) -> c_int;
+        // pub fn write_history(arg1: *const c_char) -> c_int;
+        // pub fn append_history(arg1: c_int, arg2: *const c_char) -> c_int;
+        // pub fn history_truncate_file(arg1: *const c_char,
+        //                              arg2: c_int) -> c_int;
+        // pub fn history_expand(arg1: *mut c_char,
+        //                       arg2: *mut *mut c_char) -> c_int;
+        // pub fn history_arg_extract(arg1: c_int, arg2: c_int,
+        //                            arg3: *const c_char) -> *mut c_char;
+        // pub fn get_history_event(arg1: *const c_char,
+        //                          arg2: *mut c_int, arg3: c_int) -> *mut c_char;
+        // pub fn history_tokenize(arg1: *const c_char) -> *mut *mut c_char;
     }
 }
 
-// /* A structure used to pass the current state of the history stuff around. */
-// typedef struct _hist_state {
-//   HIST_ENTRY **entries;		/* Pointer to the entries themselves. */
-//   int offset;			/* The location pointer within this array. */
-//   int length;			/* Number of elements within this array. */
-//   int size;			/* Number of slots allocated to this array. */
-//   int flags;
-// } HISTORY_STATE;
-// #[repr(C)]
-// pub struct hist_state {
-//     entries: c_void,
-//     offset: c_int,
-//     length: c_int,
-//     side: c_int,
-//     flags: c_int,
-// }
+pub type HistoryData = *mut c_void;
+#[repr(C)]
+#[derive(Copy)]
+pub struct HistoryEntry {
+    pub line: *mut c_char,
+    pub timestamp: *mut c_char,
+    pub data: HistoryData,
+}
+
+impl Clone for HistoryEntry {
+    fn clone(&self) -> Self { *self }
+}
+
+impl Default for HistoryEntry {
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
+}
+
+impl fmt::Debug for HistoryEntry {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let line = unsafe { CStr::from_ptr(self.line).to_string_lossy().into_owned() };
+        let time = unsafe { CStr::from_ptr(self.timestamp).to_string_lossy().into_owned() };
+        write!(
+            f,
+            "HistoryEntry {{ line: {:?}, timestamp: {:?}, data: {:?} }}",
+            line,
+            time,
+            self.data
+        )
+    }
+}
+
+#[repr(C)]
+#[derive(Copy)]
+pub struct HistoryState {
+    pub entries: *mut *mut HistoryEntry,
+    pub offset: c_int,
+    pub length: c_int,
+    pub size: c_int,
+    pub flags: c_int,
+}
+
+impl Clone for HistoryState {
+    fn clone(&self) -> Self { *self }
+}
+
+impl Default for HistoryState {
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
+}
+
+impl fmt::Debug for HistoryState {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "HistoryState {{ entries: {:?}, offset: {:?}, length: {:?}, size: {:?}, flags: {:?}",
+            self.entries,
+            self.offset,
+            self.length,
+            self.size,
+            self.flags
+        )
+    }
+}
 
 static START: Once = ONCE_INIT;
 
@@ -43,6 +135,26 @@ fn init() {
         debug!("readline_sys initialized");
         using_history();
     });
+}
+
+/// Begins a session in which the history functions might be used.
+///
+/// This initializes the interactive variables.
+fn using_history() {
+    unsafe { ext_history::using_history() }
+}
+
+/// # Examples
+/// ```
+/// use rl_sys::history;
+///
+/// let state = history::history_get_history_state();
+/// ```
+pub fn history_get_history_state<'r>() -> &'r mut HistoryState {
+    unsafe {
+        init();
+        &mut *ext_history::history_get_history_state()
+    }
 }
 
 /// Wraps the libreadline add_history functionality.  The argument is the line
@@ -67,29 +179,22 @@ pub fn add_history(line: &str) -> Result<(), ::ReadlineError> {
     }
 }
 
+pub fn add_history_time() -> Result<(), ::ReadlineError> {
+    unsafe {
+        let now = time::now();
+        let now_str = format!("{}", now.asctime());
+        let cline = try!(CString::new(now_str.as_bytes()));
+        init();
+        ext_history::add_history_time(cline.as_ptr());
+        Ok(())
+    }
+}
+
 /// Clear the history list by deleting all the entries.
 pub fn clear_history() {
     unsafe {
         init();
         ext_history::clear_history();
-    }
-}
-
-/// Is the history stifled?
-///
-/// # Examples
-///
-/// ```
-/// use rl_sys::history;
-///
-/// assert!(!history::history_is_stifled());
-/// history::stifle_history(1);
-/// assert!(history::history_is_stifled());
-/// ```
-pub fn history_is_stifled() -> bool {
-    unsafe {
-        init();
-        ext_history::history_is_stifled() != 0
     }
 }
 
@@ -122,11 +227,36 @@ pub fn unstifle_history() -> i32 {
     }
 }
 
-/// Begins a session in which the history functions might be used.
+/// Is the history stifled?
 ///
-/// This initializes the interactive variables.
-fn using_history() {
-    unsafe { ext_history::using_history() }
+/// # Examples
+///
+/// ```
+/// use rl_sys::history;
+///
+/// assert!(!history::history_is_stifled());
+/// history::stifle_history(1);
+/// assert!(history::history_is_stifled());
+/// ```
+pub fn history_is_stifled() -> bool {
+    unsafe {
+        init();
+        ext_history::history_is_stifled() != 0
+    }
+}
+
+pub fn current_history<'a>() -> &'a HistoryEntry {
+    unsafe {
+        init();
+        &*ext_history::current_history()
+    }
+}
+
+pub fn next_history<'a>() -> &'a HistoryEntry {
+    unsafe {
+        init();
+        &*ext_history::next_history()
+    }
 }
 
 // /// Preload the readline history with lines from the given file.  This is often
@@ -241,8 +371,15 @@ mod test {
     use super::*;
 
     #[test]
+    fn test_history_state() {
+        let state = history_get_history_state();
+        println!("{:?}", state);
+    }
+
+    #[test]
     fn test_add_history() {
         assert!(add_history("test").is_ok());
+        assert!(add_history_time().is_ok());
     }
 
     #[test]
@@ -256,5 +393,13 @@ mod test {
 
         assert_eq!(max, unstifle_history());
         assert!(!history_is_stifled());
+    }
+
+    #[test]
+    fn test_current_history() {
+        println!("{:?}", current_history());
+        assert!(add_history("ls -al").is_ok());
+        println!("{:?}", current_history());
+        println!("{:?}", next_history());
     }
 }

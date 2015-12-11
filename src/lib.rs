@@ -38,6 +38,7 @@
 extern crate libc;
 #[macro_use] extern crate log;
 #[cfg(test)] extern crate sodium_sys;
+extern crate time;
 
 pub use error::ReadlineError;
 use std::ffi::{CStr, CString};
