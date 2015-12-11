@@ -6,15 +6,6 @@ use std::ffi::CString;
 // use std::path::Path;
 use std::sync::{ONCE_INIT, Once};
 
-static START: Once = ONCE_INIT;
-
-fn init() {
-    START.call_once(|| {
-        debug!("readline_sys initialized");
-        using_history();
-    });
-}
-
 mod ext_history {
     use libc::{c_char, c_int};
 
@@ -26,6 +17,32 @@ mod ext_history {
         pub fn unstifle_history() -> c_int;
         pub fn using_history();
     }
+}
+
+// /* A structure used to pass the current state of the history stuff around. */
+// typedef struct _hist_state {
+//   HIST_ENTRY **entries;		/* Pointer to the entries themselves. */
+//   int offset;			/* The location pointer within this array. */
+//   int length;			/* Number of elements within this array. */
+//   int size;			/* Number of slots allocated to this array. */
+//   int flags;
+// } HISTORY_STATE;
+// #[repr(C)]
+// pub struct hist_state {
+//     entries: c_void,
+//     offset: c_int,
+//     length: c_int,
+//     side: c_int,
+//     flags: c_int,
+// }
+
+static START: Once = ONCE_INIT;
+
+fn init() {
+    START.call_once(|| {
+        debug!("readline_sys initialized");
+        using_history();
+    });
 }
 
 /// Wraps the libreadline add_history functionality.  The argument is the line

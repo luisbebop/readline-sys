@@ -1,0 +1,1 @@
+bindgen -I /usr/lib/clang/3.7.0/include/ -I/usr/include/readline -lhistory -match history.h -o history.rs gen.h
