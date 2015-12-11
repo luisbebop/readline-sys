@@ -11,14 +11,14 @@
 //!
 //! # Examples
 //!
-//! ```no_run
-//! # extern crate rl_sys;
-//! # fn main() {
+//! ```
+//! use rl_sys::{history, readline};
+//!
 //! loop {
-//!     let input = match rl_sys::readline("$ ") {
+//!     let input = match readline("$ ") {
 //!         Ok(Some(s)) => match &*s {
 //!             "clear" => {
-//!                 rl_sys::clear_history();
+//!                 history::clear_history();
 //!                 continue;
 //!             }
 //!             _ => s
@@ -32,9 +32,8 @@
 //!     println!("{}", input);
 //!
 //!     // Add input to history.
-//!     let _ = rl_sys::add_history(&input);
+//!     let _ = history::add_history(&input);
 //! }
-//! # }
 //! ```
 extern crate libc;
 #[macro_use] extern crate log;
@@ -42,59 +41,20 @@ extern crate libc;
 
 pub use error::ReadlineError;
 use std::ffi::{CStr, CString};
-use std::fs::{self, File, OpenOptions};
-use std::io::{BufRead, BufReader, LineWriter, Write};
-use std::path::Path;
 use std::str;
-use std::sync::{Once, ONCE_INIT};
+
 pub use version::version;
 
 mod error;
 mod ext_readline {
-    use libc::{c_char, c_int};
+    use libc::c_char;
 
     extern {
         pub fn readline(p: *const c_char) -> *const c_char;
-        pub fn add_history(line: *const c_char);
-        pub fn clear_history();
-        pub fn stifle_history(max: c_int);
-        pub fn unstifle_history() -> c_int;
-        pub fn history_is_stifled() -> c_int;
     }
 }
-mod init;
+pub mod history;
 mod version;
-
-static START: Once = ONCE_INIT;
-
-fn init() {
-    START.call_once(|| {
-        debug!("readline_sys initialized");
-        init::using_history();
-    });
-}
-
-/// Wraps the libreadline add_history functionality.  The argument is the line
-/// to add to history.
-///
-/// # Examples
-///
-/// ```
-/// use rl_sys;
-///
-/// match rl_sys::add_history("ls -al") {
-///     Ok(_)  => println!("Success!"),
-///     Err(e) => println!("{}", e),
-/// }
-/// ```
-pub fn add_history(line: &str) -> Result<(), ReadlineError> {
-    unsafe {
-        let cline = try!(CString::new(line.as_bytes()));
-        init();
-        ext_readline::add_history(cline.as_ptr());
-        Ok(())
-    }
-}
 
 /// Wraps the libreadline readline function.  The argument is the prompt to use.
 ///
@@ -103,11 +63,11 @@ pub fn add_history(line: &str) -> Result<(), ReadlineError> {
 ///
 /// # Examples
 ///
-/// ```no_run
-/// use rl_sys;
+/// ```
+/// use rl_sys::readline;
 ///
 /// loop {
-///     match rl_sys::readline("$ ") {
+///     match readline("$ ") {
 ///         Ok(Some(s)) => println!("{}", s),
 ///         Ok(None) => break,
 ///         Err(e) => {
@@ -129,190 +89,5 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
             let res = try!(str::from_utf8(slice.to_bytes()));
             Ok(Some(res.to_owned()))
         }
-    }
-}
-
-/// Preload the readline history with lines from the given file.  This is often
-/// use in conjunction with the *add_history_persist* api to maintain a readline
-/// history persistently.
-///
-/// # Examples
-///
-/// ```
-/// use rl_sys;
-/// use std::path::Path;
-///
-/// let history_file = Path::new("/home/user/.app-hist");
-/// match rl_sys::preload_history(&history_file) {
-///     Ok(_)  => println!("Success!"),
-///     Err(e) => println!("{}", e),
-/// }
-/// ```
-pub fn preload_history(file: &Path) -> Result<(), ReadlineError> {
-    let exists = match fs::metadata(file) {
-        Ok(meta) => meta.is_file(),
-        Err(e)   => {
-            error!("{:?}", e);
-            false
-        },
-    };
-
-    if exists {
-        let file = BufReader::new(File::open(file).unwrap());
-        for opt in file.lines() {
-            match opt {
-                Ok(o) => try!(add_history(&o[..])),
-                Err(e) => {
-                    error!("{:?}", e);
-                    return Err(ReadlineError::new("ReadlineError", e))
-                },
-            }
-        }
-    }
-
-    Ok(())
-}
-
-/// Add the given line to readline history and persistently to a file at the
-/// given path.  This is useful in conjunction with the *preload_history*
-/// function for keeping a useful history for your application.
-///
-/// Note that this function will only add the line to the readline history and
-/// the file history if it doesn't already exist there.
-///
-/// # Examples
-///
-/// ```
-/// use rl_sys;
-/// use std::path::Path;
-///
-/// let history_file = Path::new("/home/user/.app-hist");
-/// match rl_sys::add_history_persist("ls -al", &history_file) {
-///     Ok(_)  => println!("Success!"),
-///     Err(e) => println!("{}", e),
-/// }
-/// ```
-pub fn add_history_persist(
-    line: &str,
-    file: &Path
-) -> Result<(), ReadlineError> {
-    let exists = match fs::metadata(file) {
-        Ok(meta) => meta.is_file(),
-        Err(e)   => {
-            error!("{:?}", e);
-            false
-        },
-    };
-
-    let mut write = LineWriter::new(if exists {
-        try!(OpenOptions::new().append(true).write(true).open(file))
-    } else {
-        try!(File::create(file))
-    });
-
-    // Only add the line to the history file if it doesn't already
-    // contain the line to add.
-    let read = BufReader::new(try!(File::open(file)));
-    // The lines method returns strings without the trailing '\n'
-    let mut cmds: Vec<String> = Vec::new();
-
-    for line in read.lines() {
-        match line {
-            Ok(l)  => cmds.push(l),
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(ReadlineError::new("ReadlineError", e))
-            },
-        }
-    }
-
-    let trimmed = line.trim_right().to_string();
-
-    // Only add the line to history if it doesn't exist already and isn't empty.
-    if !cmds.contains(&trimmed) && !trimmed.is_empty() {
-        // Write the line with the trailing '\n' to the file.
-        try!(write.write(line.as_bytes()));
-    }
-
-    // Add the line witout the trailing '\n' to the readline history.
-    try!(add_history(&trimmed[..]));
-    Ok(())
-}
-
-/// Clear the history list by deleting all the entries.
-pub fn clear_history() {
-    unsafe {
-        ext_readline::clear_history();
-    }
-}
-
-/// Stifle the history list, remembering only the last *max* entries.
-pub fn stifle_history(max: i32) {
-    unsafe {
-        init();
-        ext_readline::stifle_history(max as libc::c_int);
-    }
-}
-
-/// Stop stifling the history.
-///
-/// This returns the previously-set maximum number of history entries (as set by stifle_history()).
-///
-/// # Examples
-///
-/// ```
-/// # extern crate rl_sys;
-/// # fn main() {
-/// let max = 5;
-/// rl_sys::stifle_history(max);
-/// assert_eq!(max, rl_sys::unstifle_history());
-/// # }
-/// ```
-pub fn unstifle_history() -> i32 {
-    unsafe {
-        init();
-        ext_readline::unstifle_history()
-    }
-}
-
-/// Is the history stifled?
-///
-/// # Examples
-///
-/// ```
-/// # extern crate rl_sys;
-/// # fn main() {
-/// assert!(!rl_sys::history_is_stifled());
-/// rl_sys::stifle_history(1);
-/// assert!(rl_sys::history_is_stifled());
-/// # }
-/// ```
-pub fn history_is_stifled() -> bool {
-    unsafe {
-        init();
-        ext_readline::history_is_stifled() != 0
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_add_history() {
-        assert!(add_history("test").is_ok());
-    }
-
-    #[test]
-    fn test_stifle() {
-        // History should not begin stifled.
-        assert!(!history_is_stifled());
-
-        let max = 5;
-        stifle_history(max);
-        assert!(history_is_stifled());
-
-        assert_eq!(max, unstifle_history());
-        assert!(!history_is_stifled());
     }
 }

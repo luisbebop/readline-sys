@@ -9,6 +9,7 @@
 
 extern crate rl_sys;
 
+use rl_sys::{history, readline};
 use std::process::Command;
 
 fn main() {
@@ -17,7 +18,7 @@ fn main() {
     let mut counter = 0;
     loop {
         let prompt = format!("{}$ ", counter);
-        let input: String = match rl_sys::readline(&prompt) {
+        let input: String = match readline(&prompt) {
             Ok(Some(s)) => s,
             Ok(None) => break,
             Err(e) => {
@@ -32,22 +33,22 @@ fn main() {
         }
 
         // Add user input to history.
-        let _ = rl_sys::add_history(&input);
+        let _ = history::add_history(&input);
 
         if input.starts_with("history") {
             let argv: Vec<&str> = input.split_whitespace().collect();
             match argv.get(1).map(|s| &**s) {
-                Some("-c") => rl_sys::clear_history(),
+                Some("-c") => history::clear_history(),
                 Some("-s") => {
                     if let Some(s) = argv.get(2) {
                         if let Ok(n) = s.parse::<i32>() {
                             // Stifle the history so that only *n* entries will be stored.
-                            rl_sys::stifle_history(n);
+                            history::stifle_history(n);
                         }
                     }
                 }
                 Some("-u") => {
-                    rl_sys::unstifle_history();
+                    history::unstifle_history();
                 }
                 Some(_) => println!("unrecognized history command"),
                 None => {
