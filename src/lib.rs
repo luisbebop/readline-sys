@@ -12,13 +12,14 @@
 //! # Examples
 //!
 //! ```
-//! use rl_sys::{history, readline};
+//! use rl_sys::readline;
+//! use rl_sys::history::listmgmt;
 //!
 //! loop {
 //!     let input = match readline("$ ") {
 //!         Ok(Some(s)) => match &*s {
 //!             "clear" => {
-//!                 history::clear_history();
+//!                 listmgmt::clear_history();
 //!                 continue;
 //!             }
 //!             _ => s
@@ -32,15 +33,17 @@
 //!     println!("{}", input);
 //!
 //!     // Add input to history.
-//!     let _ = history::add_history(&input);
+//!     let _ = listmgmt::add_history(&input);
 //! }
 //! ```
 extern crate libc;
-#[macro_use] extern crate log;
-#[cfg(test)] extern crate sodium_sys;
+#[macro_use]
+extern crate log;
+#[cfg(test)]
+extern crate sodium_sys;
 extern crate time;
 
-pub use error::ReadlineError;
+pub use error::{HistoryError, ReadlineError};
 use std::ffi::{CStr, CString};
 use std::str;
 
@@ -50,7 +53,7 @@ mod error;
 mod ext_readline {
     use libc::c_char;
 
-    extern {
+    extern "C" {
         pub fn readline(p: *const c_char) -> *const c_char;
     }
 }
@@ -83,7 +86,8 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ReadlineError> {
 
     unsafe {
         let ret = ext_readline::readline(cprmt.as_ptr());
-        if ret.is_null() {  // user pressed Ctrl-D
+        if ret.is_null() {
+            // user pressed Ctrl-D
             Ok(None)
         } else {
             let slice = CStr::from_ptr(ret);

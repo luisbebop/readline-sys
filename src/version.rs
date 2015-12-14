@@ -2,32 +2,50 @@ include!(concat!(env!("OUT_DIR"), "/version.rs"));
 
 #[cfg(unix)]
 fn verbose_ver() -> String {
-    format!("\x1b[32;1mrl-sys {}\x1b[0m ({} {}) (built {})\n\
-             commit-hash: {}\ncommit-date: {}\n\
-             build-date: {}\nhost: {}\nrelease: {}",
-            semver(), short_sha(), commit_date(), short_now(),
-            sha(), commit_date(), short_now(), target(), semver())
+    format!("\x1b[32;1mrl-sys {}\x1b[0m ({} {}) (built {})\ncommit-hash: {}\ncommit-date: \
+             {}\nbuild-date: {}\nhost: {}\nrelease: {}",
+            semver(),
+            short_sha(),
+            commit_date(),
+            short_now(),
+            sha(),
+            commit_date(),
+            short_now(),
+            target(),
+            semver())
 }
 
 #[cfg(windows)]
 fn verbose_ver() -> String {
-    format!("rl-sys {} ({} {}) (built {})\n\
-             commit-hash: {}\ncommit-date: {}\n\
-             build-date: {}\nhost: {}\nrelease: {}",
-            semver(), short_sha(), commit_date(), short_now(),
-            sha(), commit_date(), short_now(), target(), semver())
+    format!("rl-sys {} ({} {}) (built {})\ncommit-hash: {}\ncommit-date: {}\nbuild-date: \
+             {}\nhost: {}\nrelease: {}",
+            semver(),
+            short_sha(),
+            commit_date(),
+            short_now(),
+            sha(),
+            commit_date(),
+            short_now(),
+            target(),
+            semver())
 }
 
 #[cfg(unix)]
 fn ver() -> String {
     format!("\x1b[32;1mrl-sys {}\x1b[0m ({} {}) (built {})",
-            semver(), short_sha(), commit_date(), short_now())
+            semver(),
+            short_sha(),
+            commit_date(),
+            short_now())
 }
 
 #[cfg(windows)]
 fn ver() -> String {
     format!("rl-sys {}[0m ({} {}) (built {})",
-            semver(), short_sha(), commit_date(), short_now())
+            semver(),
+            short_sha(),
+            commit_date(),
+            short_now())
 }
 
 /// Generate a version string.
@@ -51,7 +69,7 @@ fn ver() -> String {
 /// ```
 pub fn version(verbose: bool) -> String {
     match verbose {
-        true  => verbose_ver(),
+        true => verbose_ver(),
         false => ver(),
     }
 }
@@ -59,9 +77,7 @@ pub fn version(verbose: bool) -> String {
 #[cfg(test)]
 mod test {
     #[cfg(all(unix,test))]
-    const TEST_VER: [u8; 13] = [
-        27, 91, 51, 50, 59, 49, 109, 114, 108, 45, 115, 121, 115
-    ];
+    const TEST_VER: [u8; 13] = [27, 91, 51, 50, 59, 49, 109, 114, 108, 45, 115, 121, 115];
 
     #[cfg(all(windows,test))]
     const TEST_VER: [u8; 6] = [114, 108, 45, 115, 121, 115];
