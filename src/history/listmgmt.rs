@@ -1,6 +1,6 @@
-//! [2.3.2 History List Management](https://cnswww.cns.cwru.edu/php/chet/readline/history.html#SEC11)
+//! [2.3.2 History List Management](https://goo.gl/P6UC5s)
 use libc::{c_int, c_void};
-use history::{vars, HistoryEntry};
+use history::{HistoryEntry, vars};
 use std::ffi::CString;
 use std::ptr;
 use time::Timespec;
@@ -9,7 +9,7 @@ mod ext_listmgmt {
     use libc::{c_char, c_int, c_void};
     use history::HistoryEntry;
 
-    extern {
+    extern "C" {
         pub fn add_history(line: *const c_char) -> ();
         pub fn add_history_time(time: *const c_char) -> ();
         pub fn remove_history(which: c_int) -> *mut HistoryEntry;
@@ -84,8 +84,8 @@ pub fn replace_history_entry<'a>(which: usize,
 
     unsafe {
         let old_entry = ext_listmgmt::replace_history_entry(which as i32,
-                                                           cline.as_ptr(),
-                                                           ptr::null_mut());
+                                                            cline.as_ptr(),
+                                                            ptr::null_mut());
 
         if old_entry.is_null() {
             Err(::HistoryError::new("Null Pointer", "Invalid replace requested!"))

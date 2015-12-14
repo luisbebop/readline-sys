@@ -16,7 +16,7 @@ pub mod vars;
 mod ext_history {
     use super::HistoryEntry;
 
-    extern {
+    extern "C" {
         // pub fn history_set_pos(arg1: c_int) -> c_int;
         pub fn previous_history() -> *mut HistoryEntry;
         pub fn next_history() -> *mut HistoryEntry;

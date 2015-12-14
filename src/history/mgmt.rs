@@ -1,4 +1,4 @@
-//! [2.3.1 Initializing History and State Management](https://cnswww.cns.cwru.edu/php/chet/readline/history.html#SEC10)
+//! [2.3.1 Initializing History and State Management](https://goo.gl/An1iSg)
 //!
 //! This section describes functions used to initialize and manage the state of the History library
 //! when you want to use the history functions in your program.
@@ -7,7 +7,7 @@ use std::sync::{ONCE_INIT, Once};
 
 mod ext_mgmt {
     use history::HistoryState;
-    extern {
+    extern "C" {
         pub fn using_history() -> ();
         pub fn history_get_history_state() -> *mut HistoryState;
         pub fn history_set_history_state(state: *mut HistoryState) -> ();
