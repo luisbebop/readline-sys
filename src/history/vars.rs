@@ -215,7 +215,7 @@ pub fn remove_word_delimiter(c: char) -> Result<(), HistoryError> {
 }
 
 /// Get the list of word delimiter characters. The characters that separate tokens for
-/// `history_tokenize()``. The default value is ``" \t\n;&()<>"``.
+/// `history_tokenize()`. The default value is `" \t\n;&()<>"`.
 ///
 /// # Examples
 ///
@@ -312,7 +312,7 @@ pub fn remove_search_delimiter_char(c: char) -> Result<(), HistoryError> {
 }
 
 /// Get the list of search delimiter characters. The list of additional characters which can delimit
-/// a history search string, in addition to space, TAB, `:' and `?' in the case of a substring
+/// a history search string, in addition to space, TAB, ':' and '?' in the case of a substring
 /// search. The default is empty.
 ///
 /// # Examples
@@ -475,11 +475,12 @@ pub fn get_quotes_inhibit_expansion() -> i8 {
     unsafe { history_quotes_inhibit_expansion as i8 }
 }
 
-/// This should be set to the address of a function that takes two arguments: a char * (string) and
-/// an int index into that string (i). It should return a non-zero value if the history expansion
-/// starting at string[i] should not be performed; zero if the expansion should be done. It is
-/// intended for use by applications like Bash that use the history expansion character for
-/// additional purposes. By default, this variable is set to NULL.
+/// This should be set to a function of the following type:
+/// `extern fn(*mut c_char, c_uint) -> c_int`.  The first argument is a string pointer
+/// and the second is an int index into that string. It should return a non-zero value if the
+/// history expansion starting at string[i] should not be performed; zero if the expansion should
+/// be done. It is intended for use by applications like Bash that use the history expansion
+/// character for additional purposes. By default, this variable is set to NULL.
 ///
 /// # Examples
 ///

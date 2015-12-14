@@ -1,4 +1,7 @@
 //! [2.3.2 History List Management](https://goo.gl/P6UC5s)
+//!
+//! These functions manage individual entries on the history list, or set parameters managing the
+//! list itself.
 use libc::{c_int, c_void};
 use history::{HistoryEntry, vars};
 use std::ffi::CString;
@@ -38,7 +41,7 @@ mod ext_listmgmt {
 /// }
 /// ```
 pub fn add_history(line: &str) -> Result<(), ::HistoryError> {
-    let cline = try!(CString::new(line.as_bytes()));
+    let cline = try!(CString::new(line));
     ::history::mgmt::init();
     unsafe {
         ext_listmgmt::add_history(cline.as_ptr());
@@ -46,23 +49,70 @@ pub fn add_history(line: &str) -> Result<(), ::HistoryError> {
     Ok(())
 }
 
-/// Change the time stamp associated with the most recent history entry to the given time.
+/// Change the time stamp associated with the most recent history entry to the given time.  Note
+/// that if the `history_comment_char` variable has not been set this will have no effect.  This is
+/// stored as seconds since the epoch, so you may lose some precision.
+///
+/// # Examples
+///
+/// ```
+/// # extern crate rl_sys;
+/// # extern crate time;
+/// # fn main() {
+/// use rl_sys::history::{listmgmt, vars};
+///
+/// vars::set_comment_char(':');
+/// match listmgmt::add_history_time(time::now().to_timespec()) {
+///     Ok(_)  => println!("Success!"),
+///     Err(e) => println!("{}", e),
+/// }
+/// # }
+/// ```
 pub fn add_history_time(time: Timespec) -> Result<(), ::HistoryError> {
     let cc = vars::get_comment_char();
-    let now_str = format!("{}{}", cc, time.sec);
-    let cline = try!(CString::new(now_str.as_bytes()));
-    ::history::mgmt::init();
-    unsafe {
-        ext_listmgmt::add_history_time(cline.as_ptr());
+
+    if cc != '\u{0}' {
+        let now_str = format!("{}{}", cc, time.sec);
+        let cline = try!(CString::new(now_str));
+        ::history::mgmt::init();
+        unsafe {
+            ext_listmgmt::add_history_time(cline.as_ptr());
+        }
+        Ok(())
+    } else {
+        Ok(())
     }
-    Ok(())
 }
 
-pub fn remove_history<'a>(idx: usize) -> &'a mut HistoryEntry {
+/// Remove history entry at the given offset from the history. The removed element is returned so
+/// you can free the line, data, and containing structure.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::listmgmt;
+///
+/// assert!(listmgmt::add_history("ls -al").is_ok());
+/// let _ = listmgmt::remove_history(0);
+/// ```
+pub fn remove_history<'a>(offset: usize) -> &'a mut HistoryEntry {
     ::history::mgmt::init();
-    unsafe { &mut *ext_listmgmt::remove_history(idx as i32) }
+    unsafe { &mut *ext_listmgmt::remove_history(offset as i32) }
 }
 
+/// Free the history entry and any history library private data associated with it. If there is
+/// application-specific data, an Err is returned with a pointer to the data so the caller can
+/// dispose of it
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::listmgmt;
+///
+/// assert!(listmgmt::add_history("ls -al").is_ok());
+/// let entry = listmgmt::remove_history(0);
+/// assert!(listmgmt::free_history_entry(entry).is_ok());
+/// ```
 pub fn free_history_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_void> {
     ::history::mgmt::init();
     unsafe {
@@ -76,16 +126,33 @@ pub fn free_history_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_
     }
 }
 
-pub fn replace_history_entry<'a>(which: usize,
-                                 line: String)
+/// Replace the history entry at offset with the given line and data. This returns the old entry so
+/// the caller can dispose of any application-specific data. In the case of an invalid offset, an
+/// Err is returned.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, vars};
+///
+/// assert!(listmgmt::add_history("ls -al").is_ok());
+/// assert_eq!(vars::history_length, 1);
+/// assert!(listmgmt::replace_history_entry(0, "test", None).is_ok());
+/// assert_eq!(vars::history_length, 1);
+/// ```
+pub fn replace_history_entry<'a>(offset: usize,
+                                 line: &str,
+                                 appdata: Option<*mut c_void>)
                                  -> Result<&'a mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();
-    let cline = try!(CString::new(line.as_bytes()));
+    let cline = try!(CString::new(line));
+    let ptr = match appdata {
+        Some(d) => d,
+        None => ptr::null_mut(),
+    };
 
     unsafe {
-        let old_entry = ext_listmgmt::replace_history_entry(which as i32,
-                                                            cline.as_ptr(),
-                                                            ptr::null_mut());
+        let old_entry = ext_listmgmt::replace_history_entry(offset as i32, cline.as_ptr(), ptr);
 
         if old_entry.is_null() {
             Err(::HistoryError::new("Null Pointer", "Invalid replace requested!"))
@@ -96,20 +163,39 @@ pub fn replace_history_entry<'a>(which: usize,
 }
 
 /// Clear the history list by deleting all the entries.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, vars};
+///
+/// assert!(listmgmt::add_history("ls -al").is_ok());
+/// assert_eq!(vars::history_length, 1);
+/// listmgmt::clear_history();
+/// assert_eq!(vars::history_length, 0);
+/// ```
 pub fn clear_history() {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::clear_history() }
 }
 
 /// Stifle the history list, remembering only the last *max* entries.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, vars};
+///
+/// listmgmt::stifle_history(5);
+/// assert_eq!(vars::history_max_entries, 5);
+/// ```
 pub fn stifle_history(max: i32) {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::stifle_history(max as c_int) }
 }
 
-/// Stop stifling the history.
-///
-/// This returns the previously-set maximum number of history entries (as set by stifle_history()).
+/// Stop stifling the history. This returns the previously-set maximum number of history entries
+/// (as set by `stifle_history()`).
 ///
 /// # Examples
 ///
@@ -119,14 +205,13 @@ pub fn stifle_history(max: i32) {
 /// let max = 5;
 /// listmgmt::stifle_history(max);
 /// assert_eq!(max, listmgmt::unstifle_history());
-///
 /// ```
 pub fn unstifle_history() -> i32 {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::unstifle_history() }
 }
 
-/// Is the history stifled?
+/// Returns true if the history is stifled, false if it is not.
 ///
 /// # Examples
 ///

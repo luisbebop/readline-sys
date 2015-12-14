@@ -1,5 +1,5 @@
 //! [2.3.3 Information About the History List](https://goo.gl/8OWMTy)
-use history::HistoryEntry;
+use history::{HistoryEntry, vars};
 use time::Timespec;
 
 mod ext_listinfo {
@@ -12,7 +12,7 @@ mod ext_listinfo {
         pub fn current_history() -> *mut HistoryEntry;
         // pub fn history_get(arg1: c_int) -> *mut HistoryEntry;
         pub fn history_get_time(arg1: *mut HistoryEntry) -> c_long;
-    // pub fn history_total_bytes() -> c_int;
+        // pub fn history_total_bytes() -> c_int;
     }
 }
 
@@ -24,16 +24,21 @@ mod ext_listinfo {
 /// ```
 ///
 /// ```
-pub fn history_list() -> Result<(), ::HistoryError> {
+pub fn history_list() -> Result<Vec<HistoryEntry>, ::HistoryError> {
     ::history::mgmt::init();
     unsafe {
         let ptrptr = &mut *ext_listinfo::history_list();
 
-        // TODO: Loop through the list and build a vector.
         if ptrptr.is_null() {
             Err(::HistoryError::new("Null Pointer", "Unable to access history list"))
         } else {
-            Ok(())
+            // TODO: Loop through the list and build a vector.
+            let len = vars::history_length;
+            for i in 0..len {
+                let ptr = *ptrptr.offset(i as isize);
+                println!("{:?}", ptr);
+            }
+            Ok(Vec::new())
         }
     }
 }
@@ -69,4 +74,16 @@ pub fn current_history<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
 pub fn history_get_time<'a>(entry: &'a mut HistoryEntry) -> Timespec {
     ::history::mgmt::init();
     Timespec::new(unsafe { ext_listinfo::history_get_time(entry) } as i64, 0)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_history_list() {
+        ::history::mgmt::init();
+        assert!(::history::listmgmt::add_history("ls -al").is_ok());
+        assert!(history_list().is_ok());
+    }
 }
