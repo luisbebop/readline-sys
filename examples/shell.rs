@@ -18,7 +18,7 @@ fn main() {
     let mut counter = 0;
     loop {
         let prompt = format!("{}$ ", counter);
-        let input: String = match readline(&prompt) {
+        let input: String = match readline::readline(&prompt) {
             Ok(Some(s)) => s,
             Ok(None) => break,
             Err(e) => {
@@ -33,26 +33,26 @@ fn main() {
         }
 
         // Add user input to history.
-        let _ = history::listmgmt::add_history(&input);
+        let _ = history::listmgmt::add(&input);
 
         if input.starts_with("history") {
             let argv: Vec<&str> = input.split_whitespace().collect();
             match argv.get(1).map(|s| &**s) {
-                Some("-c") => history::listmgmt::clear_history(),
+                Some("-c") => history::listmgmt::clear(),
                 Some("-s") => {
                     if let Some(s) = argv.get(2) {
                         if let Ok(n) = s.parse::<i32>() {
                             // Stifle the history so that only *n* entries will be stored.
-                            history::listmgmt::stifle_history(n);
+                            history::listmgmt::stifle(n);
                         }
                     }
                 }
                 Some("-u") => {
-                    history::listmgmt::unstifle_history();
+                    history::listmgmt::unstifle();
                 }
                 Some(_) => println!("unrecognized history command"),
                 None => {
-                    println!("TODO: print the history.");
+                    println!("{:?}", history::listinfo::list());
                 }
             }
         } else {

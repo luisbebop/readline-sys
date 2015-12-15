@@ -1,18 +1,53 @@
 //! [2.3.4 Moving Around the History List](https://goo.gl/ROYfRB)
 //!
 //! These functions allow the current index into the history list to be set or changed.
+use libc::c_int;
 use history::HistoryEntry;
 
 mod ext_move {
+    use libc::c_int;
     use history::HistoryEntry;
     extern "C" {
-        // pub fn history_set_pos(arg1: c_int) -> c_int;
+        pub fn history_set_pos(which: c_int) -> c_int;
         pub fn previous_history() -> *mut HistoryEntry;
         pub fn next_history() -> *mut HistoryEntry;
     }
 }
 
-pub fn previous_history<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
+/// Set the current history offset, an absolute index into the list. Returns true on success, false
+/// if the offset is less than zero or greater than the number of history entries.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, move_};
+///
+/// assert!(listmgmt::add("ls -al").is_ok());
+/// assert!(listmgmt::add("test").is_ok());
+/// assert!(move_::set_pos(2));
+/// assert!(!move_::set_pos(3));
+/// ```
+pub fn set_pos(offset: usize) -> bool {
+    ::history::mgmt::init();
+    unsafe { ext_move::history_set_pos(offset as c_int) == 1 }
+}
+
+/// Back up the current history offset to the previous history entry, and return a pointer to that
+/// entry. If there is no previous entry, return a `HistoryError`.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, move_};
+///
+/// assert!(listmgmt::add("ls -al").is_ok());
+/// assert!(listmgmt::add("test").is_ok());
+/// assert!(move_::set_pos(2));
+/// assert!(move_::previous().is_ok());
+/// assert!(move_::previous().is_ok());
+/// assert!(move_::previous().is_err());
+/// ```
+pub fn previous<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();
     unsafe {
         let ptr = ext_move::previous_history();
@@ -25,7 +60,21 @@ pub fn previous_history<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
     }
 }
 
-pub fn next_history<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
+/// Move the current history offset forward to the next history entry, and return a pointer to that
+/// entry. If there is no next entry, return a `HistoryError`.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, move_};
+///
+/// assert!(listmgmt::add("ls -al").is_ok());
+/// assert!(listmgmt::add("test").is_ok());
+/// assert!(move_::set_pos(0));
+/// assert!(move_::next().is_ok());
+/// assert!(move_::next().is_err());
+/// ```
+pub fn next<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();
     unsafe {
         let ptr = ext_move::next_history();

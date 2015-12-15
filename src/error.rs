@@ -2,7 +2,7 @@
 use std::fmt;
 
 #[derive(Debug)]
-/// Represents an error that has occurred within the API.
+/// Represents an error that has occurred within the Readline API.
 pub struct ReadlineError {
     desc: String,
     detail: String,
@@ -53,7 +53,7 @@ pub struct HistoryError {
 }
 
 impl HistoryError {
-    /// Create a ReadlineError struct from the given description and detail.
+    /// Create a HistoryError struct from the given description and detail.
     pub fn new<T>(desc: &str, detail: T) -> HistoryError
         where T: fmt::Debug
     {

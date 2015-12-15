@@ -35,12 +35,12 @@ mod ext_listmgmt {
 /// ```
 /// use rl_sys::history::listmgmt;
 ///
-/// match listmgmt::add_history("ls -al") {
+/// match listmgmt::add("ls -al") {
 ///     Ok(_)  => println!("Success!"),
 ///     Err(e) => println!("{}", e),
 /// }
 /// ```
-pub fn add_history(line: &str) -> Result<(), ::HistoryError> {
+pub fn add(line: &str) -> Result<(), ::HistoryError> {
     let cline = try!(CString::new(line));
     ::history::mgmt::init();
     unsafe {
@@ -62,13 +62,13 @@ pub fn add_history(line: &str) -> Result<(), ::HistoryError> {
 /// use rl_sys::history::{listmgmt, vars};
 ///
 /// vars::set_comment_char(':');
-/// match listmgmt::add_history_time(time::now().to_timespec()) {
+/// match listmgmt::add_time(time::now().to_timespec()) {
 ///     Ok(_)  => println!("Success!"),
 ///     Err(e) => println!("{}", e),
 /// }
 /// # }
 /// ```
-pub fn add_history_time(time: Timespec) -> Result<(), ::HistoryError> {
+pub fn add_time(time: Timespec) -> Result<(), ::HistoryError> {
     let cc = vars::get_comment_char();
 
     if cc != '\u{0}' {
@@ -92,10 +92,10 @@ pub fn add_history_time(time: Timespec) -> Result<(), ::HistoryError> {
 /// ```
 /// use rl_sys::history::listmgmt;
 ///
-/// assert!(listmgmt::add_history("ls -al").is_ok());
-/// let _ = listmgmt::remove_history(0);
+/// assert!(listmgmt::add("ls -al").is_ok());
+/// let _ = listmgmt::remove(0);
 /// ```
-pub fn remove_history<'a>(offset: usize) -> &'a mut HistoryEntry {
+pub fn remove<'a>(offset: usize) -> &'a mut HistoryEntry {
     ::history::mgmt::init();
     unsafe { &mut *ext_listmgmt::remove_history(offset as i32) }
 }
@@ -109,11 +109,11 @@ pub fn remove_history<'a>(offset: usize) -> &'a mut HistoryEntry {
 /// ```
 /// use rl_sys::history::listmgmt;
 ///
-/// assert!(listmgmt::add_history("ls -al").is_ok());
-/// let entry = listmgmt::remove_history(0);
-/// assert!(listmgmt::free_history_entry(entry).is_ok());
+/// assert!(listmgmt::add("ls -al").is_ok());
+/// let entry = listmgmt::remove(0);
+/// assert!(listmgmt::free_entry(entry).is_ok());
 /// ```
-pub fn free_history_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_void> {
+pub fn free_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_void> {
     ::history::mgmt::init();
     unsafe {
         let data_ptr = ext_listmgmt::free_history_entry(entry);
@@ -135,15 +135,15 @@ pub fn free_history_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_
 /// ```
 /// use rl_sys::history::{listmgmt, vars};
 ///
-/// assert!(listmgmt::add_history("ls -al").is_ok());
+/// assert!(listmgmt::add("ls -al").is_ok());
 /// assert_eq!(vars::history_length, 1);
-/// assert!(listmgmt::replace_history_entry(0, "test", None).is_ok());
+/// assert!(listmgmt::replace_entry(0, "test", None).is_ok());
 /// assert_eq!(vars::history_length, 1);
 /// ```
-pub fn replace_history_entry<'a>(offset: usize,
-                                 line: &str,
-                                 appdata: Option<*mut c_void>)
-                                 -> Result<&'a mut HistoryEntry, ::HistoryError> {
+pub fn replace_entry<'a>(offset: usize,
+                         line: &str,
+                         appdata: Option<*mut c_void>)
+                         -> Result<&'a mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();
     let cline = try!(CString::new(line));
     let ptr = match appdata {
@@ -169,12 +169,12 @@ pub fn replace_history_entry<'a>(offset: usize,
 /// ```
 /// use rl_sys::history::{listmgmt, vars};
 ///
-/// assert!(listmgmt::add_history("ls -al").is_ok());
+/// assert!(listmgmt::add("ls -al").is_ok());
 /// assert_eq!(vars::history_length, 1);
-/// listmgmt::clear_history();
+/// listmgmt::clear();
 /// assert_eq!(vars::history_length, 0);
 /// ```
-pub fn clear_history() {
+pub fn clear() {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::clear_history() }
 }
@@ -186,10 +186,10 @@ pub fn clear_history() {
 /// ```
 /// use rl_sys::history::{listmgmt, vars};
 ///
-/// listmgmt::stifle_history(5);
+/// listmgmt::stifle(5);
 /// assert_eq!(vars::history_max_entries, 5);
 /// ```
-pub fn stifle_history(max: i32) {
+pub fn stifle(max: i32) {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::stifle_history(max as c_int) }
 }
@@ -203,10 +203,10 @@ pub fn stifle_history(max: i32) {
 /// use rl_sys::history::listmgmt;
 ///
 /// let max = 5;
-/// listmgmt::stifle_history(max);
-/// assert_eq!(max, listmgmt::unstifle_history());
+/// listmgmt::stifle(max);
+/// assert_eq!(max, listmgmt::unstifle());
 /// ```
-pub fn unstifle_history() -> i32 {
+pub fn unstifle() -> i32 {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::unstifle_history() }
 }
@@ -218,11 +218,11 @@ pub fn unstifle_history() -> i32 {
 /// ```
 /// use rl_sys::history::listmgmt;
 ///
-/// assert!(!listmgmt::history_is_stifled());
-/// listmgmt::stifle_history(1);
-/// assert!(listmgmt::history_is_stifled());
+/// assert!(!listmgmt::is_stifled());
+/// listmgmt::stifle(1);
+/// assert!(listmgmt::is_stifled());
 /// ```
-pub fn history_is_stifled() -> bool {
+pub fn is_stifled() -> bool {
     ::history::mgmt::init();
     unsafe { ext_listmgmt::history_is_stifled() != 0 }
 }
@@ -234,13 +234,13 @@ mod test {
     #[test]
     fn test_stifle() {
         // History should not begin stifled.
-        assert!(!history_is_stifled());
+        assert!(!is_stifled());
 
         let max = 5;
-        stifle_history(max);
-        assert!(history_is_stifled());
+        stifle(max);
+        assert!(is_stifled());
 
-        assert_eq!(max, unstifle_history());
-        assert!(!history_is_stifled());
+        assert_eq!(max, unstifle());
+        assert!(!is_stifled());
     }
 }
