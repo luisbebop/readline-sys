@@ -14,9 +14,13 @@ pub mod move_;
 pub mod search;
 pub mod vars;
 
+/// Application specific data attached to the history entry.
 pub type HistoryData = *mut c_void;
+
 #[repr(C)]
 #[derive(Copy)]
+/// A history entry.  This includes the line, the optional timestamp, and optional application
+/// specific data.
 pub struct HistoryEntry {
     pub line: *mut c_char,
     pub timestamp: *mut c_char,
@@ -49,6 +53,9 @@ impl fmt::Debug for HistoryEntry {
 
 #[repr(C)]
 #[derive(Copy)]
+/// The history state.  This includes a pointer the the history entries array, and offset to the
+/// current position in the history, the history length, the history size, and any history flags
+/// that have been set.
 pub struct HistoryState {
     pub entries: *mut *mut HistoryEntry,
     pub offset: c_int,

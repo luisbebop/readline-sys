@@ -36,6 +36,7 @@
 //!     let _ = listmgmt::add(&input);
 //! }
 //! ```
+extern crate errno;
 extern crate libc;
 #[macro_use]
 extern crate log;

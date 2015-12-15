@@ -18,6 +18,7 @@ vergen = "~0.0.16"
 sodium-sys = "~0.0.4"
 
 [dependencies]
+errno = "~0.1.5"
 libc = "~0.2.2"
 log = "~0.3.4"
 time = "~0.1.34"
