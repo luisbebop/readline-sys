@@ -161,7 +161,7 @@ mod test {
             Ok(l) => {
                 let state = mgmt::get_state();
                 assert_eq!(l.len() as i32, state.length);
-            },
+            }
             Err(_) => assert!(false),
         }
     }
