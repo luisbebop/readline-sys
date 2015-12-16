@@ -82,3 +82,9 @@ impl From<::std::str::Utf8Error> for HistoryError {
         HistoryError::new("FromUtf8Error", e)
     }
 }
+
+impl From<::std::num::ParseIntError> for HistoryError {
+    fn from(e: ::std::num::ParseIntError) -> HistoryError {
+        HistoryError::new("ParseIntError", e)
+    }
+}

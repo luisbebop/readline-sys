@@ -4,28 +4,6 @@
 use libc::{c_char, c_int, c_void, free};
 use std::ffi::{CStr, CString};
 
-pub struct Expand {
-    ptr: *mut c_char,
-    pub output: String,
-}
-
-impl Drop for Expand {
-    fn drop(&mut self) {
-        unsafe { free(self.ptr as *mut c_void) };
-    }
-}
-
-pub struct Event {
-    ptr: *mut c_char,
-    pub output: String,
-}
-
-impl Drop for Event {
-    fn drop(&mut self) {
-        unsafe { free(self.ptr as *mut c_void) };
-    }
-}
-
 mod ext_expand {
     use libc::{c_char, c_int};
 
@@ -33,8 +11,7 @@ mod ext_expand {
         pub fn history_expand(s: *mut c_char, out: *mut *mut c_char) -> c_int;
         pub fn get_history_event(s: *const c_char, idx: *mut c_int, delim: c_int) -> *mut c_char;
         pub fn history_tokenize(s: *const c_char) -> *mut *mut c_char;
-    // pub fn history_arg_extract(arg1: c_int, arg2: c_int,
-    //                            arg3: *const c_char) -> *mut c_char;
+        pub fn history_arg_extract(first: c_int, last: c_int, s: *const c_char) -> *mut c_char;
     }
 }
 
@@ -60,9 +37,9 @@ mod ext_expand {
 /// assert!(listmgmt::add("ls -al").is_ok());
 /// let (res, out) = expand::expand("!ls").unwrap();
 /// assert!(res == 1);
-/// assert!(out.output == "ls -al");
+/// assert!(out == "ls -al");
 /// ```
-pub fn expand(s: &str) -> Result<(isize, Expand), ::HistoryError> {
+pub fn expand(s: &str) -> Result<(isize, String), ::HistoryError> {
     use std::ptr;
     ::history::mgmt::init();
 
@@ -70,11 +47,8 @@ pub fn expand(s: &str) -> Result<(isize, Expand), ::HistoryError> {
         let ptr = try!(CString::new(s)).into_raw();
         let mut output_ptr: *mut c_char = ptr::null_mut();
         let res = ext_expand::history_expand(ptr, &mut output_ptr);
-        let cstr = CStr::from_ptr(output_ptr);
-        let out = Expand {
-            ptr: output_ptr,
-            output: cstr.to_string_lossy().into_owned(),
-        };
+        let out = CStr::from_ptr(output_ptr).to_string_lossy().into_owned();
+        free(output_ptr as *mut c_void);
         Ok((res as isize, out))
     }
 }
@@ -92,24 +66,21 @@ pub fn expand(s: &str) -> Result<(isize, Expand), ::HistoryError> {
 /// assert!(listmgmt::add("ls -al").is_ok());
 /// let mut idx = 0;
 /// let evt = expand::get_event("!ls:p", &mut idx, None).unwrap();
-/// assert!(evt.output == "ls -al");
+/// assert!(evt == "ls -al");
 /// assert!(idx == 3);
 /// ```
-pub fn get_event(s: &str, idx: &mut i32, add_delim: Option<char>) -> Result<Event, ::HistoryError> {
+pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(CString::new(s)).as_ptr();
-    let ch = match add_delim {
+    let ch = match delim {
         Some(c) => c as c_int,
         None    => 0 as c_int,
     };
 
     unsafe {
         let char_ptr = ext_expand::get_history_event(ptr, idx as *mut c_int, ch);
-        let cstr = CStr::from_ptr(char_ptr);
-        let out = Event {
-            ptr: char_ptr,
-            output: cstr.to_string_lossy().into_owned(),
-        };
+        let out = CStr::from_ptr(char_ptr).to_string_lossy().into_owned();
+        free(char_ptr as *mut c_void);
         Ok(out)
     }
 }
@@ -121,18 +92,73 @@ pub fn get_event(s: &str, idx: &mut i32, add_delim: Option<char>) -> Result<Even
 /// # Examples
 ///
 /// ```
+/// use rl_sys::history::expand;
 ///
+/// let res = expand::tokenize("one two three 'a b c' <def>").unwrap();
+/// // ["one", "two", "three", "'a b c'", "<", "def", ">"]
+/// assert!(res.len() == 7);
+/// assert!(res[0] == "one");
+/// assert!(res[6] == ">");
 /// ```
 pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(CString::new(s)).as_ptr();
+    let mut res = Vec::new();
 
     unsafe {
-        let arr_ptr = &mut *ext_expand::history_tokenize(ptr);
-        println!("{:?}", arr_ptr);
-        println!("{:?}", *arr_ptr.offset(1));
-        Ok(Vec::new())
+        // Returns a char **.  The last entry is 0x0.
+        let arr_ptr = ext_expand::history_tokenize(ptr);
+
+        // Loop through the char** offsets until 0x0 is found, then break.  The pointers point to
+        // *mut chars (string), so use CStr to convert them.  free the string from readline after
+        // conversion.
+        for i in 0.. {
+            let curr_ptr = *arr_ptr.offset(i);
+            if curr_ptr == 0 as *mut i8 {
+                break;
+            } else {
+                res.push(CStr::from_ptr(curr_ptr).to_string_lossy().into_owned());
+                free(curr_ptr as *mut c_void);
+            }
+        }
+
+        // free the char ** pointer afer use.
+        free(arr_ptr as *mut c_void);
+
+        Ok(res)
     }
 }
 
-pub fn arg_extract() {}
+/// Extract a string segment consisting of the `first` through `last` arguments present in string
+/// `s`. Arguments are split using `history_tokenize`. If either `first` or `last` is < 0, then make
+/// that arg count from the right (subtract from the number of tokens, so that `first` = -1 means
+/// the next to last token on the line). If `first` and `last` are 36 (ASCII '$') the last arg from
+/// string `s` is used.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::expand;
+///
+/// let mut res = expand::arg_extract("one two three 'a b c' <def>", 0, 1).unwrap();
+/// assert!(res == "one two");
+/// // 36 is used to represent ASCII '$'.
+/// res = expand::arg_extract("one two three", 36, 36).unwrap();
+/// println!("{:?}", res);
+/// assert!(res == "three");
+/// ```
+pub fn arg_extract(s: &str, first: i32, last: i32) -> Result<String, ::HistoryError> {
+    ::history::mgmt::init();
+    let ptr = try!(CString::new(s)).as_ptr();
+    unsafe {
+        let char_ptr = ext_expand::history_arg_extract(first, last, ptr);
+
+        if char_ptr.is_null() {
+            Err(::HistoryError::new("History Error", "Null pointer returned!"))
+        } else {
+            let out = CStr::from_ptr(char_ptr).to_string_lossy().into_owned();
+            free(char_ptr as *mut c_void);
+            Ok(out)
+        }
+    }
+}
