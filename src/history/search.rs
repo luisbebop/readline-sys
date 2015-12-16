@@ -10,7 +10,9 @@ use self::Direction::*;
 
 /// The direction to search through the history entries.
 pub enum Direction {
+    /// Search forward through history entries.
     Forward,
+    /// Search backward through history entries.
     Backward,
 }
 

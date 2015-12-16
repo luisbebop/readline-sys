@@ -38,7 +38,8 @@
 //! ```
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
-#![cfg_attr(feature="clippy", warn(clippy_pedantic))]
+#![cfg_attr(feature="clippy", deny(clippy, clippy_pedantic))]
+#![deny(missing_docs)]
 extern crate errno;
 extern crate libc;
 #[macro_use]
