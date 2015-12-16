@@ -95,9 +95,9 @@ pub fn add_time(time: Timespec) -> Result<(), ::HistoryError> {
 /// assert!(listmgmt::add("ls -al").is_ok());
 /// let _ = listmgmt::remove(0);
 /// ```
-pub fn remove<'a>(offset: usize) -> &'a mut HistoryEntry {
+pub fn remove<'a>(offset: i32) -> &'a mut HistoryEntry {
     ::history::mgmt::init();
-    unsafe { &mut *ext_listmgmt::remove_history(offset as i32) }
+    unsafe { &mut *ext_listmgmt::remove_history(offset) }
 }
 
 /// Free the history entry and any history library private data associated with it. If there is
@@ -113,7 +113,7 @@ pub fn remove<'a>(offset: usize) -> &'a mut HistoryEntry {
 /// let entry = listmgmt::remove(0);
 /// assert!(listmgmt::free_entry(entry).is_ok());
 /// ```
-pub fn free_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_void> {
+pub fn free_entry(entry: &mut HistoryEntry) -> Result<(), *mut c_void> {
     ::history::mgmt::init();
     unsafe {
         let data_ptr = ext_listmgmt::free_history_entry(entry);
@@ -140,19 +140,19 @@ pub fn free_entry<'a>(entry: &'a mut HistoryEntry) -> Result<(), *mut c_void> {
 /// assert!(listmgmt::replace_entry(0, "test", None).is_ok());
 /// assert_eq!(vars::history_length, 1);
 /// ```
-pub fn replace_entry<'a>(offset: usize,
-                         line: &str,
-                         appdata: Option<*mut c_void>)
-                         -> Result<&'a mut HistoryEntry, ::HistoryError> {
+pub fn replace_entry(offset: i32,
+                     line: &str,
+                     appdata: Option<*mut c_void>)
+                     -> Result<&mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();
-    let cline = try!(CString::new(line));
+    let sptr = try!(CString::new(line)).as_ptr();
     let ptr = match appdata {
         Some(d) => d,
         None => ptr::null_mut(),
     };
 
     unsafe {
-        let old_entry = ext_listmgmt::replace_history_entry(offset as i32, cline.as_ptr(), ptr);
+        let old_entry = ext_listmgmt::replace_history_entry(offset, sptr, ptr);
 
         if old_entry.is_null() {
             Err(::HistoryError::new("Null Pointer", "Invalid replace requested!"))

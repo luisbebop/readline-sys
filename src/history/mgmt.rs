@@ -57,7 +57,7 @@ pub fn get_state<'r>() -> &'r mut HistoryState {
 /// println!("{:?}", state);
 /// mgmt::set_state(&mut state);
 /// ```
-pub fn set_state<'a>(state: &'a mut HistoryState) -> () {
+pub fn set_state(state: &mut HistoryState) -> () {
     init();
     unsafe { ext_mgmt::history_set_history_state(state) }
 }

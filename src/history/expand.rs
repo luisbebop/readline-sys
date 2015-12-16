@@ -3,6 +3,7 @@
 //! These functions implement history expansion.
 use libc::{c_char, c_int, c_void, free};
 use std::ffi::{CStr, CString};
+use std::ptr;
 
 mod ext_expand {
     use libc::{c_char, c_int};
@@ -40,16 +41,22 @@ mod ext_expand {
 /// assert!(out == "ls -al");
 /// ```
 pub fn expand(s: &str) -> Result<(isize, String), ::HistoryError> {
-    use std::ptr;
     ::history::mgmt::init();
 
     unsafe {
         let ptr = try!(CString::new(s)).into_raw();
         let mut output_ptr: *mut c_char = ptr::null_mut();
         let res = ext_expand::history_expand(ptr, &mut output_ptr);
-        let out = CStr::from_ptr(output_ptr).to_string_lossy().into_owned();
-        free(output_ptr as *mut c_void);
-        Ok((res as isize, out))
+        // Memory safety, grabbing back *mut char
+        let _ = CString::from_raw(ptr);
+
+        if output_ptr.is_null() {
+            Err(::HistoryError::new("NullPointer", "Null pointer returned from history_expand!"))
+        } else {
+            let out = CStr::from_ptr(output_ptr).to_string_lossy().into_owned();
+            free(output_ptr as *mut c_void);
+            Ok((res as isize, out))
+        }
     }
 }
 
@@ -79,9 +86,14 @@ pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, 
 
     unsafe {
         let char_ptr = ext_expand::get_history_event(ptr, idx as *mut c_int, ch);
-        let out = CStr::from_ptr(char_ptr).to_string_lossy().into_owned();
-        free(char_ptr as *mut c_void);
-        Ok(out)
+
+        if char_ptr.is_null() {
+            Err(::HistoryError::new("History Error", "Null pointer returned!"))
+        } else {
+            let out = CStr::from_ptr(char_ptr).to_string_lossy().into_owned();
+            free(char_ptr as *mut c_void);
+            Ok(out)
+        }
     }
 }
 
@@ -109,23 +121,27 @@ pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
         // Returns a char **.  The last entry is 0x0.
         let arr_ptr = ext_expand::history_tokenize(ptr);
 
-        // Loop through the char** offsets until 0x0 is found, then break.  The pointers point to
-        // *mut chars (string), so use CStr to convert them.  free the string from readline after
-        // conversion.
-        for i in 0.. {
-            let curr_ptr = *arr_ptr.offset(i);
-            if curr_ptr == 0 as *mut i8 {
-                break;
-            } else {
-                res.push(CStr::from_ptr(curr_ptr).to_string_lossy().into_owned());
-                free(curr_ptr as *mut c_void);
+        if arr_ptr.is_null() {
+            Err(::HistoryError::new("History Error", "Null pointer returned!"))
+        } else {
+            // Loop through the char** offsets until 0x0 is found, then break.  The pointers point
+            // to *mut chars (string), so use CStr to convert them.  free the string from readline
+            // after conversion.
+            for i in 0.. {
+                let curr_ptr = *arr_ptr.offset(i);
+                if curr_ptr.is_null() {
+                    break;
+                } else {
+                    res.push(CStr::from_ptr(curr_ptr).to_string_lossy().into_owned());
+                    free(curr_ptr as *mut c_void);
+                }
             }
+
+            // free the char ** pointer afer use.
+            free(arr_ptr as *mut c_void);
+
+            Ok(res)
         }
-
-        // free the char ** pointer afer use.
-        free(arr_ptr as *mut c_void);
-
-        Ok(res)
     }
 }
 

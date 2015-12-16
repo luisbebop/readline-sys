@@ -93,12 +93,12 @@ pub fn search_prefix(s: &str, dir: Direction) -> Result<isize, ::HistoryError> {
 /// let res = search::search_pos("ls", Direction::Backward, 1).unwrap();
 /// assert!(res == 0);
 /// ```
-pub fn search_pos(s: &str, dir: Direction, pos: usize) -> Result<isize, ::HistoryError> {
-    let d = match dir {
+pub fn search_pos(s: &str, dir: Direction, pos: i32) -> Result<isize, ::HistoryError> {
+    let d: i32 = match dir {
         Forward => 0,
         Backward => -1,
     };
     let cline = try!(CString::new(s));
     ::history::mgmt::init();
-    unsafe { Ok(ext_search::history_search_pos(cline.as_ptr(), d as c_int, pos as c_int) as isize) }
+    unsafe { Ok(ext_search::history_search_pos(cline.as_ptr(), d, pos) as isize) }
 }

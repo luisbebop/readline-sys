@@ -52,8 +52,8 @@ pub fn set_write_timestamps(v: u8) {
 /// vars::set_write_timestamps(1);
 /// assert_eq!(vars::get_write_timestamps(), 1);
 /// ```
-pub fn get_write_timestamps() -> u8 {
-    unsafe { history_write_timestamps as u8 }
+pub fn get_write_timestamps() -> i32 {
+    unsafe { history_write_timestamps }
 }
 
 /// The character that introduces a history event. The default is `!'. Setting this to 0
@@ -80,6 +80,7 @@ pub fn set_expansion_char(c: char) {
 /// vars::set_expansion_char(':');
 /// assert_eq!(vars::get_expansion_char(), ':');
 /// ```
+#[cfg_attr(feature = "clippy", allow(cast_sign_loss))]
 pub fn get_expansion_char() -> char {
     unsafe { (history_expansion_char as u8) as char }
 }
@@ -108,6 +109,7 @@ pub fn set_subst_char(c: char) {
 /// vars::set_subst_char(':');
 /// assert_eq!(vars::get_subst_char(), ':');
 /// ```
+#[cfg_attr(feature = "clippy", allow(cast_sign_loss))]
 pub fn get_subst_char() -> char {
     unsafe { (history_subst_char as u8) as char }
 }
@@ -137,6 +139,7 @@ pub fn set_comment_char(c: char) {
 /// vars::set_comment_char(':');
 /// assert_eq!(vars::get_comment_char(), ':');
 /// ```
+#[cfg_attr(feature = "clippy", allow(cast_sign_loss))]
 pub fn get_comment_char() -> char {
     unsafe { (history_comment_char as u8) as char }
 }
@@ -471,8 +474,8 @@ pub fn set_quotes_inhibit_expansion(v: i8) {
 /// vars::set_quotes_inhibit_expansion(1);
 /// assert_eq!(vars::get_quotes_inhibit_expansion(), 1);
 /// ```
-pub fn get_quotes_inhibit_expansion() -> i8 {
-    unsafe { history_quotes_inhibit_expansion as i8 }
+pub fn get_quotes_inhibit_expansion() -> i32 {
+    unsafe { history_quotes_inhibit_expansion }
 }
 
 /// This should be set to a function of the following type:
@@ -588,41 +591,91 @@ mod test {
     #[test]
     fn test_word_delimiter() {
         ::history::mgmt::init();
-        add_word_delimiter(':').unwrap();
-        let mut delims: String = get_word_delimiters().unwrap().into_iter().collect();
+        match add_word_delimiter(':') {
+            Ok(_) => assert!(true),
+            Err(_) => assert!(false),
+        };
+        let mut delims: String = match get_word_delimiters() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
+
         assert_eq!(&delims[..], " \t\n;&()|<>:");
         assert!(remove_word_delimiter(':').is_ok());
         assert!(remove_word_delimiter('|').is_ok());
-        delims = get_word_delimiters().unwrap().into_iter().collect();
+        delims = match get_word_delimiters() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n;&()<>");
         let mut new_delims = Vec::new();
         new_delims.extend([' ', '\t', '\n'].iter().cloned());
         assert!(set_word_delimiters(new_delims).is_ok());
-        delims = get_word_delimiters().unwrap().into_iter().collect();
+        delims = match get_word_delimiters() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n");
         let mut old_delims = Vec::new();
         old_delims.extend([' ', '\t', '\n', ';', '&', '(', ')', '|', '<', '>'].iter().cloned());
         assert!(set_word_delimiters(old_delims).is_ok());
-        delims = get_word_delimiters().unwrap().into_iter().collect();
+        delims = match get_word_delimiters() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n;&()|<>");
     }
 
     #[test]
     fn test_search_delimiter_chars() {
         ::history::mgmt::init();
-        let schars = get_search_delimiter_chars();
-        assert!(schars.is_ok());
-        assert!(schars.unwrap().is_empty());
+        match get_search_delimiter_chars() {
+            Ok(d) => assert!(d.is_empty()),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        }
         let mut new_delims = Vec::new();
         new_delims.extend(['#'].iter().cloned());
         assert!(set_search_delimiter_chars(new_delims).is_ok());
-        let mut delims: String = get_search_delimiter_chars().unwrap().into_iter().collect();
+        let mut delims: String = match get_search_delimiter_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], "#");
         assert!(add_search_delimiter_char('@').is_ok());
-        delims = get_search_delimiter_chars().unwrap().into_iter().collect();
+        delims = match get_search_delimiter_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], "#@");
         assert!(remove_search_delimiter_char('@').is_ok());
-        delims = get_search_delimiter_chars().unwrap().into_iter().collect();
+        delims = match get_search_delimiter_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], "#");
         assert!(remove_search_delimiter_char('#').is_ok());
     }
@@ -632,23 +685,53 @@ mod test {
         ::history::mgmt::init();
         let nec = get_no_expand_chars();
         assert!(nec.is_ok());
-        let mut delims: String = get_no_expand_chars().unwrap().into_iter().collect();
+        let mut delims: String = match get_no_expand_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n\r=");
         assert!(add_no_expand_char('#').is_ok());
-        delims = get_no_expand_chars().unwrap().into_iter().collect();
+        delims = match get_no_expand_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n\r=#");
         assert!(remove_no_expand_char('#').is_ok());
-        delims = get_no_expand_chars().unwrap().into_iter().collect();
+        delims = match get_no_expand_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n\r=");
         let mut new_delims = Vec::new();
         new_delims.extend(['#'].iter().cloned());
         assert!(set_no_expand_chars(new_delims).is_ok());
-        delims = get_no_expand_chars().unwrap().into_iter().collect();
+        delims = match get_no_expand_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], "#");
         let mut old_delims = Vec::new();
         old_delims.extend([' ', '\t', '\n', '\r', '='].iter().cloned());
         assert!(set_no_expand_chars(old_delims).is_ok());
-        delims = get_no_expand_chars().unwrap().into_iter().collect();
+        delims = match get_no_expand_chars() {
+            Ok(d) => d.into_iter().collect(),
+            Err(_) => {
+                assert!(false);
+                return;
+            }
+        };
         assert_eq!(&delims[..], " \t\n\r=");
     }
 

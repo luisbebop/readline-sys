@@ -1,7 +1,6 @@
 //! [2.3.4 Moving Around the History List](https://goo.gl/ROYfRB)
 //!
 //! These functions allow the current index into the history list to be set or changed.
-use libc::c_int;
 use history::HistoryEntry;
 
 mod ext_move {
@@ -27,9 +26,9 @@ mod ext_move {
 /// assert!(move_::set_pos(2));
 /// assert!(!move_::set_pos(3));
 /// ```
-pub fn set_pos(offset: usize) -> bool {
+pub fn set_pos(offset: i32) -> bool {
     ::history::mgmt::init();
-    unsafe { ext_move::history_set_pos(offset as c_int) == 1 }
+    unsafe { ext_move::history_set_pos(offset) == 1 }
 }
 
 /// Back up the current history offset to the previous history entry, and return a pointer to that

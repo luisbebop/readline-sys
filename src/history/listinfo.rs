@@ -1,7 +1,6 @@
 //! [2.3.3 Information About the History List](https://goo.gl/8OWMTy)
 //!
 //! These functions return information about the entire history list or individual list entries.
-use libc::c_int;
 use history::{HistoryEntry, vars};
 use time::Timespec;
 
@@ -60,9 +59,9 @@ pub fn list() -> Result<Vec<HistoryEntry>, ::HistoryError> {
 /// assert!(listmgmt::add("test").is_ok());
 /// assert!(listinfo::offset() == 0);
 /// ```
-pub fn offset() -> usize {
+pub fn offset() -> i32 {
     ::history::mgmt::init();
-    unsafe { ext_listinfo::where_history() as usize }
+    unsafe { ext_listinfo::where_history() }
 }
 
 /// Return the history entry at the current position, as determined by `where_history()``. If there
@@ -101,10 +100,10 @@ pub fn current<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
 /// assert!(vars::history_base == 1);
 /// assert!(listinfo::get(1).is_ok());
 /// ```
-pub fn get<'a>(offset: usize) -> Result<&'a mut HistoryEntry, ::HistoryError> {
+pub fn get<'a>(offset: i32) -> Result<&'a mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();
     unsafe {
-        let ptr = ext_listinfo::history_get(offset as c_int);
+        let ptr = ext_listinfo::history_get(offset);
 
         if ptr.is_null() {
             Err(::HistoryError::new("Null Pointer", "Unable to get the history!"))
@@ -127,7 +126,7 @@ pub fn get<'a>(offset: usize) -> Result<&'a mut HistoryEntry, ::HistoryError> {
 /// let entry = listinfo::get(1).unwrap();
 /// assert!(listinfo::get_time(entry).sec > 0);
 /// ```
-pub fn get_time<'a>(entry: &'a mut HistoryEntry) -> Timespec {
+pub fn get_time(entry: &mut HistoryEntry) -> Timespec {
     ::history::mgmt::init();
     Timespec::new(unsafe { ext_listinfo::history_get_time(entry) } as i64, 0)
 }
@@ -144,9 +143,9 @@ pub fn get_time<'a>(entry: &'a mut HistoryEntry) -> Timespec {
 /// assert!(vars::history_base == 1);
 /// assert!(listinfo::total_bytes() > 0);
 /// ```
-pub fn total_bytes() -> usize {
+pub fn total_bytes() -> i32 {
     ::history::mgmt::init();
-    unsafe { ext_listinfo::history_total_bytes() as usize }
+    unsafe { ext_listinfo::history_total_bytes() }
 }
 
 #[cfg(test)]

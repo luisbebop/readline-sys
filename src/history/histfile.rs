@@ -3,7 +3,6 @@
 //! The History library can read the history from and write it to a file. This section documents the
 //! functions for managing a history file.
 use errno::errno;
-use libc::c_int;
 use std::ffi::CString;
 use std::path::Path;
 use std::ptr;
@@ -25,16 +24,14 @@ fn get_path_ptr(path: Option<&Path>) -> Result<*const i8, ::HistoryError> {
         Some(p) => {
             match p.to_str() {
                 Some(p) => Ok(try!(CString::new(p)).as_ptr()),
-                None => {
-                    return Err(::HistoryError::new("History Error", "Unable to determine path!"));
-                }
+                None => Err(::HistoryError::new("History Error", "Unable to determine path!")),
             }
         }
         None => Ok(ptr::null()),
     }
 }
 
-fn gen_result(res: usize) -> Result<usize, ::HistoryError> {
+fn gen_result(res: i32) -> Result<i32, ::HistoryError> {
     if res == 0 {
         Ok(res)
     } else {
@@ -64,11 +61,11 @@ fn gen_result(res: usize) -> Result<usize, ::HistoryError> {
 /// res = histfile::read(Some(path.as_path())).unwrap();
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
-pub fn read(path: Option<&Path>) -> Result<usize, ::HistoryError> {
+pub fn read(path: Option<&Path>) -> Result<i32, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(get_path_ptr(path));
 
-    unsafe { gen_result(ext_histfile::read_history(ptr) as usize) }
+    unsafe { gen_result(ext_histfile::read_history(ptr)) }
 }
 
 /// Read a range of lines from filename, adding them to the history list. Start reading at line
@@ -91,13 +88,11 @@ pub fn read(path: Option<&Path>) -> Result<usize, ::HistoryError> {
 /// res = histfile::read_range(Some(path.as_path()), 0, -1).unwrap();
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
-pub fn read_range(path: Option<&Path>, from: usize, to: isize) -> Result<usize, ::HistoryError> {
+pub fn read_range(path: Option<&Path>, from: i32, to: i32) -> Result<i32, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(get_path_ptr(path));
 
-    unsafe {
-        gen_result(ext_histfile::read_history_range(ptr, from as c_int, to as c_int) as usize)
-    }
+    unsafe { gen_result(ext_histfile::read_history_range(ptr, from, to)) }
 }
 
 /// Write the current history to `filename`, overwriting `filename` if necessary. If `filename` is
@@ -118,11 +113,11 @@ pub fn read_range(path: Option<&Path>, from: usize, to: isize) -> Result<usize, 
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
 /// ```
-pub fn write(path: Option<&Path>) -> Result<usize, ::HistoryError> {
+pub fn write(path: Option<&Path>) -> Result<i32, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(get_path_ptr(path));
 
-    unsafe { gen_result(ext_histfile::write_history(ptr) as usize) }
+    unsafe { gen_result(ext_histfile::write_history(ptr)) }
 }
 
 /// Append the last `n` elements of the history list to `filename`. If `filename` is None, then
@@ -144,11 +139,11 @@ pub fn write(path: Option<&Path>) -> Result<usize, ::HistoryError> {
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
 /// ```
-pub fn append(path: Option<&Path>, n: usize) -> Result<usize, ::HistoryError> {
+pub fn append(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(get_path_ptr(path));
 
-    unsafe { gen_result(ext_histfile::append_history(n as c_int, ptr) as usize) }
+    unsafe { gen_result(ext_histfile::append_history(n, ptr)) }
 }
 
 /// Truncate the history file `filename`, leaving only the last `n` lines. If `filename` is None,
@@ -173,9 +168,9 @@ pub fn append(path: Option<&Path>, n: usize) -> Result<usize, ::HistoryError> {
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
 /// ```
-pub fn truncate(path: Option<&Path>, n: usize) -> Result<usize, ::HistoryError> {
+pub fn truncate(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
     ::history::mgmt::init();
     let ptr = try!(get_path_ptr(path));
 
-    unsafe { gen_result(ext_histfile::history_truncate_file(ptr, n as c_int) as usize) }
+    unsafe { gen_result(ext_histfile::history_truncate_file(ptr, n)) }
 }
