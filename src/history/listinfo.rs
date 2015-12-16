@@ -151,7 +151,7 @@ pub fn total_bytes() -> usize {
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn test_history_list() {
