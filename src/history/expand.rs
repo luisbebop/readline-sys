@@ -74,7 +74,7 @@ pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, 
     let ptr = try!(CString::new(s)).as_ptr();
     let ch = match delim {
         Some(c) => c as c_int,
-        None    => 0 as c_int,
+        None => 0 as c_int,
     };
 
     unsafe {
