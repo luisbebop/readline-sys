@@ -4,6 +4,7 @@
 //! list itself.
 use libc::{c_int, c_void};
 use history::{HistoryEntry, vars};
+use history::mgmt::init;
 use std::ffi::CString;
 use std::ptr;
 use time::Timespec;
@@ -41,7 +42,7 @@ mod ext_listmgmt {
 /// }
 /// ```
 pub fn add(line: &str) -> Result<(), ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(CString::new(line)).as_ptr();
 
     unsafe {
@@ -71,7 +72,7 @@ pub fn add(line: &str) -> Result<(), ::HistoryError> {
 /// # }
 /// ```
 pub fn add_time(time: Timespec) -> Result<(), ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let cc = vars::get_comment_char();
 
     if cc != '\u{0}' {
@@ -98,7 +99,7 @@ pub fn add_time(time: Timespec) -> Result<(), ::HistoryError> {
 /// let _ = listmgmt::remove(0);
 /// ```
 pub fn remove<'a>(offset: i32) -> &'a mut HistoryEntry {
-    ::history::mgmt::init();
+    init();
     unsafe { &mut *ext_listmgmt::remove_history(offset) }
 }
 
@@ -116,7 +117,7 @@ pub fn remove<'a>(offset: i32) -> &'a mut HistoryEntry {
 /// assert!(listmgmt::free_entry(entry).is_ok());
 /// ```
 pub fn free_entry(entry: &mut HistoryEntry) -> Result<(), *mut c_void> {
-    ::history::mgmt::init();
+    init();
     unsafe {
         let data_ptr = ext_listmgmt::free_history_entry(entry);
 
@@ -146,7 +147,7 @@ pub fn replace_entry(offset: i32,
                      line: &str,
                      appdata: Option<*mut c_void>)
                      -> Result<&mut HistoryEntry, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let sptr = try!(CString::new(line)).as_ptr();
     let ptr = match appdata {
         Some(d) => d,
@@ -177,7 +178,7 @@ pub fn replace_entry(offset: i32,
 /// assert_eq!(vars::history_length, 0);
 /// ```
 pub fn clear() {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_listmgmt::clear_history() }
 }
 
@@ -192,7 +193,7 @@ pub fn clear() {
 /// assert_eq!(vars::history_max_entries, 5);
 /// ```
 pub fn stifle(max: i32) {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_listmgmt::stifle_history(max as c_int) }
 }
 
@@ -209,7 +210,7 @@ pub fn stifle(max: i32) {
 /// assert_eq!(max, listmgmt::unstifle());
 /// ```
 pub fn unstifle() -> i32 {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_listmgmt::unstifle_history() }
 }
 
@@ -225,7 +226,7 @@ pub fn unstifle() -> i32 {
 /// assert!(listmgmt::is_stifled());
 /// ```
 pub fn is_stifled() -> bool {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_listmgmt::history_is_stifled() != 0 }
 }
 

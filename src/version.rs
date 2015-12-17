@@ -68,7 +68,11 @@ fn ver() -> String {
 /// // release: v0.1.3-pre-11-gd90443d
 /// ```
 pub fn version(verbose: bool) -> String {
-    if verbose { verbose_ver() } else { ver() }
+    if verbose {
+        verbose_ver()
+    } else {
+        ver()
+    }
 }
 
 #[cfg(test)]

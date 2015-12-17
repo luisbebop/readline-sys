@@ -1,7 +1,8 @@
 //! [2.3.3 Information About the History List](https://goo.gl/8OWMTy)
 //!
 //! These functions return information about the entire history list or individual list entries.
-use history::{HistoryEntry, vars};
+use history::HistoryEntry;
+use history::mgmt::init;
 use time::Timespec;
 
 mod ext_listinfo {
@@ -31,18 +32,22 @@ mod ext_listinfo {
 /// assert!(entries.len() == 1);
 /// ```
 pub fn list() -> Result<Vec<HistoryEntry>, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     unsafe {
-        let ptr = &mut *ext_listinfo::history_list();
+        let ptr = ext_listinfo::history_list();
 
         if ptr.is_null() {
             Err(::HistoryError::new("Null Pointer", "Unable to access history list"))
         } else {
-            let len = vars::history_length;
             let mut entries = Vec::new();
-            for i in 0..len {
-                let entry = *ptr.offset(i as isize);
-                entries.push(entry);
+            for i in 0.. {
+                let entry_ptr = *ptr.offset(i as isize);
+
+                if !entry_ptr.is_null() {
+                    entries.push(*entry_ptr);
+                } else {
+                    break;
+                }
             }
             Ok(entries)
         }
@@ -60,7 +65,7 @@ pub fn list() -> Result<Vec<HistoryEntry>, ::HistoryError> {
 /// assert!(listinfo::offset() == 0);
 /// ```
 pub fn offset() -> i32 {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_listinfo::where_history() }
 }
 
@@ -76,7 +81,7 @@ pub fn offset() -> i32 {
 /// assert!(listinfo::current().is_ok());
 /// ```
 pub fn current<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     unsafe {
         let ptr = ext_listinfo::current_history();
 
@@ -101,7 +106,7 @@ pub fn current<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
 /// assert!(listinfo::get(1).is_ok());
 /// ```
 pub fn get<'a>(offset: i32) -> Result<&'a mut HistoryEntry, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     unsafe {
         let ptr = ext_listinfo::history_get(offset);
 
@@ -127,7 +132,7 @@ pub fn get<'a>(offset: i32) -> Result<&'a mut HistoryEntry, ::HistoryError> {
 /// assert!(listinfo::get_time(entry).sec > 0);
 /// ```
 pub fn get_time(entry: &mut HistoryEntry) -> Timespec {
-    ::history::mgmt::init();
+    init();
     Timespec::new(unsafe { ext_listinfo::history_get_time(entry) } as i64, 0)
 }
 
@@ -144,7 +149,7 @@ pub fn get_time(entry: &mut HistoryEntry) -> Timespec {
 /// assert!(listinfo::total_bytes() > 0);
 /// ```
 pub fn total_bytes() -> i32 {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_listinfo::history_total_bytes() }
 }
 

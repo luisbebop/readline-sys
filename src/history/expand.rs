@@ -2,6 +2,7 @@
 //!
 //! These functions implement history expansion.
 use libc::{c_char, c_int, c_void, free};
+use history::mgmt::init;
 use readline::util;
 use std::ffi::{CStr, CString};
 use std::ptr;
@@ -42,7 +43,7 @@ mod ext_expand {
 /// assert!(out == "ls -al");
 /// ```
 pub fn expand(s: &str) -> Result<(isize, String), ::HistoryError> {
-    ::history::mgmt::init();
+    init();
 
     unsafe {
         let ptr = try!(CString::new(s)).into_raw();
@@ -78,7 +79,7 @@ pub fn expand(s: &str) -> Result<(isize, String), ::HistoryError> {
 /// assert!(idx == 3);
 /// ```
 pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(CString::new(s)).as_ptr();
     let ch = match delim {
         Some(c) => c as c_int,
@@ -113,7 +114,7 @@ pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, 
 /// assert!(res[6] == ">");
 /// ```
 pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(CString::new(s)).as_ptr();
     let mut res = Vec::new();
 
@@ -164,7 +165,7 @@ pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
 /// assert!(res == "three");
 /// ```
 pub fn arg_extract(s: &str, first: i32, last: i32) -> Result<String, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(CString::new(s)).as_ptr();
     unsafe {
         let char_ptr = ext_expand::history_arg_extract(first, last, ptr);

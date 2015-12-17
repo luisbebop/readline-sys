@@ -13,7 +13,7 @@
 //!
 //! ```
 //! use rl_sys::readline;
-//! use rl_sys::history::listmgmt;
+//! use rl_sys::history::{listmgmt, mgmt};
 //!
 //! loop {
 //!     let input = match readline::readline("$ ") {
@@ -33,8 +33,13 @@
 //!     println!("{}", input);
 //!
 //!     // Add input to history.
-//!     let _ = listmgmt::add(&input);
+//!     match listmgmt::add(&input) {
+//!         Ok(_) => {},
+//!         Err(e) => { println!("{:?}", e); },
+//!     }
 //! }
+//!
+//! mgmt::cleanup();
 //! ```
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]

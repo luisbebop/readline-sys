@@ -3,21 +3,26 @@
 //! Use the arrow keys to go forwards and backwards through the history.
 //!
 //! Currently supported commands:
-//! `history -c` -> clear the history
-//! `history -s n` -> stifle the history to n entries
-//! `history -u` -> unstifle the history
-
+//!
+//! * `history -c` -> clear the history
+//! * `history -s n` -> stifle the history to n entries
+//! * `history -u` -> unstifle the history
+//! * `exit` -> exit the shell
+//!
+//! Other commands will be run via a subshell and the result output.
+//!
 extern crate rl_sys;
+extern crate time;
 
-use rl_sys::{history, readline};
+use rl_sys::history::{expand, listinfo, listmgmt, mgmt};
+use rl_sys::readline;
 use std::process::Command;
 
 fn main() {
     println!("welcome to shrl!");
 
-    let mut counter = 0;
     loop {
-        let prompt = format!("{}$ ", counter);
+        let prompt = format!("{} $ ", time::now().rfc3339());
         let input: String = match readline::readline(&prompt) {
             Ok(Some(s)) => s,
             Ok(None) => break,
@@ -33,39 +38,60 @@ fn main() {
         }
 
         // Add user input to history.
-        let _ = history::listmgmt::add(&input);
+        listmgmt::add(&input).unwrap_or_else(|e| println!("{:?}", e));
 
-        if input.starts_with("history") {
-            let argv: Vec<&str> = input.split_whitespace().collect();
-            match argv.get(1).map(|s| &**s) {
-                Some("-c") => history::listmgmt::clear(),
-                Some("-s") => {
-                    if let Some(s) = argv.get(2) {
+        if input.starts_with("exit") {
+            break;
+        } else if input.starts_with("history") {
+            let toks: Vec<String> = match expand::tokenize(&input) {
+                Ok(t) => t,
+                Err(e) => {
+                    println!("{:?}", e);
+                    Vec::new()
+                }
+            };
+
+            let argv: Vec<&str> = toks.iter()
+                                      .filter_map(|s| {
+                                          if s == "history" {
+                                              None
+                                          } else {
+                                              Some(s.as_ref())
+                                          }
+                                      })
+                                      .collect();
+
+            match argv.get(0) {
+                Some(&"-c") => listmgmt::clear(),
+                Some(&"-s") => {
+                    if let Some(s) = argv.get(1) {
                         if let Ok(n) = s.parse::<i32>() {
                             // Stifle the history so that only *n* entries will be stored.
-                            history::listmgmt::stifle(n);
+                            listmgmt::stifle(n);
                         }
                     }
                 }
-                Some("-u") => {
-                    history::listmgmt::unstifle();
+                Some(&"-u") => {
+                    listmgmt::unstifle();
                 }
-                Some(_) => println!("unrecognized history command"),
+                Some(&_) => println!("unrecognized history command"),
                 None => {
-                    println!("{:?}", history::listinfo::list());
+                    println!("{:?}", listinfo::list());
                 }
             }
         } else {
-            let output = match Command::new("sh").arg("-c").arg(input).output() {
-                Ok(output) => output,
+            match Command::new("sh").arg("-c").arg(input).output() {
+                Ok(output) => {
+                    print!("{}", String::from_utf8_lossy(&output.stdout));
+                }
                 Err(e) => {
                     println!("failed to execute process: {}", e);
                     continue;
                 }
-            };
-            println!("{}", String::from_utf8_lossy(&output.stdout));
-        }
+            }
 
-        counter += 1;
+        }
     }
+
+    mgmt::cleanup();
 }

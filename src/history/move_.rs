@@ -2,6 +2,7 @@
 //!
 //! These functions allow the current index into the history list to be set or changed.
 use history::HistoryEntry;
+use history::mgmt::init;
 
 mod ext_move {
     use libc::c_int;
@@ -27,7 +28,7 @@ mod ext_move {
 /// assert!(!move_::set_pos(3));
 /// ```
 pub fn set_pos(offset: i32) -> bool {
-    ::history::mgmt::init();
+    init();
     unsafe { ext_move::history_set_pos(offset) == 1 }
 }
 
@@ -47,7 +48,7 @@ pub fn set_pos(offset: i32) -> bool {
 /// assert!(move_::previous().is_err());
 /// ```
 pub fn previous<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     unsafe {
         let ptr = ext_move::previous_history();
 
@@ -74,7 +75,7 @@ pub fn previous<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
 /// assert!(move_::next().is_err()); // There is no pos 2.
 /// ```
 pub fn next<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     unsafe {
         let ptr = ext_move::next_history();
 

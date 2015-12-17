@@ -3,6 +3,7 @@
 //! The History library can read the history from and write it to a file. This section documents the
 //! functions for managing a history file.
 use errno::errno;
+use history::mgmt::init;
 use std::ffi::CString;
 use std::path::Path;
 use std::ptr;
@@ -62,7 +63,7 @@ fn gen_result(res: i32) -> Result<i32, ::HistoryError> {
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
 pub fn read(path: Option<&Path>) -> Result<i32, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(get_path_ptr(path));
 
     unsafe { gen_result(ext_histfile::read_history(ptr)) }
@@ -89,7 +90,7 @@ pub fn read(path: Option<&Path>) -> Result<i32, ::HistoryError> {
 /// assert!(res == 0);
 /// assert!(fs::remove_file(path).is_ok());
 pub fn read_range(path: Option<&Path>, from: i32, to: i32) -> Result<i32, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(get_path_ptr(path));
 
     unsafe { gen_result(ext_histfile::read_history_range(ptr, from, to)) }
@@ -114,7 +115,7 @@ pub fn read_range(path: Option<&Path>, from: i32, to: i32) -> Result<i32, ::Hist
 /// assert!(fs::remove_file(path).is_ok());
 /// ```
 pub fn write(path: Option<&Path>) -> Result<i32, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(get_path_ptr(path));
 
     unsafe { gen_result(ext_histfile::write_history(ptr)) }
@@ -140,7 +141,7 @@ pub fn write(path: Option<&Path>) -> Result<i32, ::HistoryError> {
 /// assert!(fs::remove_file(path).is_ok());
 /// ```
 pub fn append(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(get_path_ptr(path));
 
     unsafe { gen_result(ext_histfile::append_history(n, ptr)) }
@@ -169,7 +170,7 @@ pub fn append(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
 /// assert!(fs::remove_file(path).is_ok());
 /// ```
 pub fn truncate(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
-    ::history::mgmt::init();
+    init();
     let ptr = try!(get_path_ptr(path));
 
     unsafe { gen_result(ext_histfile::history_truncate_file(ptr, n)) }
