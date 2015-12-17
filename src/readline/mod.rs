@@ -1,6 +1,6 @@
 //! Readline API
+use libc::{c_void, free};
 use std::ffi::{CStr, CString};
-use std::str;
 
 mod ext_readline {
     use libc::c_char;
@@ -9,6 +9,7 @@ mod ext_readline {
         pub fn readline(p: *const c_char) -> *const c_char;
     }
 }
+pub mod util;
 
 /// Wraps the libreadline readline function.  The argument is the prompt to use.
 ///
@@ -32,17 +33,17 @@ mod ext_readline {
 /// }
 /// ```
 pub fn readline(prompt: &str) -> Result<Option<String>, ::ReadlineError> {
-    let cprmt = try!(CString::new(prompt.as_bytes()));
+    let prompt_ptr = try!(CString::new(prompt)).as_ptr();
 
     unsafe {
-        let ret = ext_readline::readline(cprmt.as_ptr());
+        let ret = ext_readline::readline(prompt_ptr);
         if ret.is_null() {
             // user pressed Ctrl-D
             Ok(None)
         } else {
-            let slice = CStr::from_ptr(ret);
-            let res = try!(str::from_utf8(slice.to_bytes()));
-            Ok(Some(res.to_owned()))
+            let line = CStr::from_ptr(ret).to_string_lossy().into_owned();
+            free(ret as *mut c_void);
+            Ok(Some(line))
         }
     }
 }

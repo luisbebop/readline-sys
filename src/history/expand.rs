@@ -2,6 +2,7 @@
 //!
 //! These functions implement history expansion.
 use libc::{c_char, c_int, c_void, free};
+use readline::util;
 use std::ffi::{CStr, CString};
 use std::ptr;
 
@@ -54,7 +55,7 @@ pub fn expand(s: &str) -> Result<(isize, String), ::HistoryError> {
             Err(::HistoryError::new("NullPointer", "Null pointer returned from history_expand!"))
         } else {
             let out = CStr::from_ptr(output_ptr).to_string_lossy().into_owned();
-            free(output_ptr as *mut c_void);
+            util::free(output_ptr as *mut c_void);
             Ok((res as isize, out))
         }
     }
@@ -91,7 +92,7 @@ pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, 
             Err(::HistoryError::new("History Error", "Null pointer returned!"))
         } else {
             let out = CStr::from_ptr(char_ptr).to_string_lossy().into_owned();
-            free(char_ptr as *mut c_void);
+            //free(char_ptr as *mut c_void);
             Ok(out)
         }
     }

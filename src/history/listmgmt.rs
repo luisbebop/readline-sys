@@ -41,10 +41,11 @@ mod ext_listmgmt {
 /// }
 /// ```
 pub fn add(line: &str) -> Result<(), ::HistoryError> {
-    let cline = try!(CString::new(line));
     ::history::mgmt::init();
+    let ptr = try!(CString::new(line)).as_ptr();
+
     unsafe {
-        ext_listmgmt::add_history(cline.as_ptr());
+        ext_listmgmt::add_history(ptr);
     }
     Ok(())
 }
