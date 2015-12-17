@@ -47,6 +47,7 @@ pub fn add(line: &str) -> Result<(), ::HistoryError> {
     unsafe {
         ext_listmgmt::add_history(ptr);
     }
+
     Ok(())
 }
 
@@ -70,14 +71,14 @@ pub fn add(line: &str) -> Result<(), ::HistoryError> {
 /// # }
 /// ```
 pub fn add_time(time: Timespec) -> Result<(), ::HistoryError> {
+    ::history::mgmt::init();
     let cc = vars::get_comment_char();
 
     if cc != '\u{0}' {
         let now_str = format!("{}{}", cc, time.sec);
-        let cline = try!(CString::new(now_str));
-        ::history::mgmt::init();
+        let ptr = try!(CString::new(now_str)).as_ptr();
         unsafe {
-            ext_listmgmt::add_history_time(cline.as_ptr());
+            ext_listmgmt::add_history_time(ptr);
         }
         Ok(())
     } else {

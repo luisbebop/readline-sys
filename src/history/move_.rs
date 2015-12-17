@@ -41,7 +41,7 @@ pub fn set_pos(offset: i32) -> bool {
 ///
 /// assert!(listmgmt::add("ls -al").is_ok());
 /// assert!(listmgmt::add("test").is_ok());
-/// assert!(move_::set_pos(2));
+/// assert!(move_::set_pos(2));  // Set pos after last entry, and back up through both.
 /// assert!(move_::previous().is_ok());
 /// assert!(move_::previous().is_ok());
 /// assert!(move_::previous().is_err());
@@ -67,11 +67,11 @@ pub fn previous<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
 /// ```
 /// use rl_sys::history::{listmgmt, move_};
 ///
-/// assert!(listmgmt::add("ls -al").is_ok());
+/// assert!(listmgmt::add("ls -al").is_ok());  // Pos 0
 /// assert!(listmgmt::add("test").is_ok());
 /// assert!(move_::set_pos(0));
-/// assert!(move_::next().is_ok());
-/// assert!(move_::next().is_err());
+/// assert!(move_::next().is_ok());  // Move to pos 1.
+/// assert!(move_::next().is_err()); // There is no pos 2.
 /// ```
 pub fn next<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
     ::history::mgmt::init();

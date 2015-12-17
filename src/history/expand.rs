@@ -92,7 +92,6 @@ pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, 
             Err(::HistoryError::new("History Error", "Null pointer returned!"))
         } else {
             let out = CStr::from_ptr(char_ptr).to_string_lossy().into_owned();
-            //free(char_ptr as *mut c_void);
             Ok(out)
         }
     }

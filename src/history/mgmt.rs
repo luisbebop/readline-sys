@@ -33,6 +33,12 @@ pub fn init() {
     });
 }
 
+/// Get pointer for cleanup
+fn get_state_ptr() -> *mut HistoryState {
+    init();
+    unsafe { ext_mgmt::history_get_history_state() }
+}
+
 /// Return a structure describing the current state of the input history.
 ///
 /// # Examples
@@ -42,9 +48,9 @@ pub fn init() {
 /// let state = mgmt::get_state();
 /// println!("{:?}", state);
 /// ```
-pub fn get_state<'r>() -> &'r mut HistoryState {
+pub fn get_state<'a>() -> &'a mut HistoryState {
     init();
-    unsafe { &mut *ext_mgmt::history_get_history_state() }
+    unsafe { &mut *get_state_ptr() }
 }
 
 /// Set the state of the history list according to state.
@@ -60,6 +66,35 @@ pub fn get_state<'r>() -> &'r mut HistoryState {
 pub fn set_state(state: &mut HistoryState) -> () {
     init();
     unsafe { ext_mgmt::history_set_history_state(state) }
+}
+
+/// Cleanup the history state.  This should be called on program exit or after you are completely
+/// finished using the History API.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::history::{listmgmt, mgmt};
+///
+/// assert!(listmgmt::add("ls -al").is_ok());
+/// mgmt::cleanup();
+/// ```
+pub fn cleanup() -> () {
+    use libc::c_void;
+    use readline::util;
+
+    // Clear the history via Readline API.  This frees all Histoy Entry data, but not the list
+    // itself.
+    util::clear_history();
+
+    // Get a pointer to the History State.
+    let state_ptr = get_state_ptr();
+
+    // Free the History Entries array.
+    util::free(unsafe { (&*state_ptr).entries } as *mut c_void);
+
+    // Free the History State.
+    util::free(state_ptr as *mut c_void);
 }
 
 #[cfg(test)]
