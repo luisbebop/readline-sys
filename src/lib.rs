@@ -45,6 +45,8 @@
 #![cfg_attr(feature="clippy", plugin(clippy))]
 #![cfg_attr(feature="clippy", deny(clippy, clippy_pedantic))]
 #![deny(missing_docs)]
+#[macro_use]
+extern crate bitflags;
 extern crate errno;
 extern crate libc;
 #[macro_use]

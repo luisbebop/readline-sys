@@ -1,8 +1,9 @@
 //! [2.4 History Variables](https://goo.gl/la0XEf)
 //!
 //! This section describes the externally-visible variables exported by the GNU History Library.
-use libc::{c_char, c_int, c_uint};
+use libc::{c_char, c_int};
 use error::HistoryError;
+use history::InhibitExpansionFunc;
 use std::ffi::{CStr, CString};
 
 extern "C" {
@@ -20,8 +21,7 @@ extern "C" {
     static mut history_search_delimiter_chars: *mut c_char;
     static mut history_no_expand_chars: *mut c_char;
     static mut history_quotes_inhibit_expansion: c_int;
-    static mut history_inhibit_expansion_function: Option<extern "C" fn(*mut c_char, c_uint)
-                                                                        -> c_int>;
+    static mut history_inhibit_expansion_function: InhibitExpansionFunc;
 }
 
 /// If non-zero, timestamps are written to the history file, so they can be preserved between
@@ -501,7 +501,7 @@ pub fn get_quotes_inhibit_expansion() -> i32 {
 /// vars::set_inhibit_expansion_function(Some(blah));
 /// # }
 /// ```
-pub fn set_inhibit_expansion_function(f: Option<extern "C" fn(*mut c_char, c_uint) -> c_int>) {
+pub fn set_inhibit_expansion_function(f: InhibitExpansionFunc) {
     unsafe { history_inhibit_expansion_function = f }
 }
 
@@ -526,7 +526,7 @@ pub fn set_inhibit_expansion_function(f: Option<extern "C" fn(*mut c_char, c_uin
 /// assert!(vars::get_inhibit_expansion_function().is_none());
 /// # }
 /// ```
-pub fn get_inhibit_expansion_function() -> Option<extern "C" fn(*mut c_char, c_uint) -> c_int> {
+pub fn get_inhibit_expansion_function() -> InhibitExpansionFunc {
     unsafe { history_inhibit_expansion_function }
 }
 

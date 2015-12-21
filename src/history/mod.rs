@@ -1,4 +1,4 @@
-//! Readline History API
+//! GNU Readline History API
 //!
 //! Many programs read input from the user a line at a time. The GNU History library is able to keep
 //! track of those lines, associate arbitrary data with each line, and utilize information from
@@ -22,7 +22,7 @@
 //! code, an application writer should include the file <readline/history.h> in any file that uses
 //! the History library's features. It supplies extern declarations for all of the library's public
 //! functions and variables, and declares all of the public data structures.
-use libc::{c_char, c_int, c_void};
+use libc::{c_char, c_int, c_uint, c_void};
 use std::clone::Clone;
 use std::default::Default;
 use std::ffi::CStr;
@@ -39,6 +39,8 @@ pub mod vars;
 
 /// Application specific data attached to the history entry.
 pub type HistoryData = *mut c_void;
+/// Inhibit Expansion Function Type.
+pub type InhibitExpansionFunc = Option<extern "C" fn(*mut c_char, c_uint) -> c_int>;
 
 #[repr(C)]
 #[derive(Copy)]

@@ -1,7 +1,6 @@
-//! [2.4.10 Utility Functions][1]
-//!
-//! [1]: https://cnswww.cns.cwru.edu/php/chet/readline/readline.html#SEC39
+//! [2.4.10 Utility Functions](https://goo.gl/wg27lL)
 use libc::c_void;
+use std::sync::{ONCE_INIT, Once};
 
 mod ext_util {
     use libc::c_void;
@@ -9,7 +8,28 @@ mod ext_util {
     extern "C" {
         pub fn rl_free(mem: *mut c_void) -> ();
         pub fn rl_clear_history() -> ();
+        pub fn rl_initialize() -> ();
     }
+}
+
+static START: Once = ONCE_INIT;
+
+/// Initialize or re-initialize Readline's internal state. It's not strictly necessary to call this;
+/// `readline()` calls it before reading any input. Note that this will only call `initialize` once
+/// after first use.
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::readline::util;
+///
+/// util::init();
+/// ```
+pub fn init() {
+    START.call_once(|| {
+        debug!("Readline API initialized");
+        unsafe { ext_util::rl_initialize() };
+    });
 }
 
 /// Deallocate the memory pointed to by `ptr`. `ptr` must have been allocated by malloc.
