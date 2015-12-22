@@ -5,8 +5,10 @@
 //! user types and the functions that get run. You can make your own keymaps, copy existing keymaps,
 //! and tell Readline which keymap to use.
 use readline::Keymap;
+use std::ffi::{CStr, CString};
 
 mod ext_keymap {
+    use libc::c_char;
     use readline::Keymap;
 
     extern "C" {
@@ -17,6 +19,8 @@ mod ext_keymap {
         pub fn rl_free_keymap(map: Keymap) -> ();
         pub fn rl_get_keymap() -> Keymap;
         pub fn rl_set_keymap(map: Keymap) -> ();
+        pub fn rl_get_keymap_by_name(name: *const c_char) -> Keymap;
+        pub fn rl_get_keymap_name(map: Keymap) -> *const c_char;
     }
 }
 
@@ -157,4 +161,70 @@ pub fn get() -> Result<Keymap, ::ReadlineError> {
 /// ```
 pub fn set(map: Keymap) -> () {
     unsafe { ext_keymap::rl_set_keymap(map) }
+}
+
+/// Return the keymap matching `name`. `name` is one which would be supplied in a set keymap inputrc
+/// line (see section [1.3 Readline Init File]).
+/// [1.3 readline init file]: https://goo.gl/VtaCdx
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::readline::keymap;
+///
+/// let keymap = keymap::get_by_name("emacs").unwrap();
+/// assert!(!keymap.is_null());
+/// ```
+pub fn get_by_name(name: &str) -> Result<Keymap, ::ReadlineError> {
+    let name_ptr = try!(CString::new(name)).as_ptr();
+    unsafe {
+        let keymap_ptr = ext_keymap::rl_get_keymap_by_name(name_ptr);
+
+        if keymap_ptr.is_null() {
+            Err(::ReadlineError::new("Null Pointer", "rl_get_keymap_by_name returned null pointer!"))
+        } else {
+            Ok(keymap_ptr)
+        }
+    }
+}
+
+/// Return the name matching `map`. `name` is one which would be supplied in a set keymap inputrc
+/// line (see section [1.3 Readline Init File]).
+/// [1.3 readline init file]: https://goo.gl/VtaCdx
+///
+/// # Examples
+///
+/// ```
+/// use rl_sys::readline::keymap;
+///
+/// let keymap = keymap::get().unwrap();
+/// assert!(!keymap.is_null());
+/// let name = keymap::get_name(keymap).unwrap();
+/// println!("{}", name);
+/// assert!(!name.is_empty());
+/// ```
+pub fn get_name(map: Keymap) -> Result<String, ::ReadlineError> {
+    unsafe {
+        let name_ptr = ext_keymap::rl_get_keymap_name(map);
+
+        if name_ptr.is_null() {
+            Err(::ReadlineError::new("Null Pointer", "rl_get_keymap_name returned null pointer!"))
+        } else {
+            Ok(CStr::from_ptr(name_ptr).to_string_lossy().into_owned())
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    pub fn test_get_name() {
+        let keymap = get().unwrap();
+        assert!(!keymap.is_null());
+        let name = get_name(keymap).unwrap();
+        println!("{}", name);
+        assert!(!name.is_empty());
+    }
 }
