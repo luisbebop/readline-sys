@@ -181,7 +181,8 @@ pub fn get_by_name(name: &str) -> Result<Keymap, ::ReadlineError> {
         let keymap_ptr = ext_keymap::rl_get_keymap_by_name(name_ptr);
 
         if keymap_ptr.is_null() {
-            Err(::ReadlineError::new("Null Pointer", "rl_get_keymap_by_name returned null pointer!"))
+            Err(::ReadlineError::new("Null Pointer",
+                                     "rl_get_keymap_by_name returned null pointer!"))
         } else {
             Ok(keymap_ptr)
         }
@@ -224,7 +225,6 @@ mod test {
         let keymap = get().unwrap();
         assert!(!keymap.is_null());
         let name = get_name(keymap).unwrap();
-        println!("{}", name);
         assert!(!name.is_empty());
     }
 }
