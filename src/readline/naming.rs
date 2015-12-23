@@ -42,15 +42,15 @@ mod ext_naming {
 ///   0
 /// }
 ///
-/// match naming::add_func("move-10-left", -1, test_cmd_func) {
+/// match naming::add_func("move-10-left", '\t', test_cmd_func) {
 ///     Ok(res) => assert!(res == 0),
 ///     Err(_)  => assert!(false),
 /// }
 /// # }
 /// ```
-pub fn add_func(name: &str, key: i32, f: CommandFunction) -> Result<i32, ::ReadlineError> {
+pub fn add_func(name: &str, key: char, f: CommandFunction) -> Result<i32, ::ReadlineError> {
     unsafe {
         let ptr = try!(CString::new(name)).as_ptr();
-        Ok(ext_naming::rl_add_defun(ptr, f as *mut CommandFunction, key))
+        Ok(ext_naming::rl_add_defun(ptr, f as *mut CommandFunction, key as i32))
     }
 }
