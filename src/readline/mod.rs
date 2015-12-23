@@ -53,6 +53,7 @@ mod ext_readline {
         pub fn readline(p: *const c_char) -> *const c_char;
     }
 }
+pub mod funmap;
 pub mod keymap;
 pub mod naming;
 pub mod util;

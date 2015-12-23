@@ -17,6 +17,9 @@ use self::BindType::*;
 use std::ffi::CString;
 use std::path::Path;
 
+/// Result type returned by all binding functions.
+pub type BindResult = Result<i32, ::ReadlineError>;
+
 /// Use for calls to `generic_bind`.
 pub enum BindType {
     /// Generate a function binding.
@@ -72,7 +75,7 @@ mod ext_binding {
     }
 }
 
-fn genresult(res: i32, err: &str) -> Result<i32, ::ReadlineError> {
+fn genresult(res: i32, err: &str) -> BindResult {
     if res == 0 {
         Ok(res)
     } else {
@@ -105,7 +108,7 @@ fn genresult(res: i32, err: &str) -> Result<i32, ::ReadlineError> {
 /// }
 /// # }
 /// ```
-pub fn bind_key(key: char, f: *mut Option<CommandFunction>) -> Result<i32, ::ReadlineError> {
+pub fn bind_key(key: char, f: *mut Option<CommandFunction>) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_bind_key(key as i32, f),
                   "Unable to bind key!")
@@ -138,10 +141,7 @@ pub fn bind_key(key: char, f: *mut Option<CommandFunction>) -> Result<i32, ::Rea
 /// }
 /// # }
 /// ```
-pub fn bind_key_in_map(key: char,
-                       map: Keymap,
-                       f: *mut Option<CommandFunction>)
-                       -> Result<i32, ::ReadlineError> {
+pub fn bind_key_in_map(key: char, map: Keymap, f: *mut Option<CommandFunction>) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_bind_key_in_map(key as i32, f, map),
                   "Unable to bind key in map!")
@@ -184,9 +184,7 @@ pub fn bind_key_in_map(key: char,
 /// }
 /// # }
 /// ```
-pub fn bind_key_if_unbound(key: char,
-                           f: *mut Option<CommandFunction>)
-                           -> Result<i32, ::ReadlineError> {
+pub fn bind_key_if_unbound(key: char, f: *mut Option<CommandFunction>) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_bind_key_if_unbound(key as i32, f),
                   "Unable to bind key!")
@@ -228,7 +226,7 @@ pub fn bind_key_if_unbound(key: char,
 pub fn bind_key_if_unbound_in_map(key: char,
                                   map: Keymap,
                                   f: *mut Option<CommandFunction>)
-                                  -> Result<i32, ::ReadlineError> {
+                                  -> BindResult {
     unsafe {
         genresult(ext_binding::rl_bind_key_if_unbound_in_map(key as i32, f, map),
                   "Unable to bind key in map!")
@@ -269,7 +267,7 @@ pub fn bind_key_if_unbound_in_map(key: char,
 /// }
 /// # }
 /// ```
-pub fn unbind_key(key: char) -> Result<i32, ::ReadlineError> {
+pub fn unbind_key(key: char) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_unbind_key(key as i32),
                   "Unable to unbind key!")
@@ -307,7 +305,7 @@ pub fn unbind_key(key: char) -> Result<i32, ::ReadlineError> {
 /// }
 /// # }
 /// ```
-pub fn unbind_key_in_map(key: char, map: Keymap) -> Result<i32, ::ReadlineError> {
+pub fn unbind_key_in_map(key: char, map: Keymap) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_unbind_key_in_map(key as i32, map),
                   "Unable to unbind key in map!")
@@ -345,9 +343,7 @@ pub fn unbind_key_in_map(key: char, map: Keymap) -> Result<i32, ::ReadlineError>
 /// }
 /// # }
 /// ```
-pub fn unbind_function_in_map(f: *mut Option<CommandFunction>,
-                              map: Keymap)
-                              -> Result<i32, ::ReadlineError> {
+pub fn unbind_function_in_map(f: *mut Option<CommandFunction>, map: Keymap) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_unbind_function_in_map(f, map),
                   "Unable to unbind key in map!")
@@ -370,7 +366,7 @@ pub fn unbind_function_in_map(f: *mut Option<CommandFunction>,
 ///     Err(_) => assert!(false),
 /// }
 /// ```
-pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> Result<i32, ::ReadlineError> {
+pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(cmd)).as_ptr();
         let res = ext_binding::rl_unbind_command_in_map(ptr, map);
@@ -409,7 +405,7 @@ pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> Result<i32, ::ReadlineEr
 /// }
 /// # }
 /// ```
-pub fn bind_keyseq(keyseq: &str, f: *mut Option<CommandFunction>) -> Result<i32, ::ReadlineError> {
+pub fn bind_keyseq(keyseq: &str, f: *mut Option<CommandFunction>) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_bind_keyseq(ptr, f),
@@ -451,7 +447,7 @@ pub fn bind_keyseq(keyseq: &str, f: *mut Option<CommandFunction>) -> Result<i32,
 pub fn bind_keyseq_in_map(keyseq: &str,
                           f: *mut Option<CommandFunction>,
                           map: Keymap)
-                          -> Result<i32, ::ReadlineError> {
+                          -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_bind_keyseq_in_map(ptr, f, map),
@@ -488,10 +484,7 @@ pub fn bind_keyseq_in_map(keyseq: &str,
 /// }
 /// # }
 /// ```
-pub fn set_key(keyseq: &str,
-               f: *mut Option<CommandFunction>,
-               map: Keymap)
-               -> Result<i32, ::ReadlineError> {
+pub fn set_key(keyseq: &str, f: *mut Option<CommandFunction>, map: Keymap) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_set_key(ptr, f, map),
@@ -529,9 +522,7 @@ pub fn set_key(keyseq: &str,
 /// }
 /// # }
 /// ```
-pub fn bind_keyseq_if_unbound(keyseq: &str,
-                              f: *mut Option<CommandFunction>)
-                              -> Result<i32, ::ReadlineError> {
+pub fn bind_keyseq_if_unbound(keyseq: &str, f: *mut Option<CommandFunction>) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_bind_keyseq_if_unbound(ptr, f),
@@ -577,7 +568,7 @@ pub fn bind_keyseq_if_unbound(keyseq: &str,
 pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
                                      f: *mut Option<CommandFunction>,
                                      map: Keymap)
-                                     -> Result<i32, ::ReadlineError> {
+                                     -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_bind_keyseq_if_unbound_in_map(ptr, f, map),
@@ -634,10 +625,7 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
 /// }
 /// # }
 /// ```
-pub fn generic_bind(keyseq: &str,
-                    bind_type: BindType,
-                    map: Keymap)
-                    -> Result<i32, ::ReadlineError> {
+pub fn generic_bind(keyseq: &str, bind_type: BindType, map: Keymap) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
 
@@ -674,7 +662,7 @@ pub fn generic_bind(keyseq: &str,
 ///     Err(_)  => assert!(false),
 /// }
 /// ```
-pub fn parse_and_bind(line: &str) -> Result<i32, ::ReadlineError> {
+pub fn parse_and_bind(line: &str) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(line)).into_raw();
         let res = genresult(ext_binding::rl_parse_and_bind(ptr),
@@ -713,7 +701,7 @@ pub fn parse_and_bind(line: &str) -> Result<i32, ::ReadlineError> {
 /// # Ok(())
 /// # }
 /// ```
-pub fn read_init_file(path: &Path) -> Result<i32, ::ReadlineError> {
+pub fn read_init_file(path: &Path) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(path.to_string_lossy().into_owned())).as_ptr();
         genresult(ext_binding::rl_read_init_file(ptr),
