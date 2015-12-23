@@ -218,13 +218,17 @@ pub fn get_name(map: Keymap) -> Result<String, ::ReadlineError> {
 
 #[cfg(test)]
 mod test {
+    use std::ptr;
     use super::*;
 
     #[test]
     pub fn test_get_name() {
-        let keymap = get().unwrap();
+        let keymap = get().unwrap_or(ptr::null_mut());
         assert!(!keymap.is_null());
-        let name = get_name(keymap).unwrap();
-        assert!(!name.is_empty());
+
+        match get_name(keymap) {
+            Ok(n) => assert!(!n.is_empty()),
+            Err(_) => assert!(false),
+        }
     }
 }
