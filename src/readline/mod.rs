@@ -46,6 +46,7 @@ use std::ffi::{CStr, CString};
 use std::mem;
 
 pub mod binding;
+pub mod charin;
 mod ext_readline {
     use libc::c_char;
 
