@@ -190,6 +190,7 @@ pub fn alphabetic(c: char) -> bool {
 /// completions, this function sets the number of columns used for display to the value of
 /// `completion-display-width`, the value of the environment variable COLUMNS, or the screen width,
 /// in that order.
+/// [1.3.1 readline init file syntax]: https://goo.gl/Ivqovs
 ///
 /// # Examples
 ///
