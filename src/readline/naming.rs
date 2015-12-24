@@ -37,8 +37,7 @@ mod ext_naming {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///

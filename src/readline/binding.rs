@@ -113,8 +113,7 @@ fn genresult(res: i32, err: &str) -> BindResult {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -144,8 +143,7 @@ pub fn bind_key(key: char, f: *mut Option<CommandFunction>) -> BindResult {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -180,8 +178,7 @@ pub fn bind_key_in_map(key: char, map: Keymap, f: *mut Option<CommandFunction>) 
 ///
 /// #[no_mangle]
 /// #[allow(private_no_mangle_fns)]
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -221,8 +218,7 @@ pub fn bind_key_if_unbound(key: char, f: *mut Option<CommandFunction>) -> BindRe
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -265,8 +261,7 @@ pub fn bind_key_if_unbound_in_map(key: char,
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -303,8 +298,7 @@ pub fn unbind_key(key: char) -> BindResult {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -341,8 +335,7 @@ pub fn unbind_key_in_map(key: char, map: Keymap) -> BindResult {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -410,8 +403,7 @@ pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> BindResult {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -445,8 +437,7 @@ pub fn bind_keyseq(keyseq: &str, f: *mut Option<CommandFunction>) -> BindResult 
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -485,8 +476,7 @@ pub fn bind_keyseq_in_map(keyseq: &str,
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -522,8 +512,7 @@ pub fn set_key(keyseq: &str, f: *mut Option<CommandFunction>, map: Keymap) -> Bi
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -561,8 +550,7 @@ pub fn bind_keyseq_if_unbound(keyseq: &str, f: *mut Option<CommandFunction>) -> 
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -611,8 +599,7 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///

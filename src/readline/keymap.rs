@@ -201,7 +201,6 @@ pub fn get_by_name(name: &str) -> Result<Keymap, ::ReadlineError> {
 /// let keymap = keymap::get().unwrap();
 /// assert!(!keymap.is_null());
 /// let name = keymap::get_name(keymap).unwrap();
-/// println!("{}", name);
 /// assert!(!name.is_empty());
 /// ```
 pub fn get_name(map: Keymap) -> Result<String, ::ReadlineError> {

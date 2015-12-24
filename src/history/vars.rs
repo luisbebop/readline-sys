@@ -226,7 +226,7 @@ pub fn remove_word_delimiter(c: char) -> Result<(), HistoryError> {
 /// use rl_sys::history::vars;
 ///
 /// let delims: String = vars::get_word_delimiters().unwrap().into_iter().collect();
-/// println!("{}", delims);
+/// assert!(!delims.is_empty());
 /// ```
 pub fn get_word_delimiters() -> Result<Vec<char>, HistoryError> {
     unsafe {
@@ -331,7 +331,7 @@ pub fn remove_search_delimiter_char(c: char) -> Result<(), HistoryError> {
 ///         String::new()
 ///     },
 /// };
-/// println!("{}", delims);
+/// assert!(delims.is_empty());
 /// ```
 pub fn get_search_delimiter_chars() -> Result<Vec<char>, HistoryError> {
     unsafe {
@@ -435,7 +435,7 @@ pub fn remove_no_expand_char(c: char) -> Result<(), HistoryError> {
 ///         String::new()
 ///     },
 /// };
-/// println!("{}", delims);
+/// assert!(!delims.is_empty());
 /// ```
 pub fn get_no_expand_chars() -> Result<Vec<char>, HistoryError> {
     unsafe {

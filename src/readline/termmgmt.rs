@@ -96,8 +96,8 @@ pub fn tty_unset_default_bindings(kmap: Keymap) -> () {
 ///
 /// util::init();
 ///
-/// termmgmt::reset_terminal(Some("vt100"));
-/// termmgmt::reset_terminal(None);
+/// assert!(termmgmt::reset_terminal(Some("vt100")).is_ok());
+/// assert!(termmgmt::reset_terminal(None).is_ok());
 /// ```
 pub fn reset_terminal(name: Option<&str>) -> Result<i32, ::ReadlineError> {
     let ptr = match name {

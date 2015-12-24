@@ -161,7 +161,6 @@ pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
 /// assert!(res == "one two");
 /// // 36 is used to represent ASCII '$'.
 /// res = expand::arg_extract("one two three", 36, 36).unwrap();
-/// println!("{:?}", res);
 /// assert!(res == "three");
 /// ```
 pub fn arg_extract(s: &str, first: i32, last: i32) -> Result<String, ::HistoryError> {

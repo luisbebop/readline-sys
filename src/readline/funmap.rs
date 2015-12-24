@@ -230,8 +230,7 @@ pub fn list_funmap_names() -> () {
 ///
 /// util::init();
 ///
-/// extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-///   println!("{:?}, {:?}", count, key);
+/// extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
 ///   0
 /// }
 ///
@@ -298,8 +297,7 @@ mod test {
 
         #[no_mangle]
         #[allow(private_no_mangle_fns)]
-        extern "C" fn test_cmd_func(count: c_int, key: c_int) -> c_int {
-            println!("{:?}, {:?}", count, key);
+        extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
             0
         }
 

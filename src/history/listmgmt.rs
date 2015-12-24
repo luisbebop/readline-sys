@@ -37,8 +37,8 @@ mod ext_listmgmt {
 /// use rl_sys::history::listmgmt;
 ///
 /// match listmgmt::add("ls -al") {
-///     Ok(_)  => println!("Success!"),
-///     Err(e) => println!("{}", e),
+///     Ok(_)  => assert!(true),
+///     Err(e) => assert!(false),
 /// }
 /// ```
 pub fn add(line: &str) -> Result<(), ::HistoryError> {
@@ -66,8 +66,8 @@ pub fn add(line: &str) -> Result<(), ::HistoryError> {
 ///
 /// vars::set_comment_char(':');
 /// match listmgmt::add_time(time::now().to_timespec()) {
-///     Ok(_)  => println!("Success!"),
-///     Err(e) => println!("{}", e),
+///     Ok(_)  => assert!(true),
+///     Err(e) => assert!(false),
 /// }
 /// # }
 /// ```

@@ -192,7 +192,6 @@ pub fn do_undo() -> Result<i32, ::ReadlineError> {
 ///
 /// ```
 /// use rl_sys::readline::{undo, util, vars};
-/// use rl_sys::readline::undo::UndoType;
 /// use std::ffi::CString;
 ///
 /// util::init();

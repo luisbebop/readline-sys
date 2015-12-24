@@ -45,8 +45,10 @@ fn get_state_ptr() -> *mut HistoryState {
 /// ```
 /// use rl_sys::history::mgmt;
 ///
+/// mgmt::init();
+///
 /// let state = mgmt::get_state();
-/// println!("{:?}", state);
+/// assert!(state.offset == 0);
 /// ```
 pub fn get_state<'a>() -> &'a mut HistoryState {
     init();
@@ -59,8 +61,10 @@ pub fn get_state<'a>() -> &'a mut HistoryState {
 /// ```
 /// use rl_sys::history::mgmt;
 ///
+/// mgmt::init();
+///
 /// let mut state = mgmt::get_state();
-/// println!("{:?}", state);
+/// assert!(state.offset == 0);
 /// mgmt::set_state(&mut state);
 /// ```
 pub fn set_state(state: &mut HistoryState) -> () {
@@ -81,11 +85,11 @@ pub fn set_state(state: &mut HistoryState) -> () {
 /// ```
 pub fn cleanup() -> () {
     use libc::c_void;
-    use readline::util;
+    use readline::{misc, util};
 
     // Clear the history via Readline API.  This frees all Histoy Entry data, but not the list
     // itself.
-    util::clear_history();
+    misc::clear_history();
 
     // Get a pointer to the History State.
     let state_ptr = get_state_ptr();

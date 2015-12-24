@@ -41,8 +41,9 @@
 //! ```
 //!
 //! For full details on the GNU History Library, see the associated manual.
-use libc::{c_char, c_int, c_long, c_ushort, c_void, free, size_t};
+use libc::{c_char, c_int, c_long, c_uint, c_ushort, c_void, free, size_t};
 use std::ffi::{CStr, CString};
+use std::fmt;
 use std::mem;
 
 pub mod binding;
@@ -56,6 +57,7 @@ mod ext_readline {
 }
 pub mod funmap;
 pub mod keymap;
+pub mod misc;
 pub mod modtext;
 pub mod naming;
 pub mod redisplay;
@@ -81,7 +83,7 @@ pub type Keymap = *mut KeymapEntryArray;
 
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Debug)]
 /// I/O Marker
 pub struct IOMarker {
     /// Next I/O marker.
@@ -97,6 +99,7 @@ impl Clone for IOMarker {
         *self
     }
 }
+
 impl Default for IOMarker {
     fn default() -> Self {
         unsafe { mem::zeroed() }
@@ -104,7 +107,7 @@ impl Default for IOMarker {
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Debug)]
 /// I/O File Type
 pub struct IOFile {
     /// Flags
@@ -180,7 +183,7 @@ impl Default for IOFile {
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Copy, Debug)]
 /// Keymap Entry
 pub struct KeymapEntry {
     /// Keymap Type
@@ -198,6 +201,121 @@ impl Clone for KeymapEntry {
 impl Default for KeymapEntry {
     fn default() -> Self {
         unsafe { mem::zeroed() }
+    }
+}
+
+#[repr(C)]
+#[derive(Copy)]
+/// Readline State
+pub struct ReadlineState {
+    /// Current point in the line.
+    pub point: c_int,
+    /// The end of the line.
+    pub end: c_int,
+    /// The mark point in the line.
+    pub mark: c_int,
+    /// The current line buffer.
+    pub buffer: *mut c_char,
+    /// The line buffer length.
+    pub buflen: c_int,
+    /// The undo list.
+    pub ul: *mut UndoList,
+    /// The current prompt.
+    pub prompt: *mut c_char,
+    /// The state bitflag.
+    pub rlstate: c_int,
+    /// The done flag.
+    pub done: c_int,
+    /// The current keymap.
+    pub kmap: Keymap,
+    /// The last function executed.
+    pub lastfunc: *mut Option<extern "C" fn() -> c_int>,
+    /// The insert mode.
+    pub insmode: c_int,
+    /// The edit mode.
+    pub edmode: c_int,
+    /// The last key sequence length.
+    pub kseqlen: c_int,
+    /// Infile.
+    pub inf: *mut IOFile,
+    /// Outfile.
+    pub outf: *mut IOFile,
+    /// The pending input.
+    pub pendingin: c_int,
+    /// A macro.
+    pub makro: *mut c_char,
+    /// Catch signals flag.
+    pub catchsigs: c_int,
+    /// Catch winch signal flag.
+    pub catchsigwinch: c_int,
+    /// Reserved for later expansion so the struct size doesn't change.
+    pub reserved: [c_char; 64usize],
+}
+
+impl fmt::Debug for ReadlineState {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("ReadlineState")
+           .field("point", &self.point)
+           .field("end", &self.end)
+           .field("mark", &self.mark)
+           .field("buffer", &self.buffer)
+           .field("buflen", &self.buflen)
+           .field("ul", &self.ul)
+           .field("prompt", &self.prompt)
+           .field("rlstate", &self.rlstate)
+           .field("done", &self.done)
+           .field("kmap", &self.kmap)
+           .field("lastfunc", &self.lastfunc)
+           .field("insmode", &self.insmode)
+           .field("edmode", &self.edmode)
+           .field("kseqlen", &self.kseqlen)
+           .field("inf", &self.inf)
+           .field("outf", &self.outf)
+           .field("pendingin", &self.pendingin)
+           .field("macro", &self.makro)
+           .field("catchsigs", &self.catchsigs)
+           .field("catchsigwinch", &self.catchsigwinch)
+           .finish()
+    }
+}
+
+impl Clone for ReadlineState {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl Default for ReadlineState {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+
+#[repr(C)]
+#[derive(Copy, Debug)]
+/// Undo List
+pub struct UndoList {
+    /// Next Undo item.
+    pub next: *mut UndoList,
+    /// Start of the text for this undo.
+    pub start: c_int,
+    /// End of the text for this undo.
+    pub end: c_int,
+    /// The undo text.
+    pub text: *mut c_char,
+    /// The type of undo (UndoDelete, UndoInsert, UndoBegin, UndoEnd)
+    pub what: c_uint,
+}
+
+impl Clone for UndoList {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl Default for UndoList {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
     }
 }
 
