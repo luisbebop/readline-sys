@@ -59,6 +59,7 @@ pub mod keymap;
 pub mod modtext;
 pub mod naming;
 pub mod redisplay;
+pub mod termmgmt;
 pub mod util;
 pub mod undo;
 pub mod vars;
