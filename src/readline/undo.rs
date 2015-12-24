@@ -20,6 +20,7 @@
 //! Notice that **UNDO_DELETE** means to insert some text, and **UNDO_INSERT** means to delete some
 //! text. That is, the undo code tells what to undo, not how to undo it. **UNDO_BEGIN** and
 //! **UNDO_END** are tags added by `rl_begin_undo_group()` and `rl_end_undo_group()`.
+use libc::c_int;
 use self::UndoType::*;
 use std::ffi::CString;
 
@@ -114,11 +115,12 @@ pub fn end_undo_group() -> i32 {
 /// assert!(undo::add_undo(UndoType::UndoDelete, "I deleted this!").is_ok());
 /// assert!(undo::end_undo_group() == 0);
 /// ```
+#[cfg_attr(feature = "clippy", allow(cast_possible_truncation, cast_possible_wrap))]
 pub fn add_undo(what: UndoType, text: &str) -> Result<(), ::ReadlineError> {
     let ptr = try!(CString::new(text)).into_raw();
 
     unsafe {
-        ext_undo::rl_add_undo(what as u32, 0, text.len() as i32, ptr);
+        ext_undo::rl_add_undo(what as u32, 0, text.len() as c_int, ptr);
         let _ = CString::from_raw(ptr);
     }
 

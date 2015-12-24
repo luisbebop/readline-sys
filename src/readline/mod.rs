@@ -56,6 +56,7 @@ mod ext_readline {
 pub mod funmap;
 pub mod keymap;
 pub mod naming;
+pub mod redisplay;
 pub mod util;
 pub mod undo;
 pub mod vars;

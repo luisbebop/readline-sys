@@ -109,7 +109,7 @@ extern "C" {
     /// displaying the prompt. The prompt must also be passed as the argument to `readline()` so
     /// the redisplay functions can update the display properly. The calling application is
     /// responsible for managing the value; Readline never sets it.
-    pub static rl_already_prompted: c_int;
+    pub static mut rl_already_prompted: c_int;
     static rl_library_version: *const c_char;
     /// An integer encoding the current version of the library. The encoding is of the form 0xMMmm,
     /// where MM is the two-digit major version number, and mm is the two-digit minor version
