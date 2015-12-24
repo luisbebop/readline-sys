@@ -57,6 +57,7 @@ pub mod funmap;
 pub mod keymap;
 pub mod naming;
 pub mod util;
+pub mod undo;
 pub mod vars;
 
 /// Readline Command Function Type

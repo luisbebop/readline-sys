@@ -70,7 +70,7 @@ extern "C" {
     /// see [2.4.5 Allowing Undoing]. The function `rl_extend_line_buffer`
     /// is available to increase the memory allocated to `rl_line_buffer`.
     /// [2.4.5 allowing undoing]: https://goo.gl/oYj9bq
-    pub static rl_line_buffer: *mut c_char;
+    pub static mut rl_line_buffer: *mut c_char;
     /// The offset of the current cursor position in `rl_line_buffer` (the *point*).
     pub static rl_point: c_int;
     /// The number of characters present in `rl_line_buffer`. When `rl_point` is at the end of the

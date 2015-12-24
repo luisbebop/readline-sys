@@ -16,11 +16,13 @@ use readline::{CommandFunction, Keymap};
 use self::BindType::*;
 use std::ffi::CString;
 use std::path::Path;
+use std::ptr;
 
 /// Result type returned by all binding functions.
 pub type BindResult = Result<i32, ::ReadlineError>;
 
 /// Use for calls to `generic_bind`.
+#[derive(Debug, PartialEq)]
 pub enum BindType {
     /// Generate a function binding.
     IsFunc(*mut Option<CommandFunction>),
@@ -28,6 +30,20 @@ pub enum BindType {
     IsKmap(Keymap),
     /// Generate a macro binding.
     IsMacr(*const c_char),
+}
+
+impl From<i32> for BindType {
+    fn from(i: i32) -> BindType {
+        if i == 0 {
+            IsFunc(ptr::null_mut())
+        } else if i == 1 {
+            IsKmap(ptr::null_mut())
+        } else if i == 2 {
+            IsMacr(ptr::null())
+        } else {
+            panic!("Unknown BindType!");
+        }
+    }
 }
 
 mod ext_binding {
@@ -683,6 +699,7 @@ pub fn parse_and_bind(line: &str) -> BindResult {
 /// use std::fs::{self, File};
 /// use std::io::{Error, ErrorKind, Write};
 ///
+/// # #[allow(dead_code)]
 /// # fn foo() -> std::io::Result<()> {
 ///
 /// util::init();
