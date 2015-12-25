@@ -50,9 +50,15 @@ pub mod binding;
 pub mod charin;
 mod ext_readline {
     use libc::c_char;
+    use super::HandlerFunction;
 
     extern "C" {
         pub fn readline(p: *const c_char) -> *const c_char;
+        pub fn rl_callback_handler_install(p: *const c_char,
+                                           lhandler: *mut Option<HandlerFunction>)
+                                           -> ();
+        pub fn rl_callback_read_char() -> ();
+        pub fn rl_callback_handler_remove() -> ();
     }
 }
 pub mod funmap;
@@ -76,6 +82,8 @@ pub type GetcFunction = unsafe extern "C" fn(io: *mut IOFile) -> c_int;
 pub type VoidFunction = extern "C" fn() -> ();
 /// Readline prep Function Type
 pub type PrepFunction = extern "C" fn(flag: c_int) -> ();
+/// Readline Callback Handler
+pub type HandlerFunction = unsafe extern "C" fn(line: *mut c_char) -> ();
 /// Keymap Entry Array
 pub type KeymapEntryArray = [KeymapEntry; 257usize];
 /// Keymap
@@ -354,4 +362,44 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ::ReadlineError> {
             Ok(Some(line))
         }
     }
+}
+
+/// [2.4.12 Alternate Interface]
+/// [2.4.12 alternate interface]: https://goo.gl/gg9u4P
+///
+/// An alternate interface is available to plain `readline()``. Some applications need to interleave
+/// keyboard I/O with file, device, or window system I/O, typically by using a main loop to select()
+/// on various file descriptors. To accommodate this need, readline can also be invoked as a
+/// 'callback' function from an event loop. There are functions available to make this easy.
+///
+/// Set up the terminal for readline I/O and display the initial expanded value of prompt `p`. Save
+/// the value of `lhandler` to use as a handler function to call when a complete line of input has
+/// been entered. The handler function receives the text of the line as an argument.
+pub fn callback_handler_install(p: &str,
+                                lhandler: *mut Option<HandlerFunction>)
+                                -> Result<(), ::ReadlineError> {
+    let ptr = try!(CString::new(p)).as_ptr();
+
+    unsafe { Ok(ext_readline::rl_callback_handler_install(ptr, lhandler)) }
+}
+
+/// Whenever an application determines that keyboard input is available, it should call
+/// `rl_callback_read_char()`, which will read the next character from the current input source. If
+/// that character completes the line, `rl_callback_read_char` will invoke the `lhandler` function
+/// installed by `rl_callback_handler_install` to process the line. Before calling the `lhandler`
+/// function, the terminal settings are reset to the values they had before calling
+/// `rl_callback_handler_install`. If the `lhandler` function returns, and the line handler remains
+/// installed, the terminal settings are modified for Readline's use again. EOF is indicated by
+/// calling `lhandler` with a NULL line.
+pub fn callback_read_char() -> () {
+    unsafe { ext_readline::rl_callback_read_char() }
+}
+
+/// Restore the terminal to its initial state and remove the line handler. This may be called from
+/// within a callback as well as independently. If the `lhandler` installed by
+/// `rl_callback_handler_install` does not exit the program, either this function or the function
+/// referred to by the value of `rl_deprep_term_function` should be called before the program exits
+/// to reset the terminal settings.
+pub fn callback_handler_remove() -> () {
+    unsafe { ext_readline::rl_callback_handler_remove() }
 }
