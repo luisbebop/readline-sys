@@ -1,3 +1,4 @@
+extern crate pkg_config;
 extern crate vergen;
 
 use std::env;
@@ -7,6 +8,18 @@ use std::process::{Command, Stdio};
 use vergen::*;
 
 fn main() {
+    match env::var("CARGO_FEATURE_LATEST") {
+        Ok(_)  => { build_readline(); },
+        Err(_) => {
+            match pkg_config::find_library("libreadline") {
+                Ok(_)  => {},
+                Err(_) => { build_readline(); },
+            }
+        },
+    }
+}
+
+fn build_readline() {
     let mut flags = Flags::all();
     flags.toggle(NOW);
     vergen(flags);
