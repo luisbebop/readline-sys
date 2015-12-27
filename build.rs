@@ -3,7 +3,9 @@ extern crate vergen;
 
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+// #[cfg(unix)]
+// use std::os::unix::fs::symlink;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use vergen::*;
 
@@ -12,17 +14,16 @@ fn main() {
     flags.toggle(NOW);
     vergen(flags);
 
-    match env::var("CARGO_FEATURE_LATEST") {
-        Ok(_) => {
+    let latest = env::var("CARGO_FEATURE_LATEST").is_ok();
+    if latest {
+        build_readline();
+    } else {
+        let has_pkgconfig = Command::new("pkg-config").output().is_ok();
+
+        if has_pkgconfig && pkg_config::find_library("libreadline").is_ok() && pkg_config::find_library("libhistory").is_ok() {
+            return
+        } else {
             build_readline();
-        }
-        Err(_) => {
-            match pkg_config::find_library("libreadline") {
-                Ok(_) => {}
-                Err(_) => {
-                    build_readline();
-                }
-            }
         }
     }
 }
@@ -40,20 +41,29 @@ fn build_readline() {
     let dst = PathBuf::from(&out_dir).join("build");
     let _ = fs::create_dir(&dst);
 
-    let cflags = env::var("CFLAGS").unwrap_or(String::new());
-    run(Command::new("./configure").current_dir(&src));
-    run(Command::new("make").env("CFLAGS", &cflags[..]).current_dir(&src));
+    run(Command::new("./configure").env("CFLAGS","-fPIC").env("CPPFLAGS", "-fPIC").current_dir(&src));
+    run(Command::new("make").current_dir(&src));
 
-    let shlib = src.join("shlib");
-    let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
-                     &dst.join("libreadline.so.6.3"));
-    let _ = fs::copy(&shlib.join("libhistory.so.6.3"),
-                     &dst.join("libhistory.so.6.3"));
+    let _ = fs::copy(&src.join("libreadline.a"),
+                     &dst.join("libreadline.a"));
+    let _ = fs::copy(&src.join("libhistory.a"),
+                     &dst.join("libhistory.a"));
 
-    println!("cargo:rustc-link-lib=readline");
-    println!("cargo:rustc-link-lib=history");
-    println!("cargo:rustc-link-search={}", dst.display());
+    // create_symlinks(dst.as_path());
+
+    println!("cargo:rustc-link-lib=static=readline");
+    println!("cargo:rustc-link-lib=curses");
+    println!("cargo:rustc-flags=-L {}", dst.display());
 }
+
+// #[cfg(unix)]
+// fn create_symlinks(dst: &Path) {
+//     let _ = symlink(dst.join("libreadline.so.6.3"), dst.join("libreadline.so"));
+//     let _ = symlink(dst.join("libhistory.so.6.3"), dst.join("libhistory.so"));
+// }
+//
+// #[cfg(windows)]
+// fn create_symlinks(_dst: &Path) {}
 
 fn run(cmd: &mut Command) {
     assert!(cmd.stdout(Stdio::inherit())
