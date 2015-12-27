@@ -22,8 +22,8 @@ matrix:
 before_install:
   - git submodule update --init --recursive
 script:
-  - cargo build --features "clippy latest" --verbose
-  - cargo test --features "clippy latest" --verbose
-  - cargo doc --features "latest" --verbose
+  - cargo build --features latest --verbose
+  - cargo test --features latest --verbose
+  - cargo doc --features latest --verbose
 after_success:
   - ./scripts/travis-doc-upload.sh
