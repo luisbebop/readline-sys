@@ -8,9 +8,9 @@ use std::process::{Command, Stdio};
 use vergen::*;
 
 fn main() {
-    let mut flags = Flags::all();
+    let mut flags = OutputFns::all();
     flags.toggle(NOW);
-    vergen(flags);
+    assert!(vergen(flags).is_ok());
 
     let latest = env::var("CARGO_FEATURE_LATEST").is_ok();
     if latest {

@@ -17,13 +17,13 @@ latest = []
 
 [build-dependencies]
 pkg-config = "~0.3.6"
-vergen = "~0.0.16"
+vergen = "~0.1.0"
 
 [dev-dependencies]
 sodium-sys = "~0.0.4"
 
 [dependencies]
-bitflags = { git = "https://github.com/rustyhorde/bitflags.git" }
+blastfig = "~0.3.3"
 clippy = { version = "~0.0.30", optional = true }
 errno = "~0.1.5"
 libc = "~0.2.2"
