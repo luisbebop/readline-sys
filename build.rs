@@ -46,7 +46,7 @@ fn build_readline() {
                      &dst.join("libreadline.so"));
 
     println!("cargo:rustc-link-lib=readline");
-    println!("cargo:rustc-link-lib=curses");
+    println!("cargo:rustc-link-lib=ncurses");
     println!("cargo:rustc-flags=-L {}", dst.display());
 }
 
