@@ -39,7 +39,7 @@ fn build_readline() {
     let dst = PathBuf::from(&out_dir).join("build");
     let _ = fs::create_dir(&dst);
 
-    run(Command::new("./configure").current_dir(&src));
+    run(Command::new("./configure").arg("--with-curses").current_dir(&src));
     run(Command::new("make").current_dir(&src));
     let shlib = &src.join("shlib");
     let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
