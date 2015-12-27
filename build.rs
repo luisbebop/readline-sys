@@ -50,9 +50,9 @@ fn build_readline() {
     let _ = fs::copy(&shlib.join("libhistory.so.6.3"),
                      &dst.join("libhistory.so.6.3"));
 
-    println!("cargo:rustc-flags=-l readline");
-    println!("cargo:rustc-flags=-l history");
-    println!("cargo:rustc-flags=-L {}", dst.display());
+    println!("cargo:rustc-link-lib=readline");
+    println!("cargo:rustc-link-lib=history");
+    println!("cargo:rustc-link-search={}", dst.display());
 }
 
 fn run(cmd: &mut Command) {
