@@ -2,7 +2,7 @@
 ## Version
 [![Crates.io](https://img.shields.io/crates/v/rl-sys.svg)](https://crates.io/crates/rl-sys)
 [![Build
-Status](https://travis-ci.org/rustyhorde/readline-sys.svg?branch=master)](https://travis-ci.org/rustyhorde/readline-sys)
+Status](https://travis-ci.org/rustyhorde/readline-sys.svg?branch=0.4.1)](https://travis-ci.org/rustyhorde/readline-sys)
 
 Native bindings to
 [libreadline](https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html).
@@ -21,7 +21,7 @@ Add `rl-sys` as a dependency in `Cargo.toml`
 
 ```toml
 [dependencies]
-rl-sys = "~0.4.0"
+rl-sys = "~0.4.1"
 ```
 
 A simple implementation of `cat` using `rl_sys::readline`
