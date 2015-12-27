@@ -51,7 +51,6 @@ extern crate errno;
 extern crate libc;
 #[macro_use]
 extern crate log;
-            Some(res)
 #[cfg(test)]
 extern crate sodium_sys;
 extern crate time;
