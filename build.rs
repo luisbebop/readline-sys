@@ -39,27 +39,15 @@ fn build_readline() {
     let dst = PathBuf::from(&out_dir).join("build");
     let _ = fs::create_dir(&dst);
 
-    run(Command::new("./configure")
-            .env("CFLAGS", "-fPIC")
-            .env("CPPFLAGS", "-fPIC")
-            .current_dir(&src));
+    run(Command::new("./configure").current_dir(&src));
     run(Command::new("make").current_dir(&src));
+    let shlib = &src.join("shlib");
+    let _ = fs::copy(&shlib.join("libreadline.so.6.3"),
+                     &dst.join("libreadline.so"));
 
-    let _ = fs::copy(&src.join("libreadline.a"), &dst.join("libreadline.a"));
-
-    println!("cargo:rustc-link-lib=static=readline");
-    termlink();
-    println!("cargo:rustc-flags=-L {}", dst.display());
-}
-
-#[cfg(target_os = "macos")]
-fn termlink() {
-    println!("cargo:rustc-link-lib=termcap");
-}
-
-#[cfg(target_os = "linux")]
-fn termlink() {
+    println!("cargo:rustc-link-lib=readline");
     println!("cargo:rustc-link-lib=curses");
+    println!("cargo:rustc-flags=-L {}", dst.display());
 }
 
 fn run(cmd: &mut Command) {
