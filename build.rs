@@ -51,6 +51,7 @@ fn build_readline() {
                      &dst.join("libhistory.so.6.3"));
 
     println!("cargo:rustc-flags=-l readline");
+    println!("cargo:rustc-flags=-l history");
     println!("cargo:rustc-flags=-L {}", dst.display());
 }
 
