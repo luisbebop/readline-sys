@@ -3,9 +3,7 @@ extern crate vergen;
 
 use std::env;
 use std::fs;
-// #[cfg(unix)]
-// use std::os::unix::fs::symlink;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use vergen::*;
 
@@ -20,8 +18,8 @@ fn main() {
     } else {
         let has_pkgconfig = Command::new("pkg-config").output().is_ok();
 
-        if has_pkgconfig && pkg_config::find_library("libreadline").is_ok() && pkg_config::find_library("libhistory").is_ok() {
-            return
+        if has_pkgconfig && pkg_config::find_library("libreadline").is_ok() {
+            return;
         } else {
             build_readline();
         }
@@ -41,29 +39,28 @@ fn build_readline() {
     let dst = PathBuf::from(&out_dir).join("build");
     let _ = fs::create_dir(&dst);
 
-    run(Command::new("./configure").env("CFLAGS","-fPIC").env("CPPFLAGS", "-fPIC").current_dir(&src));
+    run(Command::new("./configure")
+            .env("CFLAGS", "-fPIC")
+            .env("CPPFLAGS", "-fPIC")
+            .current_dir(&src));
     run(Command::new("make").current_dir(&src));
 
-    let _ = fs::copy(&src.join("libreadline.a"),
-                     &dst.join("libreadline.a"));
-    let _ = fs::copy(&src.join("libhistory.a"),
-                     &dst.join("libhistory.a"));
-
-    // create_symlinks(dst.as_path());
+    let _ = fs::copy(&src.join("libreadline.a"), &dst.join("libreadline.a"));
 
     println!("cargo:rustc-link-lib=static=readline");
-    println!("cargo:rustc-link-lib=curses");
+    termlink();
     println!("cargo:rustc-flags=-L {}", dst.display());
 }
 
-// #[cfg(unix)]
-// fn create_symlinks(dst: &Path) {
-//     let _ = symlink(dst.join("libreadline.so.6.3"), dst.join("libreadline.so"));
-//     let _ = symlink(dst.join("libhistory.so.6.3"), dst.join("libhistory.so"));
-// }
-//
-// #[cfg(windows)]
-// fn create_symlinks(_dst: &Path) {}
+#[cfg(target_os = "macos")]
+fn termlink() {
+    println!("cargo:rustc-link-lib=termcap");
+}
+
+#[cfg(target_os = "linux")]
+fn termlink() {
+    println!("cargo:rustc-link-lib=curses");
+}
 
 fn run(cmd: &mut Command) {
     assert!(cmd.stdout(Stdio::inherit())
