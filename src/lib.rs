@@ -1,96 +1,65 @@
+//! This library provides native bindings for the [GNU readline library][1].
+//!
+//! [1]: https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
+//!
+//! The GNU Readline library provides a set of functions for use by applications
+//! that allow users to edit command lines as they are typed in. Both Emacs and
+//! vi editing modes are available. The Readline library includes additional
+//! functions to maintain a list of previously-entered command lines, to recall
+//! and perhaps reedit those lines, and perform csh-like history expansion on
+//! previous commands.
+//!
+//! # Examples
+//!
+//! ```
+//! use rl_sys::readline;
+//! use rl_sys::history::{listmgmt, mgmt};
+//!
+//! loop {
+//!     let input = match readline::readline("$ ") {
+//!         Ok(Some(s)) => match &*s {
+//!             "clear" => {
+//!                 listmgmt::clear();
+//!                 continue;
+//!             }
+//!             _ => s
+//!         },
+//!         Ok(None) => break,  // EOF encountered
+//!         Err(e) => {
+//!             println!("{}", e);
+//!             continue;
+//!         }
+//!     };
+//!     println!("{}", input);
+//!
+//!     // Add input to history.
+//!     match listmgmt::add(&input) {
+//!         Ok(_) => {},
+//!         Err(e) => { println!("{:?}", e); },
+//!     }
+//! }
+//!
+//! mgmt::cleanup();
+//! ```
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature="clippy", deny(clippy, clippy_pedantic))]
+#![deny(missing_docs)]
+#[macro_use]
+extern crate bitflags;
+extern crate errno;
 extern crate libc;
-
-use std::ffi::{CStr,CString};
-use std::io::prelude::*;
-use std::fs::{self,File,OpenOptions};
-use std::io::{BufReader,LineWriter};
-use std::path::Path;
-use std::str;
-
-mod ext_readline {
-    use libc::c_char;
-
-    extern {
-        pub fn add_history(line: *const c_char);
-        pub fn readline(p: *const c_char) -> *const c_char;
-    }
-}
-
-pub fn add_history(line: String) {
-    unsafe {
-        let cline = CString::new(line).unwrap();
-        ext_readline::add_history(cline.as_ptr());
-    }
-}
-
-pub fn readline(prompt: String) -> Option<String> {
-    let cprmt = CString::new(prompt).unwrap();
-    unsafe {
-        let ret = ext_readline::readline(cprmt.as_ptr());
-        if ret.is_null() {  // user pressed Ctrl-D
-            None
-        } else {
-            let slice = CStr::from_ptr(ret);
-            let res = str::from_utf8(slice.to_bytes())
-                .ok().expect("Failed to parse utf-8").to_owned();
-            libc::free(slice.as_ptr() as *mut libc::c_void);
+#[macro_use]
+extern crate log;
             Some(res)
-        }
-    }
-}
-
-pub fn preload_history(file: &Path) {
-    let exists = match fs::metadata(file) {
-        Ok(meta) => meta.is_file(),
-        Err(_)   => false,
-    };
-
-    if exists {
-        let file = BufReader::new(File::open(file).unwrap());
-        for opt in file.lines() {
-            add_history(opt.unwrap());
-        }
-    }
-}
-
-pub fn add_history_persist(line: String, file: &Path) {
-    let exists = match fs::metadata(file) {
-        Ok(meta) => meta.is_file(),
-        Err(_)   => false,
-    };
-
-    let mut write = LineWriter::new(if exists {
-        let mut oo = OpenOptions::new();
-        oo.append(true);
-        oo.write(true);
-        oo.open(file).unwrap()
-    } else {
-        File::create(file).unwrap()
-    });
-
-    // Only add the line to the history file if it doesn't already
-    // contain the line to add.
-    let read = BufReader::new(File::open(file).unwrap());
-    // The lines method returns strings without the trailing '\n'
-    let cmds: Vec<String> = read.lines().map(|l| l.unwrap()).collect();
-    let trimmed = line.trim_right().to_string();
-
-    // Only add the line to history if it doesn't exist already and isn't empty.
-    if !cmds.contains(&trimmed) && !trimmed.is_empty() {
-        // Write the line with the trailing '\n' to the file.
-        let _ = write.write(line.as_bytes());
-    }
-
-    // Add the line witout the trailing '\n' to the readline history.
-    add_history(trimmed);
-}
-
 #[cfg(test)]
-mod test {
-    use super::add_history;
+extern crate sodium_sys;
+extern crate time;
 
-    #[test]
-    fn test_readline() {
-        add_history("test".to_string());
-    }
-}
+pub use error::{HistoryError, ReadlineError};
+pub use version::version;
+
+mod error;
+pub mod history;
+pub mod readline;
+mod version;

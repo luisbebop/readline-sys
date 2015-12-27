@@ -1,15 +1,34 @@
 [package]
 name = "rl-sys"
-version = "0.1.3-pre"
+version = "0.4.1-pre"
 authors = ["Jason Ozias <jason.g.ozias@gmail.com>"]
+description = "Native bindings to libreadline."
+documentation = "https://rustyhorde.github.io/readline-sys/readline-sys/rl_sys/index.html"
+homepage = "https://rustyhorde.github.io/readline-sys/index.html"
+repository = "https://github.com/rustyhorde/readline-sys.git"
+keywords = ["readline", "readline-sys", "rl-sys"]
+license = "MIT"
 links = "readline"
 build = "build.rs"
-repository = "https://github.com/rustyhorde/readline-sys.git"
-license = "MIT"
-description = "Native bindings to the readline library"
+
+[features]
+default = []
+latest = []
+
+[build-dependencies]
+pkg-config = "~0.3.6"
+vergen = "~0.0.16"
+
+[dev-dependencies]
+sodium-sys = "~0.0.4"
 
 [dependencies]
-libc = "*"
+bitflags = { git = "https://github.com/rustyhorde/bitflags.git" }
+clippy = { version = "~0.0.30", optional = true }
+errno = "~0.1.5"
+libc = "~0.2.2"
+log = "~0.3.4"
+time = "~0.1.34"
 
 [lib]
 name = "rl_sys"

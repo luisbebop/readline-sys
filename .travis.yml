@@ -1,3 +1,18 @@
 language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+os:
+  - linux
+matrix:
+  allow_failures:
+    - rust: nightly
 before_install:
   - git submodule update --init --recursive
+script:
+  - cargo build --features latest --verbose
+  - cargo test --features latest --verbose
+  - cargo doc --features latest --verbose
+after_success:
+  - ./scripts/travis-doc-upload.sh
