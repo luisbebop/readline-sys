@@ -28,9 +28,12 @@ A simple implementation of `cat` using `rl_sys::readline`
 ```rust
 extern crate rl_sys;
 
+use rl_sys::readline;
+use rl_sys::history::listmgmt;
+
 fn main() {
     loop {
-        let input: String = match rl_sys::readline("") {
+        let input: String = match readline::readline("") {
             Ok(Some(s)) => s,
             Ok(None) => break,  // user entered ctrl-d
             Err(e) => {
@@ -41,7 +44,7 @@ fn main() {
         println!("{}", input);
 
         // Enables up/down arrow scrolling through history
-        rl_sys::add_history(&input);
+        listmgmt::add(&input).unwrap();
     }
 }
 ```
