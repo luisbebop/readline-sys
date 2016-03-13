@@ -9,6 +9,7 @@
 
     <title>rl_sys::readline::charin::read_key - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-788' class='srclink' href='../../../src/rl_sys/readline/charin.rs.html#25-27' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn read_key() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Return the next character available from Readline&#39;s current input stream. This handles input
+        </span><a id='src-793' class='srclink' href='../../../src/rl_sys/readline/charin.rs.html#25-27' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn read_key() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Return the next character available from Readline&#39;s current input stream. This handles input
 inserted into the input stream via <code>rl_pending_input</code> (see section <a href="https://goo.gl/E1D6om">2.3 Readline Variables</a>) and
 <code>rl_stuff_char()</code>, macros, and characters read from the keyboard. While waiting for input, this
 function will call any function assigned to the <code>rl_event_hook</code> variable.</p>
@@ -109,6 +110,6 @@ function will call any function assigned to the <code>rl_event_hook</code> varia
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

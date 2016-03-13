@@ -9,6 +9,7 @@
 
     <title>rl_sys::readline::misc::get_termcap - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-981' class='srclink' href='../../../src/rl_sys/readline/misc.rs.html#164-176' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn get_termcap(cap: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Retrieve the string value of the termcap capability <code>cap</code>. Readline fetches the termcap entry
+        </span><a id='src-986' class='srclink' href='../../../src/rl_sys/readline/misc.rs.html#164-176' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn get_termcap(cap: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Retrieve the string value of the termcap capability <code>cap</code>. Readline fetches the termcap entry
 for the current terminal name and uses those capabilities to move around the screen line and
 perform other terminal-specific operations, like erasing a line. Readline does not use all of a
 terminal&#39;s capabilities, and this function will return values for only those capabilities
@@ -120,6 +121,6 @@ Readline uses.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@
 
     <title>rl_sys::readline::undo::modifying - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1265' class='srclink' href='../../../src/rl_sys/readline/undo.rs.html#209-211' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn modifying(start: <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, end: <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></pre><div class='docblock'><p>Tell Readline to save the text between <code>start</code> and <code>end</code> as a single undo unit. It is assumed
+        </span><a id='src-1274' class='srclink' href='../../../src/rl_sys/readline/undo.rs.html#209-211' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn modifying(start: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, end: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></pre><div class='docblock'><p>Tell Readline to save the text between <code>start</code> and <code>end</code> as a single undo unit. It is assumed
 that you will subsequently modify that text.</p>
 
 <p>If you neither insert nor delete text, but directly modify the existing text (e.g.,
@@ -127,6 +128,6 @@ the indices of the text range that you are going to modify.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

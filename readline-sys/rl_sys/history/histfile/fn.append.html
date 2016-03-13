@@ -9,6 +9,7 @@
 
     <title>rl_sys::history::histfile::append - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-207' class='srclink' href='../../../src/rl_sys/history/histfile.rs.html#143-148' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn append(path: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;, n: <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='struct' href='../../../rl_sys/struct.HistoryError.html' title='rl_sys::HistoryError'>HistoryError</a>&gt;</pre><div class='docblock'><p>Append the last <code>n</code> elements of the history list to <code>filename</code>. If <code>filename</code> is None, then
+        </span><a id='src-209' class='srclink' href='../../../src/rl_sys/history/histfile.rs.html#143-148' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn append(path: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='struct' href='../../../rl_sys/struct.HistoryError.html' title='rl_sys::HistoryError'>HistoryError</a>&gt;</pre><div class='docblock'><p>Append the last <code>n</code> elements of the history list to <code>filename</code>. If <code>filename</code> is None, then
 append to <code>~/.history</code>. Returns 0 on success, or <code>HistoryError</code> with <code>errno</code> information on a
 write error.</p>
 
@@ -121,6 +122,6 @@ write error.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

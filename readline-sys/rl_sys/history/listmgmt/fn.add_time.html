@@ -9,6 +9,7 @@
 
     <title>rl_sys::history::listmgmt::add_time - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-290' class='srclink' href='../../../src/rl_sys/history/listmgmt.rs.html#74-88' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn add_time(time: <a class='struct' href='../../../time/struct.Timespec.html' title='time::Timespec'>Timespec</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../../rl_sys/struct.HistoryError.html' title='rl_sys::HistoryError'>HistoryError</a>&gt;</pre><div class='docblock'><p>Change the time stamp associated with the most recent history entry to the given time.  Note
+        </span><a id='src-292' class='srclink' href='../../../src/rl_sys/history/listmgmt.rs.html#74-88' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn add_time(time: <a class='struct' href='../../../time/struct.Timespec.html' title='time::Timespec'>Timespec</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../../rl_sys/struct.HistoryError.html' title='rl_sys::HistoryError'>HistoryError</a>&gt;</pre><div class='docblock'><p>Change the time stamp associated with the most recent history entry to the given time.  Note
 that if the <code>history_comment_char</code> variable has not been set this will have no effect.  This is
 stored as seconds since the epoch, so you may lose some precision.</p>
 
@@ -117,6 +118,6 @@ stored as seconds since the epoch, so you may lose some precision.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

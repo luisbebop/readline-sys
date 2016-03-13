@@ -9,6 +9,7 @@
 
     <title>rl_sys::readline::undo::do_undo - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1263' class='srclink' href='../../../src/rl_sys/readline/undo.rs.html#172-182' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn do_undo() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Undo the first thing on the undo list. Returns an Err if there was nothing to undo, Ok if
+        </span><a id='src-1272' class='srclink' href='../../../src/rl_sys/readline/undo.rs.html#172-182' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn do_undo() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>Undo the first thing on the undo list. Returns an Err if there was nothing to undo, Ok if
 something was undone. Note that this depends on history being initialized and used.</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
@@ -121,6 +122,6 @@ something was undone. Note that this depends on history being initialized and us
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

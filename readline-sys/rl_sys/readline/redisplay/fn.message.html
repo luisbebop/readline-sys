@@ -9,6 +9,7 @@
 
     <title>rl_sys::readline::redisplay::message - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1089' class='srclink' href='../../../src/rl_sys/readline/redisplay.rs.html#230-233' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn message(message: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>The arguments are a format string as would be supplied to printf, possibly containing conversion
+        </span><a id='src-1094' class='srclink' href='../../../src/rl_sys/readline/redisplay.rs.html#230-233' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn message(message: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='struct' href='../../../rl_sys/struct.ReadlineError.html' title='rl_sys::ReadlineError'>ReadlineError</a>&gt;</pre><div class='docblock'><p>The arguments are a format string as would be supplied to printf, possibly containing conversion
 specifications such as <code>%d&#39;, and any additional arguments necessary to satisfy the conversion specifications. The resulting string is displayed in the echo area. The echo area is also used to display numeric arguments and search strings. You should call</code>rl_save_prompt` to save the
 prompt information before calling this function.</p>
 
@@ -118,6 +119,6 @@ prompt information before calling this function.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

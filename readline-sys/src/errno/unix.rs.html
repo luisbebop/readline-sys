@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-0a35038f75765ae4/errno-0.1.5/src/unix.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-88ac128001ac3a9a/errno-0.1.6/src/unix.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>unix.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
@@ -189,9 +190,9 @@
                <span class='ident'>link_name</span> <span class='op'>=</span> <span class='string'>&quot;__error&quot;</span>)]</span>
     <span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;dragonfly&quot;</span>,
                <span class='ident'>link_name</span> <span class='op'>=</span> <span class='string'>&quot;__dfly_error&quot;</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>any</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;openbsd&quot;</span>, <span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;bitrig&quot;</span>),
+    <span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>any</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;openbsd&quot;</span>, <span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;bitrig&quot;</span>, <span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;android&quot;</span>),
                <span class='ident'>link_name</span> <span class='op'>=</span> <span class='string'>&quot;__errno&quot;</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>any</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;linux&quot;</span>, <span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;android&quot;</span>),
+    <span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;linux&quot;</span>,
                <span class='ident'>link_name</span> <span class='op'>=</span> <span class='string'>&quot;__errno_location&quot;</span>)]</span>
     <span class='kw'>fn</span> <span class='ident'>errno_location</span>() <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_int</span>;
 
@@ -259,6 +260,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

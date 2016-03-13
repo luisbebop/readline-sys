@@ -9,6 +9,7 @@
 
     <title>rl_sys::history::search::search - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-397' class='srclink' href='../../../src/rl_sys/history/search.rs.html#55-61' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn search&lt;T&gt;(s: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, dir: T) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, <a class='struct' href='../../../rl_sys/struct.HistoryError.html' title='rl_sys::HistoryError'>HistoryError</a>&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>&gt;</span></pre><div class='docblock'><p>Search the history for string, starting at the current history offset. If direction is
+        </span><a id='src-399' class='srclink' href='../../../src/rl_sys/history/search.rs.html#55-61' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn search&lt;T&gt;(s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, dir: T) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, <a class='struct' href='../../../rl_sys/struct.HistoryError.html' title='rl_sys::HistoryError'>HistoryError</a>&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>&gt;</span></pre><div class='docblock'><p>Search the history for string, starting at the current history offset. If direction is
 <code>Backward</code>, then the search is through previous entries, otherwise through subsequent entries.
 If string is found, then the current history index is set to that history entry, and the value
 returned is the offset in the line of the entry where string was found. Otherwise, nothing is
@@ -120,6 +121,6 @@ changed, and a -1 is returned.</p>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>
