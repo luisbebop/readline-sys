@@ -75,14 +75,14 @@ pub fn add_time(time: Timespec) -> Result<(), ::HistoryError> {
     init();
     let cc = vars::get_comment_char();
 
-    if cc != '\u{0}' {
+    if cc == '\u{0}' {
+        Ok(())
+    } else {
         let now_str = format!("{}{}", cc, time.sec);
         let ptr = try!(CString::new(now_str)).as_ptr();
         unsafe {
             ext_listmgmt::add_history_time(ptr);
         }
-        Ok(())
-    } else {
         Ok(())
     }
 }
@@ -148,14 +148,14 @@ pub fn replace_entry(offset: i32,
                      appdata: Option<*mut c_void>)
                      -> Result<&mut HistoryEntry, ::HistoryError> {
     init();
-    let sptr = try!(CString::new(line)).as_ptr();
+    let line_ptr = try!(CString::new(line)).as_ptr();
     let ptr = match appdata {
         Some(d) => d,
         None => ptr::null_mut(),
     };
 
     unsafe {
-        let old_entry = ext_listmgmt::replace_history_entry(offset, sptr, ptr);
+        let old_entry = ext_listmgmt::replace_history_entry(offset, line_ptr, ptr);
 
         if old_entry.is_null() {
             Err(::HistoryError::new("Null Pointer", "Invalid replace requested!"))

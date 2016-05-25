@@ -148,7 +148,7 @@ pub fn append(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
 }
 
 /// Truncate the history file `filename`, leaving only the last `n` lines. If `filename` is None,
-/// then `~/.history' is truncated. Returns 0 on success, or `HistoryError` with `errno` information
+/// then `~/.history` is truncated. Returns 0 on success, or `HistoryError` with `errno` information
 /// on a write error.
 ///
 /// # Examples

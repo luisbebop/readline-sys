@@ -57,8 +57,8 @@ pub fn named_function(name: &str) -> Result<*mut Option<CommandFunction>, ::Read
 }
 
 /// Return the function invoked by `keyseq` in keymap `map`. If `map` is None, the current keymap is
-/// used. If `add_type` is true, the type of the object is returned (one of IsFunc, IsKmap, or
-/// IsMacr).
+/// used. If `add_type` is true, the type of the object is returned (one of `Func`, `Kmap`, or
+/// `Macr`).
 ///
 /// # Examples
 ///
@@ -96,12 +96,10 @@ pub fn function_of_keyseq
         if func_ptr.is_null() {
             Err(::ReadlineError::new("Funmap Error",
                                      "Unable to get function associated with keyseq!"))
+        } else if add_type {
+            Ok((func_ptr, Some(BindType::from(*bind_type))))
         } else {
-            if add_type {
-                Ok((func_ptr, Some(BindType::from(*bind_type))))
-            } else {
-                Ok((func_ptr, None))
-            }
+            Ok((func_ptr, None))
         }
     }
 }
@@ -293,13 +291,13 @@ mod test {
     fn test_add_funmap_entry() {
         use libc::c_int;
 
-        util::init();
-
         #[no_mangle]
         #[allow(private_no_mangle_fns)]
         extern "C" fn test_cmd_func(_count: c_int, _key: c_int) -> c_int {
             0
         }
+
+        util::init();
 
         match add_funmap_entry("test-cmd", &mut Some(test_cmd_func)) {
             Ok(res) => assert!(res >= 0),

@@ -18,11 +18,11 @@ impl fmt::Display for ReadlineError {
 impl ReadlineError {
     /// Create a ReadlineError struct from the given description and detail.
     pub fn new<T>(desc: &str, detail: T) -> ReadlineError
-        where T: fmt::Debug
+        where T: fmt::Display
     {
         ReadlineError {
             desc: String::from(desc),
-            detail: format!("{:?}", detail),
+            detail: format!("{}", detail),
         }
     }
 }
@@ -55,11 +55,11 @@ pub struct HistoryError {
 impl HistoryError {
     /// Create a HistoryError struct from the given description and detail.
     pub fn new<T>(desc: &str, detail: T) -> HistoryError
-        where T: fmt::Debug
+        where T: fmt::Display
     {
         HistoryError {
             desc: String::from(desc),
-            detail: format!("{:?}", detail),
+            detail: format!("{}", detail),
         }
     }
 }

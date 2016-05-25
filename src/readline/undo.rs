@@ -17,36 +17,36 @@
 //! enum undo_code { UNDO_DELETE, UNDO_INSERT, UNDO_BEGIN, UNDO_END };
 //! ```
 //!
-//! Notice that **UNDO_DELETE** means to insert some text, and **UNDO_INSERT** means to delete some
-//! text. That is, the undo code tells what to undo, not how to undo it. **UNDO_BEGIN** and
-//! **UNDO_END** are tags added by `rl_begin_undo_group()` and `rl_end_undo_group()`.
+//! Notice that `UNDO_DELETE` means to insert some text, and `UNDO_INSERT` means to delete some
+//! text. That is, the undo code tells what to undo, not how to undo it. `UNDO_BEGIN` and
+//! `UNDO_END` are tags added by `rl_begin_undo_group()` and `rl_end_undo_group()`.
 use libc::c_int;
-use self::UndoType::*;
+use self::UndoType::{Begin, Delete, End, Insert};
 use std::ffi::CString;
 
 /// Undo Event Types
 #[derive(Debug, PartialEq)]
 pub enum UndoType {
     /// Insert some text.
-    UndoDelete,
+    Delete,
     /// Delete some text.
-    UndoInsert,
+    Insert,
     /// Start an undo group (added by `rl_begin_undo_group()`)
-    UndoBegin,
+    Begin,
     /// End an undo group (add by `rl_end_undo_group()`)
-    UndoEnd,
+    End,
 }
 
 impl From<i32> for UndoType {
     fn from(i: i32) -> UndoType {
         if i == 0 {
-            UndoDelete
+            Delete
         } else if i == 1 {
-            UndoInsert
+            Insert
         } else if i == 2 {
-            UndoBegin
-        } else if i == 2 {
-            UndoEnd
+            Begin
+        } else if i == 3 {
+            End
         } else {
             panic!("Unknown BindType!");
         }
@@ -112,7 +112,7 @@ pub fn end_undo_group() -> i32 {
 /// util::init();
 ///
 /// assert!(undo::begin_undo_group() == 0);
-/// assert!(undo::add_undo(UndoType::UndoDelete, "I deleted this!").is_ok());
+/// assert!(undo::add_undo(UndoType::Delete, "I deleted this!").is_ok());
 /// assert!(undo::end_undo_group() == 0);
 /// ```
 #[cfg_attr(feature = "clippy", allow(cast_possible_truncation, cast_possible_wrap))]
@@ -141,7 +141,7 @@ pub fn add_undo(what: UndoType, text: &str) -> Result<(), ::ReadlineError> {
 ///
 /// assert!(undo::begin_undo_group() == 0);
 /// assert!(listmgmt::add("I deleted this!").is_ok());
-/// assert!(undo::add_undo(UndoType::UndoInsert, "I deleted this!").is_ok());
+/// assert!(undo::add_undo(UndoType::Insert, "I deleted this!").is_ok());
 /// assert!(undo::end_undo_group() == 0);
 /// undo::free_undo_list();
 /// mgmt::cleanup();
@@ -165,7 +165,7 @@ pub fn free_undo_list() -> () {
 ///
 /// assert!(undo::begin_undo_group() == 0);
 /// assert!(listmgmt::add("I deleted this!").is_ok());
-/// assert!(undo::add_undo(UndoType::UndoInsert, "I deleted this!").is_ok());
+/// assert!(undo::add_undo(UndoType::Insert, "I deleted this!").is_ok());
 /// assert!(undo::end_undo_group() == 0);
 /// assert!(undo::do_undo().is_ok());
 /// ```

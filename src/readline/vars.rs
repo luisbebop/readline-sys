@@ -6,61 +6,61 @@ use readline::{CommandFunction, GetcFunction, HookFunction, IOFile, Keymap, Prep
 use std::ffi::CStr;
 
 bitflags!(
-    /// Readline State Bitflags
-    flags ReadlineState: i32 {
-        /// Readline has not yet been called, nor has it begun to initialize.
+/// Readline State Bitflags
+    pub flags ReadlineState: i32 {
+/// Readline has not yet been called, nor has it begun to initialize.
         const RL_STATE_NONE         = 0x0000000,
-        /// Readline is initializing its internal data structures.
+/// Readline is initializing its internal data structures.
         const RL_STATE_INITIALIZING = 0x0000001,
-        /// Readline has completed its initialization.
+/// Readline has completed its initialization.
         const RL_STATE_INITIALIZED  = 0x0000002,
-        /// Readline has modified the terminal modes to do its own input and redisplay.
+/// Readline has modified the terminal modes to do its own input and redisplay.
         const RL_STATE_TERMPREPPED  = 0x0000004,
-        /// Readline is reading a command from the keyboard.
+/// Readline is reading a command from the keyboard.
         const RL_STATE_READCMD      = 0x0000008,
-        /// Readline is reading more input after reading the meta-prefix character.
+/// Readline is reading more input after reading the meta-prefix character.
         const RL_STATE_METANEXT     = 0x0000010,
-        /// Readline is dispatching to a command.
+/// Readline is dispatching to a command.
         const RL_STATE_DISPATCHING  = 0x0000020,
-        /// Readline is reading more input while executing an editing command.
+/// Readline is reading more input while executing an editing command.
         const RL_STATE_MOREINPUT    = 0x0000040,
-        /// Readline is performing an incremental history search.
+/// Readline is performing an incremental history search.
         const RL_STATE_ISEARCH      = 0x0000080,
-        /// Readline is performing a non-incremental history search.
+/// Readline is performing a non-incremental history search.
         const RL_STATE_NSEARCH      = 0x0000100,
-        /// Readline is searching backward or forward through the history for a string.
+/// Readline is searching backward or forward through the history for a string.
         const RL_STATE_SEARCH       = 0x0000200,
-        /// Readline is reading a numeric argument.
+/// Readline is reading a numeric argument.
         const RL_STATE_NUMERICARG   = 0x0000400,
-        /// Readline is currently getting its input from a previously-defined keyboard macro.
+/// Readline is currently getting its input from a previously-defined keyboard macro.
         const RL_STATE_MACROINPUT   = 0x0000800,
-        /// Readline is currently reading characters defining a keyboard macro.
+/// Readline is currently reading characters defining a keyboard macro.
         const RL_STATE_MACRODEF     = 0x0001000,
-        /// Readline is in overwrite mode.
+/// Readline is in overwrite mode.
         const RL_STATE_OVERWRITE    = 0x0002000,
-        /// Readline is performing word completion.
+/// Readline is performing word completion.
         const RL_STATE_COMPLETING   = 0x0004000,
-        /// Readline is currently executing the readline signal handler.
+/// Readline is currently executing the readline signal handler.
         const RL_STATE_SIGHANDLER   = 0x0008000,
-        /// Readline is performing an undo.
+/// Readline is performing an undo.
         const RL_STATE_UNDOING      = 0x0010000,
-        /// Readline has input pending due to a call to `rl_execute_next()`.
+/// Readline has input pending due to a call to `rl_execute_next()`.
         const RL_STATE_INPUTPENDING = 0x0020000,
-        /// Readline has saved the values of the terminal's special characters.
+/// Readline has saved the values of the terminal's special characters.
         const RL_STATE_TTYCSAVED    = 0x0040000,
-        /// Readline is currently using the alternate (callback) interface (see section
-        /// [2.4.12 Alternate Interface]).
-        /// [2.4.12 alternate interface]: https://goo.gl/PHb4Kq
+/// Readline is currently using the alternate (callback) interface (see section
+/// [2.4.12 Alternate Interface]).
+/// [2.4.12 alternate interface]: https://goo.gl/PHb4Kq
         const RL_STATE_CALLBACK     = 0x0080000,
-        /// Readline is reading the argument to a vi-mode "motion" command.
+/// Readline is reading the argument to a vi-mode "motion" command.
         const RL_STATE_VIMOTION     = 0x0100000,
-        /// Readline is reading a multiple-keystroke command.
+/// Readline is reading a multiple-keystroke command.
         const RL_STATE_MULTIKEY     = 0x0200000,
-        /// Readline has entered vi command (movement) mode at least one time during the current
-        /// call to `readline()`.
+/// Readline has entered vi command (movement) mode at least one time during the current
+/// call to `readline()`.
         const RL_STATE_VICMDONCE    = 0x0400000,
-        /// Readline has read a key sequence bound to `accept-line` and is about to return the line
-        /// to the caller.
+/// Readline has read a key sequence bound to `accept-line` and is about to return the line
+/// to the caller.
         const RL_STATE_DONE         = 0x1000000,
     }
 );

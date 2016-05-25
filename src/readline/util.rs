@@ -151,7 +151,9 @@ pub fn extend_line_buffer(len: i32) -> () {
 pub fn init() {
     START.call_once(|| {
         debug!("Readline API initialized");
-        unsafe { ext_util::rl_initialize() };
+        unsafe {
+            ext_util::rl_initialize();
+        }
     });
 }
 
