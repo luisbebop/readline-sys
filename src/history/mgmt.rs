@@ -29,7 +29,7 @@ static START: Once = ONCE_INIT;
 pub fn init() {
     START.call_once(|| {
         debug!("History API initialized");
-        unsafe { ext_mgmt::using_history() };
+        unsafe { ext_mgmt::using_history() }
     });
 }
 

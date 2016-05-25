@@ -6,7 +6,7 @@
 //! entry.
 use history::mgmt::init;
 use std::ffi::CString;
-use self::Direction::*;
+use self::Direction::{Backward, Forward};
 
 /// The direction to search through the history entries.
 pub enum Direction {

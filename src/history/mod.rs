@@ -23,7 +23,6 @@
 //! the History library's features. It supplies extern declarations for all of the library's public
 //! functions and variables, and declares all of the public data structures.
 use libc::{c_char, c_int, c_uint, c_void};
-use std::clone::Clone;
 use std::default::Default;
 use std::ffi::CStr;
 use std::fmt;
@@ -43,7 +42,7 @@ pub type HistoryData = *mut c_void;
 pub type InhibitExpansionFunc = Option<extern "C" fn(*mut c_char, c_uint) -> c_int>;
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 /// A history entry.
 pub struct HistoryEntry {
     /// The line as a string.
@@ -52,12 +51,6 @@ pub struct HistoryEntry {
     pub timestamp: *mut c_char,
     /// Optional application specific data.
     pub data: HistoryData,
-}
-
-impl Clone for HistoryEntry {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 impl Default for HistoryEntry {
@@ -79,7 +72,7 @@ impl fmt::Debug for HistoryEntry {
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 /// The history state.
 pub struct HistoryState {
     /// A pointer to the history entries list.
@@ -92,12 +85,6 @@ pub struct HistoryState {
     pub size: c_int,
     /// Any history flags that have been set.
     pub flags: c_int,
-}
-
-impl Clone for HistoryState {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 impl Default for HistoryState {

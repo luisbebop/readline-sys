@@ -19,7 +19,7 @@ mod ext_listinfo {
     }
 }
 
-/// Return a Vec<HistoryEntry> which is the current input history. Element 0 of this list is the
+/// Return a `Vec<HistoryEntry>` which is the current input history. Element 0 of this list is the
 /// beginning of time. If there is no history, return an empty vector.
 ///
 /// # Examples
@@ -43,10 +43,10 @@ pub fn list() -> Result<Vec<HistoryEntry>, ::HistoryError> {
             for i in 0.. {
                 let entry_ptr = *ptr.offset(i as isize);
 
-                if !entry_ptr.is_null() {
-                    entries.push(*entry_ptr);
-                } else {
+                if entry_ptr.is_null() {
                     break;
+                } else {
+                    entries.push(*entry_ptr);
                 }
             }
             Ok(entries)
@@ -70,7 +70,7 @@ pub fn offset() -> i32 {
 }
 
 /// Return the history entry at the current position, as determined by `where_history()``. If there
-/// is no entry there, return a HistoryError.
+/// is no entry there, return a `HistoryError`.
 ///
 /// # Examples
 ///
@@ -94,7 +94,7 @@ pub fn current<'a>() -> Result<&'a mut HistoryEntry, ::HistoryError> {
 }
 
 /// Return the history entry at position offset, starting from `history_base`. If there is no entry
-/// there, or if offset is greater than the history length, return a HistoryError.
+/// there, or if offset is greater than the history length, return a `HistoryError`.
 ///
 /// # Examples
 ///

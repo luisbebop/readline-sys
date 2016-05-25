@@ -85,6 +85,7 @@ mod test {
 
     #[test]
     #[cfg(unix)]
+    #[cfg_attr(feature="clippy", allow(indexing_slicing))]
     fn test_version() {
         use sodium_sys::crypto::utils::secmem;
         use super::version;
@@ -99,6 +100,7 @@ mod test {
 
     #[test]
     #[cfg(windows)]
+    #[cfg_attr(feature="clippy", allow(indexing_slicing))]
     fn test_version() {
         use sodium_sys::crypto::utils::secmem;
         use super::version;

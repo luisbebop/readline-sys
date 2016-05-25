@@ -300,7 +300,7 @@ pub fn rl_restore_prompt() -> () {
 /// It returns the number of visible characters on the last line of the (possibly multi-line)
 /// prompt. Applications may indicate that the prompt contains characters that take up no physical
 /// screen space when displayed by bracketing a sequence of such characters with the special markers
-/// **RL_PROMPT_START_IGNORE** and **RL_PROMPT_END_IGNORE** (declared in `readline.h'. This may be
+/// `RL_PROMPT_START_IGNORE` and `RL_PROMPT_END_IGNORE` (declared in `readline.h'. This may be
 /// used to embed terminal-specific escape sequences in prompts.
 ///
 /// # Examples

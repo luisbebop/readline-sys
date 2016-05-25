@@ -13,7 +13,7 @@
 //! [2.3 readline variables]: https://goo.gl/E1D6om
 use libc::c_char;
 use readline::{CommandFunction, Keymap};
-use self::BindType::*;
+use self::BindType::{Func, Kmap, Macr};
 use std::ffi::CString;
 use std::path::Path;
 use std::ptr;
@@ -25,21 +25,21 @@ pub type BindResult = Result<i32, ::ReadlineError>;
 #[derive(Debug, PartialEq)]
 pub enum BindType {
     /// Generate a function binding.
-    IsFunc(*mut Option<CommandFunction>),
+    Func(*mut Option<CommandFunction>),
     /// Generate a keymap binding.
-    IsKmap(Keymap),
+    Kmap(Keymap),
     /// Generate a macro binding.
-    IsMacr(*const c_char),
+    Macr(*const c_char),
 }
 
 impl From<i32> for BindType {
     fn from(i: i32) -> BindType {
         if i == 0 {
-            IsFunc(ptr::null_mut())
+            Func(ptr::null_mut())
         } else if i == 1 {
-            IsKmap(ptr::null_mut())
+            Kmap(ptr::null_mut())
         } else if i == 2 {
-            IsMacr(ptr::null())
+            Macr(ptr::null())
         } else {
             panic!("Unknown BindType!");
         }
@@ -581,9 +581,9 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
 }
 
 /// Bind the key sequence represented by the string `keyseq` to the function `f`. type says what
-/// kind of data is pointed to by data; this can be a function (IsFunc), a macro (IsMacr), or a
-/// keymap (IsKmap). This makes new keymaps as necessary. The initial keymap in which to do bindings
-/// is `map`.
+/// kind of data is pointed to by data; this can be a function (`Func`), a macro (`Macr`), or a
+/// keymap (`Kmap`). This makes new keymaps as necessary. The initial keymap in which to do
+/// bindings is `map`.
 ///
 /// # Examples
 ///
@@ -607,7 +607,7 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
 ///
 /// assert!(!km.is_null());
 ///
-/// match binding::generic_bind("C-z", BindType::IsFunc(&mut Some(test_cmd_func)), km) {
+/// match binding::generic_bind("C-z", BindType::Func(&mut Some(test_cmd_func)), km) {
 ///     Ok(res) => assert!(res == 0),
 ///     Err(_)  => assert!(false),
 /// }
@@ -615,14 +615,14 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
 /// let km2 = keymap::create_empty().unwrap_or(ptr::null_mut());
 /// assert!(!km2.is_null());
 ///
-/// match binding::generic_bind("C-k", BindType::IsKmap(km2), km) {
+/// match binding::generic_bind("C-k", BindType::Kmap(km2), km) {
 ///     Ok(res) => assert!(res == 0),
 ///     Err(_)  => assert!(false),
 /// }
 ///
 /// let macr = CString::new("\\C-e | less\\C-m").unwrap().as_ptr();
 ///
-/// match binding::generic_bind("C-M-l", BindType::IsMacr(macr), km) {
+/// match binding::generic_bind("C-M-l", BindType::Macr(macr), km) {
 ///     Ok(res) => assert!(res == 0),
 ///     Err(_)  => assert!(false),
 /// }
@@ -633,15 +633,15 @@ pub fn generic_bind(keyseq: &str, bind_type: BindType, map: Keymap) -> BindResul
         let ptr = try!(CString::new(keyseq)).as_ptr();
 
         match bind_type {
-            IsFunc(func_ptr) => {
+            Func(func_ptr) => {
                 genresult(ext_binding::rl_generic_bind(0, ptr, func_ptr as *mut i8, map),
                           "Unable to bind to function!")
             }
-            IsKmap(km) => {
+            Kmap(km) => {
                 genresult(ext_binding::rl_generic_bind(1, ptr, km as *mut i8, map),
                           "Unable to bind to keymap!")
             }
-            IsMacr(m) => {
+            Macr(m) => {
                 genresult(ext_binding::rl_generic_bind(2, ptr, m as *mut i8, map),
                           "Unable to bind to macro!")
             }

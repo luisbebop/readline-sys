@@ -36,10 +36,6 @@
 //! If you want the user to be able to get at the line later, (with `C-p` for example), you must
 //! call `add_history()` to save the line away in a history list of such lines.
 //!
-//! ```c
-//!     add_history (line);
-//! ```
-//!
 //! For full details on the GNU History Library, see the associated manual.
 use libc::{c_char, c_int, c_long, c_uint, c_ushort, c_void, free, size_t};
 use std::ffi::{CStr, CString};
@@ -91,7 +87,7 @@ pub type Keymap = *mut KeymapEntryArray;
 
 
 #[repr(C)]
-#[derive(Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 /// I/O Marker
 pub struct IOMarker {
     /// Next I/O marker.
@@ -102,12 +98,6 @@ pub struct IOMarker {
     pub pos: c_int,
 }
 
-impl Clone for IOMarker {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
 impl Default for IOMarker {
     fn default() -> Self {
         unsafe { mem::zeroed() }
@@ -115,7 +105,7 @@ impl Default for IOMarker {
 }
 
 #[repr(C)]
-#[derive(Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 /// I/O File Type
 pub struct IOFile {
     /// Flags
@@ -178,12 +168,6 @@ pub struct IOFile {
     pub unused2: [c_char; 20usize],
 }
 
-impl Clone for IOFile {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
 impl Default for IOFile {
     fn default() -> Self {
         unsafe { mem::zeroed() }
@@ -191,19 +175,13 @@ impl Default for IOFile {
 }
 
 #[repr(C)]
-#[derive(Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 /// Keymap Entry
 pub struct KeymapEntry {
     /// Keymap Type
     pub type_: c_char,
     /// Keymap Function
     pub kfunc: *mut Option<extern "C" fn() -> c_int>,
-}
-
-impl Clone for KeymapEntry {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 impl Default for KeymapEntry {
@@ -263,27 +241,27 @@ pub struct ReadlineState {
 impl fmt::Debug for ReadlineState {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt.debug_struct("ReadlineState")
-           .field("point", &self.point)
-           .field("end", &self.end)
-           .field("mark", &self.mark)
-           .field("buffer", &self.buffer)
-           .field("buflen", &self.buflen)
-           .field("ul", &self.ul)
-           .field("prompt", &self.prompt)
-           .field("rlstate", &self.rlstate)
-           .field("done", &self.done)
-           .field("kmap", &self.kmap)
-           .field("lastfunc", &self.lastfunc)
-           .field("insmode", &self.insmode)
-           .field("edmode", &self.edmode)
-           .field("kseqlen", &self.kseqlen)
-           .field("inf", &self.inf)
-           .field("outf", &self.outf)
-           .field("pendingin", &self.pendingin)
-           .field("macro", &self.makro)
-           .field("catchsigs", &self.catchsigs)
-           .field("catchsigwinch", &self.catchsigwinch)
-           .finish()
+            .field("point", &self.point)
+            .field("end", &self.end)
+            .field("mark", &self.mark)
+            .field("buffer", &self.buffer)
+            .field("buflen", &self.buflen)
+            .field("ul", &self.ul)
+            .field("prompt", &self.prompt)
+            .field("rlstate", &self.rlstate)
+            .field("done", &self.done)
+            .field("kmap", &self.kmap)
+            .field("lastfunc", &self.lastfunc)
+            .field("insmode", &self.insmode)
+            .field("edmode", &self.edmode)
+            .field("kseqlen", &self.kseqlen)
+            .field("inf", &self.inf)
+            .field("outf", &self.outf)
+            .field("pendingin", &self.pendingin)
+            .field("macro", &self.makro)
+            .field("catchsigs", &self.catchsigs)
+            .field("catchsigwinch", &self.catchsigwinch)
+            .finish()
     }
 }
 
@@ -300,7 +278,7 @@ impl Default for ReadlineState {
 }
 
 #[repr(C)]
-#[derive(Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 /// Undo List
 pub struct UndoList {
     /// Next Undo item.
@@ -311,14 +289,8 @@ pub struct UndoList {
     pub end: c_int,
     /// The undo text.
     pub text: *mut c_char,
-    /// The type of undo (UndoDelete, UndoInsert, UndoBegin, UndoEnd)
+    /// The type of undo (Delete, Insert, Begin, End)
     pub what: c_uint,
-}
-
-impl Clone for UndoList {
-    fn clone(&self) -> Self {
-        *self
-    }
 }
 
 impl Default for UndoList {
