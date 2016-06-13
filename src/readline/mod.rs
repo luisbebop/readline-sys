@@ -51,7 +51,7 @@ mod ext_readline {
     extern "C" {
         pub fn readline(p: *const c_char) -> *const c_char;
         pub fn rl_callback_handler_install(p: *const c_char,
-                                           lhandler: *mut Option<HandlerFunction>)
+                                           lhandler: Option<HandlerFunction>)
                                            -> ();
         pub fn rl_callback_read_char() -> ();
         pub fn rl_callback_handler_remove() -> ();
@@ -181,7 +181,7 @@ pub struct KeymapEntry {
     /// Keymap Type
     pub type_: c_char,
     /// Keymap Function
-    pub kfunc: *mut Option<extern "C" fn() -> c_int>,
+    pub kfunc: Option<extern "C" fn() -> c_int>,
 }
 
 impl Default for KeymapEntry {
@@ -215,7 +215,7 @@ pub struct ReadlineState {
     /// The current keymap.
     pub kmap: Keymap,
     /// The last function executed.
-    pub lastfunc: *mut Option<extern "C" fn() -> c_int>,
+    pub lastfunc: Option<extern "C" fn() -> c_int>,
     /// The insert mode.
     pub insmode: c_int,
     /// The edit mode.
@@ -348,7 +348,7 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ::ReadlineError> {
 /// the value of `lhandler` to use as a handler function to call when a complete line of input has
 /// been entered. The handler function receives the text of the line as an argument.
 pub fn callback_handler_install(p: &str,
-                                lhandler: *mut Option<HandlerFunction>)
+                                lhandler: Option<HandlerFunction>)
                                 -> Result<(), ::ReadlineError> {
     let ptr = try!(CString::new(p)).as_ptr();
 
