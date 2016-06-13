@@ -20,9 +20,7 @@ mod ext_funmap {
                                      bind_type: *mut c_int)
                                      -> Option<CommandFunction>;
         pub fn rl_invoking_keyseqs(f: CommandFunction) -> *mut *mut c_char;
-        pub fn rl_invoking_keyseqs_in_map(f: CommandFunction,
-                                          map: Keymap)
-                                          -> *mut *mut c_char;
+        pub fn rl_invoking_keyseqs_in_map(f: CommandFunction, map: Keymap) -> *mut *mut c_char;
         pub fn rl_function_dumper(readable: c_int) -> ();
         pub fn rl_list_funmap_names() -> ();
         pub fn rl_add_funmap_entry(name: *const c_char, f: CommandFunction) -> c_int;
@@ -48,7 +46,7 @@ pub fn named_function(name: &str) -> Result<CommandFunction, ::ReadlineError> {
         if func_ptr.is_none() {
             Err(::ReadlineError::new("Funmap Error", "Unable to find name function!"))
         } else {
-            Ok(func_ptr.unwrap())
+            Ok(func_ptr.expect("Unable to get function pointer"))
         }
     }
 }
@@ -82,11 +80,7 @@ pub fn function_of_keyseq
             Some(km) => km,
             None => ptr::null_mut(),
         };
-        let bind_type: *mut i32 = if add_type {
-            &mut 1
-        } else {
-            ptr::null_mut()
-        };
+        let bind_type: *mut i32 = if add_type { &mut 1 } else { ptr::null_mut() };
 
         let func_ptr = ext_funmap::rl_function_of_keyseq(ptr, km, bind_type);
 
@@ -188,11 +182,7 @@ pub fn invoking_keyseqs_in_map(f: CommandFunction,
 /// funmap::function_dumper(true);
 /// ```
 pub fn function_dumper(readable: bool) -> () {
-    let i = if readable {
-        1
-    } else {
-        0
-    };
+    let i = if readable { 1 } else { 0 };
     unsafe { ext_funmap::rl_function_dumper(i) }
 }
 
@@ -235,9 +225,7 @@ pub fn list_funmap_names() -> () {
 /// }
 /// # }
 /// ```
-pub fn add_funmap_entry(name: &str,
-                        cmd: CommandFunction)
-                        -> Result<i32, ::ReadlineError> {
+pub fn add_funmap_entry(name: &str, cmd: CommandFunction) -> Result<i32, ::ReadlineError> {
     unsafe {
         let ptr = try!(CString::new(name)).as_ptr();
         let res = ext_funmap::rl_add_funmap_entry(ptr, cmd);

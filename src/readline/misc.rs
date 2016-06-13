@@ -30,11 +30,7 @@ mod ext_misc {
 /// misc::macro_dumper(true);
 /// ```
 pub fn macro_dumper(readable: bool) -> () {
-    let read = if readable {
-        1
-    } else {
-        0
-    };
+    let read = if readable { 1 } else { 0 };
 
     unsafe { ext_misc::rl_macro_dumper(read) }
 }
@@ -110,11 +106,7 @@ pub fn variable_value(name: &str) -> Result<String, ::ReadlineError> {
 /// misc::variable_dumper(true);
 /// ```
 pub fn variable_dumper(readable: bool) -> () {
-    let read = if readable {
-        1
-    } else {
-        0
-    };
+    let read = if readable { 1 } else { 0 };
 
     unsafe { ext_misc::rl_variable_dumper(read) }
 }

@@ -112,11 +112,7 @@ pub fn free(ptr: *mut c_void) {
 /// ```
 pub fn replace_line(text: &str, clear_undo: bool) -> Result<(), ::ReadlineError> {
     let ptr = try!(CString::new(text)).as_ptr();
-    let clear = if clear_undo {
-        1
-    } else {
-        0
-    };
+    let clear = if clear_undo { 1 } else { 0 };
 
     unsafe { Ok(ext_util::rl_replace_line(ptr, clear)) }
 }

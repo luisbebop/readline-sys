@@ -52,15 +52,9 @@ mod ext_binding {
 
     extern "C" {
         pub fn rl_bind_key(key: c_int, f: CommandFunction) -> c_int;
-        pub fn rl_bind_key_in_map(key: c_int,
-                                  f: CommandFunction,
-                                  map: Keymap)
-                                  -> c_int;
+        pub fn rl_bind_key_in_map(key: c_int, f: CommandFunction, map: Keymap) -> c_int;
         pub fn rl_bind_key_if_unbound(key: c_int, f: CommandFunction) -> c_int;
-        pub fn rl_bind_key_if_unbound_in_map(key: c_int,
-                                             f: CommandFunction,
-                                             map: Keymap)
-                                             -> c_int;
+        pub fn rl_bind_key_if_unbound_in_map(key: c_int, f: CommandFunction, map: Keymap) -> c_int;
         pub fn rl_unbind_key(key: c_int) -> c_int;
         pub fn rl_unbind_key_in_map(key: c_int, map: Keymap) -> c_int;
         pub fn rl_unbind_function_in_map(f: CommandFunction, map: Keymap) -> c_int;
@@ -70,13 +64,8 @@ mod ext_binding {
                                      f: CommandFunction,
                                      map: Keymap)
                                      -> c_int;
-        pub fn rl_set_key(keyseq: *const c_char,
-                          f: CommandFunction,
-                          map: Keymap)
-                          -> c_int;
-        pub fn rl_bind_keyseq_if_unbound(keyseq: *const c_char,
-                                         f: CommandFunction)
-                                         -> c_int;
+        pub fn rl_set_key(keyseq: *const c_char, f: CommandFunction, map: Keymap) -> c_int;
+        pub fn rl_bind_keyseq_if_unbound(keyseq: *const c_char, f: CommandFunction) -> c_int;
         pub fn rl_bind_keyseq_if_unbound_in_map(keyseq: *const c_char,
                                                 f: CommandFunction,
                                                 map: Keymap)
@@ -235,10 +224,7 @@ pub fn bind_key_if_unbound(key: char, f: CommandFunction) -> BindResult {
 /// }
 /// # }
 /// ```
-pub fn bind_key_if_unbound_in_map(key: char,
-                                  map: Keymap,
-                                  f: CommandFunction)
-                                  -> BindResult {
+pub fn bind_key_if_unbound_in_map(key: char, map: Keymap, f: CommandFunction) -> BindResult {
     unsafe {
         genresult(ext_binding::rl_bind_key_if_unbound_in_map(key as i32, f, map),
                   "Unable to bind key in map!")
@@ -353,9 +339,7 @@ pub fn unbind_key_in_map(key: char, map: Keymap) -> BindResult {
 /// # }
 /// ```
 pub fn unbind_function_in_map(f: CommandFunction, map: Keymap) -> BindResult {
-    let res = unsafe {
-        ext_binding::rl_unbind_function_in_map(f, map)
-    };
+    let res = unsafe { ext_binding::rl_unbind_function_in_map(f, map) };
     if res == 1 {
         Ok(res)
     } else {
@@ -455,10 +439,7 @@ pub fn bind_keyseq(keyseq: &str, f: CommandFunction) -> BindResult {
 /// }
 /// # }
 /// ```
-pub fn bind_keyseq_in_map(keyseq: &str,
-                          f: CommandFunction,
-                          map: Keymap)
-                          -> BindResult {
+pub fn bind_keyseq_in_map(keyseq: &str, f: CommandFunction, map: Keymap) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_bind_keyseq_in_map(ptr, f, map),
@@ -573,10 +554,7 @@ pub fn bind_keyseq_if_unbound(keyseq: &str, f: CommandFunction) -> BindResult {
 /// }
 /// # }
 /// ```
-pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
-                                     f: CommandFunction,
-                                     map: Keymap)
-                                     -> BindResult {
+pub fn bind_keyseq_if_unbound_in_map(keyseq: &str, f: CommandFunction, map: Keymap) -> BindResult {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         genresult(ext_binding::rl_bind_keyseq_if_unbound_in_map(ptr, f, map),
@@ -634,24 +612,24 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str,
 /// ```
 pub fn generic_bind(keyseq: &str, bind_type: BindType, map: Keymap) -> BindResult {
     unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
+        let str_ptr = try!(CString::new(keyseq)).as_ptr();
 
         match bind_type {
             Func(func_ptr) => {
-                let fptr = if func_ptr.is_some() {
-                    func_ptr.unwrap() as *mut i8
+                let fn_ptr = if func_ptr.is_some() {
+                    func_ptr.expect("Unable to get function pointer") as *mut i8
                 } else {
                     ::std::ptr::null_mut() as *mut i8
                 };
-                genresult(ext_binding::rl_generic_bind(0, ptr, fptr, map),
+                genresult(ext_binding::rl_generic_bind(0, str_ptr, fn_ptr, map),
                           "Unable to bind to function!")
             }
             Kmap(km) => {
-                genresult(ext_binding::rl_generic_bind(1, ptr, km as *mut i8, map),
+                genresult(ext_binding::rl_generic_bind(1, str_ptr, km as *mut i8, map),
                           "Unable to bind to keymap!")
             }
             Macr(m) => {
-                genresult(ext_binding::rl_generic_bind(2, ptr, m as *mut i8, map),
+                genresult(ext_binding::rl_generic_bind(2, str_ptr, m as *mut i8, map),
                           "Unable to bind to macro!")
             }
         }

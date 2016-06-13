@@ -210,7 +210,7 @@ pub fn show_char(c: char) -> Result<i32, ::ReadlineError> {
 }
 
 /// The arguments are a format string as would be supplied to printf, possibly containing conversion
-/// specifications such as `%d', and any additional arguments necessary to satisfy the conversion
+/// specifications such as `%d`, and any additional arguments necessary to satisfy the conversion
 /// specifications. The resulting string is displayed in the echo area. The echo area is also used
 /// to display numeric arguments and search strings. You should call `rl_save_prompt` to save the
 /// prompt information before calling this function.
@@ -325,7 +325,7 @@ pub fn expand_prompt(prompt: &str) -> Result<i32, ::ReadlineError> {
     }
 }
 
-/// Make Readline use prompt for subsequent redisplay. This calls `rl_expand_prompt()`` to expand
+/// Make Readline use prompt for subsequent redisplay. This calls `rl_expand_prompt()` to expand
 /// the prompt and sets `rl_prompt` to the result.
 ///
 /// # Examples

@@ -69,7 +69,7 @@ pub fn offset() -> i32 {
     unsafe { ext_listinfo::where_history() }
 }
 
-/// Return the history entry at the current position, as determined by `where_history()``. If there
+/// Return the history entry at the current position, as determined by `where_history()`. If there
 /// is no entry there, return a `HistoryError`.
 ///
 /// # Examples

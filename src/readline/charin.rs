@@ -47,7 +47,7 @@ pub fn stuff_char(c: char) -> Result<i32, ::ReadlineError> {
     }
 }
 
-/// Make `c` be the next command to be executed when `rl_read_key()`` is called. This sets
+/// Make `c` be the next command to be executed when `rl_read_key()` is called. This sets
 /// `rl_pending_input`.
 ///
 /// # Examples
