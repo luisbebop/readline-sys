@@ -346,16 +346,20 @@ pub fn unbind_key_in_map(key: char, map: Keymap) -> BindResult {
 ///     Err(_)  => assert!(false),
 /// }
 ///
-///     Ok(res)  => assert!(res == 0),
 /// match binding::unbind_function_in_map(test_cmd_func, km) {
+///     Ok(res)  => assert!(res == 1),
 ///     Err(_) => assert!(false),
 /// }
 /// # }
 /// ```
 pub fn unbind_function_in_map(f: CommandFunction, map: Keymap) -> BindResult {
-    unsafe {
-        genresult(ext_binding::rl_unbind_function_in_map(f, map),
-                  "Unable to unbind key in map!")
+    let res = unsafe {
+        ext_binding::rl_unbind_function_in_map(f, map)
+    };
+    if res == 1 {
+        Ok(res)
+    } else {
+        Err(::ReadlineError::new("Binding Error", "Unable to unbind function!"))
     }
 }
 
