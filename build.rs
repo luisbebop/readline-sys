@@ -38,14 +38,15 @@ fn build_readline() {
     let src = PathBuf::from(&manifest_dir).join("readline");
     let dst = PathBuf::from(&out_dir).join("build");
     let _ = fs::create_dir(&dst);
-
-    run(Command::new("./configure")
-            .env("CFLAGS", "-fPIC")
-            .env("CPPFLAGS", "-fPIC")
-            .current_dir(&src));
-    run(Command::new("make").current_dir(&src));
-    let _ = fs::copy(&src.join("libreadline.a"), &dst.join("libreadline.a"));
-
+    let dst_file = dst.join("libreadline.a");
+    if !dst_file.exists() {
+        run(Command::new("./configure")
+                .env("CFLAGS", "-fPIC")
+                .env("CPPFLAGS", "-fPIC")
+                .current_dir(&src));
+        run(Command::new("make").current_dir(&src));
+        let _ = fs::copy(&src.join("libreadline.a"), &dst_file);
+    }
     println!("cargo:rustc-link-lib=static=readline");
     println!("cargo:rustc-link-lib=ncurses");
     println!("cargo:rustc-flags=-L {}", dst.display());
