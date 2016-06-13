@@ -14,18 +14,18 @@ mod ext_funmap {
     use readline::{CommandFunction, Keymap};
 
     extern "C" {
-        pub fn rl_named_function(name: *const c_char) -> *mut Option<CommandFunction>;
+        pub fn rl_named_function(name: *const c_char) -> Option<CommandFunction>;
         pub fn rl_function_of_keyseq(keyseq: *const c_char,
                                      map: Keymap,
                                      bind_type: *mut c_int)
-                                     -> *mut Option<CommandFunction>;
-        pub fn rl_invoking_keyseqs(f: *mut Option<CommandFunction>) -> *mut *mut c_char;
-        pub fn rl_invoking_keyseqs_in_map(f: *mut Option<CommandFunction>,
+                                     -> Option<CommandFunction>;
+        pub fn rl_invoking_keyseqs(f: CommandFunction) -> *mut *mut c_char;
+        pub fn rl_invoking_keyseqs_in_map(f: CommandFunction,
                                           map: Keymap)
                                           -> *mut *mut c_char;
         pub fn rl_function_dumper(readable: c_int) -> ();
         pub fn rl_list_funmap_names() -> ();
-        pub fn rl_add_funmap_entry(name: *const c_char, f: *mut Option<CommandFunction>) -> c_int;
+        pub fn rl_add_funmap_entry(name: *const c_char, f: CommandFunction) -> c_int;
     }
 }
 
@@ -38,20 +38,17 @@ mod ext_funmap {
 ///
 /// util::init();
 ///
-/// match funmap::named_function("self-insert") {
-///     Ok(f)  => assert!(!f.is_null()),
-///     Err(_) => assert!(false),
-/// }
+/// assert!(funmap::named_function("self-insert").is_ok())
 /// ```
-pub fn named_function(name: &str) -> Result<*mut Option<CommandFunction>, ::ReadlineError> {
+pub fn named_function(name: &str) -> Result<CommandFunction, ::ReadlineError> {
     unsafe {
         let ptr = try!(CString::new(name)).as_ptr();
         let func_ptr = ext_funmap::rl_named_function(ptr);
 
-        if func_ptr.is_null() {
+        if func_ptr.is_none() {
             Err(::ReadlineError::new("Funmap Error", "Unable to find name function!"))
         } else {
-            Ok(func_ptr)
+            Ok(func_ptr.unwrap())
         }
     }
 }
@@ -78,7 +75,7 @@ pub fn function_of_keyseq
     (keyseq: &str,
      map: Option<Keymap>,
      add_type: bool)
-     -> Result<(*mut Option<CommandFunction>, Option<BindType>), ::ReadlineError> {
+     -> Result<(Option<CommandFunction>, Option<BindType>), ::ReadlineError> {
     unsafe {
         let ptr = try!(CString::new(keyseq)).as_ptr();
         let km = match map {
@@ -93,7 +90,7 @@ pub fn function_of_keyseq
 
         let func_ptr = ext_funmap::rl_function_of_keyseq(ptr, km, bind_type);
 
-        if func_ptr.is_null() {
+        if func_ptr.is_none() {
             Err(::ReadlineError::new("Funmap Error",
                                      "Unable to get function associated with keyseq!"))
         } else if add_type {
@@ -118,7 +115,7 @@ pub fn function_of_keyseq
 /// let names = funmap::invoking_keyseqs(cmd).unwrap();
 /// assert!(names.len() > 0);
 /// ```
-pub fn invoking_keyseqs(f: *mut Option<CommandFunction>) -> Result<Vec<String>, ::ReadlineError> {
+pub fn invoking_keyseqs(f: CommandFunction) -> Result<Vec<String>, ::ReadlineError> {
     unsafe {
         let arr_ptr = ext_funmap::rl_invoking_keyseqs(f);
 
@@ -154,7 +151,7 @@ pub fn invoking_keyseqs(f: *mut Option<CommandFunction>) -> Result<Vec<String>, 
 /// let names = funmap::invoking_keyseqs_in_map(cmd, km).unwrap();
 /// assert!(names.len() > 0);
 /// ```
-pub fn invoking_keyseqs_in_map(f: *mut Option<CommandFunction>,
+pub fn invoking_keyseqs_in_map(f: CommandFunction,
                                map: Keymap)
                                -> Result<Vec<String>, ::ReadlineError> {
     unsafe {
@@ -232,14 +229,14 @@ pub fn list_funmap_names() -> () {
 ///   0
 /// }
 ///
-/// match funmap::add_funmap_entry("test-cmd", &mut Some(test_cmd_func)) {
+/// match funmap::add_funmap_entry("test-cmd", test_cmd_func) {
 ///     Ok(res) => assert!(res >= 0),
 ///     Err(_)  => assert!(false),
 /// }
 /// # }
 /// ```
 pub fn add_funmap_entry(name: &str,
-                        cmd: *mut Option<CommandFunction>)
+                        cmd: CommandFunction)
                         -> Result<i32, ::ReadlineError> {
     unsafe {
         let ptr = try!(CString::new(name)).as_ptr();
@@ -299,7 +296,7 @@ mod test {
 
         util::init();
 
-        match add_funmap_entry("test-cmd", &mut Some(test_cmd_func)) {
+        match add_funmap_entry("test-cmd", test_cmd_func) {
             Ok(res) => assert!(res >= 0),
             Err(_) => assert!(false),
         }
