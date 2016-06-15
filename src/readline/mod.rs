@@ -321,14 +321,16 @@ impl Default for UndoList {
 /// }
 /// ```
 pub fn readline(prompt: &str) -> Result<Option<String>, ::ReadlineError> {
-    let prompt_ptr = try!(CString::new(prompt)).as_ptr();
+    let csprompt = try!(CString::new(prompt));
 
-    unsafe {
-        let ret = ext_readline::readline(prompt_ptr);
-        if ret.is_null() {
-            // user pressed Ctrl-D
-            Ok(None)
-        } else {
+    let ret = unsafe {
+        ext_readline::readline(csprompt.as_ptr())
+    };
+    if ret.is_null() {
+        // user pressed Ctrl-D
+        Ok(None)
+    } else {
+        unsafe {
             let line = CStr::from_ptr(ret).to_string_lossy().into_owned();
             free(ret as *mut c_void);
             Ok(Some(line))
@@ -350,9 +352,9 @@ pub fn readline(prompt: &str) -> Result<Option<String>, ::ReadlineError> {
 pub fn callback_handler_install(p: &str,
                                 lhandler: Option<HandlerFunction>)
                                 -> Result<(), ::ReadlineError> {
-    let ptr = try!(CString::new(p)).as_ptr();
+    let cp = try!(CString::new(p));
 
-    unsafe { Ok(ext_readline::rl_callback_handler_install(ptr, lhandler)) }
+    unsafe { Ok(ext_readline::rl_callback_handler_install(cp.as_ptr(), lhandler)) }
 }
 
 /// Whenever an application determines that keyboard input is available, it should call

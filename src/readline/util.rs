@@ -111,10 +111,10 @@ pub fn free(ptr: *mut c_void) {
 /// assert!(util::replace_line("replacement", false).is_ok());
 /// ```
 pub fn replace_line(text: &str, clear_undo: bool) -> Result<(), ::ReadlineError> {
-    let ptr = try!(CString::new(text)).as_ptr();
+    let cstext = try!(CString::new(text));
     let clear = if clear_undo { 1 } else { 0 };
 
-    unsafe { Ok(ext_util::rl_replace_line(ptr, clear)) }
+    unsafe { Ok(ext_util::rl_replace_line(cstext.as_ptr(), clear)) }
 }
 
 /// Ensure that `rl_line_buffer` has enough space to hold len characters, possibly reallocating it

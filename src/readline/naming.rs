@@ -49,7 +49,7 @@ mod ext_naming {
 /// ```
 pub fn add_func(name: &str, key: char, f: CommandFunction) -> Result<i32, ::ReadlineError> {
     unsafe {
-        let ptr = try!(CString::new(name)).as_ptr();
-        Ok(ext_naming::rl_add_defun(ptr, f as *mut CommandFunction, key as i32))
+        let csname = try!(CString::new(name));
+        Ok(ext_naming::rl_add_defun(csname.as_ptr(), f as *mut CommandFunction, key as i32))
     }
 }

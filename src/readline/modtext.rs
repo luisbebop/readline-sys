@@ -35,10 +35,10 @@ fn genresult(res: i32, message: &str) -> Result<i32, ::ReadlineError> {
 /// assert!(modtext::insert_text("inserted").is_ok());
 /// ```
 pub fn insert_text(text: &str) -> Result<i32, ::ReadlineError> {
-    let ptr = try!(CString::new(text)).as_ptr();
+    let cstext = try!(CString::new(text));
 
     unsafe {
-        let res = ext_modtext::rl_insert_text(ptr);
+        let res = ext_modtext::rl_insert_text(cstext.as_ptr());
 
         if res > 0 {
             Ok(res)
@@ -135,6 +135,6 @@ pub fn kill_text(start: i32, end: i32) -> Result<i32, ::ReadlineError> {
 /// assert!(modtext::push_macro_input("\\C-e | less\\C-m").is_ok());
 /// ```
 pub fn push_macro_input(m: &str) -> Result<(), ::ReadlineError> {
-    let ptr = try!(CString::new(m)).as_ptr();
-    unsafe { Ok(ext_modtext::rl_push_macro_input(ptr)) }
+    let csm = try!(CString::new(m));
+    unsafe { Ok(ext_modtext::rl_push_macro_input(csm.as_ptr())) }
 }
