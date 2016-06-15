@@ -176,9 +176,9 @@ pub fn set(map: Keymap) -> () {
 /// assert!(!keymap.is_null());
 /// ```
 pub fn get_by_name(name: &str) -> Result<Keymap, ::ReadlineError> {
-    let name_ptr = try!(CString::new(name)).as_ptr();
+    let csname = try!(CString::new(name));
     unsafe {
-        let keymap_ptr = ext_keymap::rl_get_keymap_by_name(name_ptr);
+        let keymap_ptr = ext_keymap::rl_get_keymap_by_name(csname.as_ptr());
 
         if keymap_ptr.is_null() {
             Err(::ReadlineError::new("Null Pointer",

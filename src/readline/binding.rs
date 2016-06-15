@@ -364,15 +364,14 @@ pub fn unbind_function_in_map(f: CommandFunction, map: Keymap) -> BindResult {
 /// }
 /// ```
 pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> BindResult {
-    unsafe {
-        let ptr = try!(CString::new(cmd)).as_ptr();
-        let res = ext_binding::rl_unbind_command_in_map(ptr, map);
-
-        if res == 1 {
-            Ok(res)
-        } else {
-            Err(::ReadlineError::new("Binding Error", "Unable to unbind command!"))
-        }
+    let cscmd = try!(CString::new(cmd));
+    let res = unsafe {
+        ext_binding::rl_unbind_command_in_map(cscmd.as_ptr(), map)
+    };
+    if res == 1 {
+        Ok(res)
+    } else {
+        Err(::ReadlineError::new("Binding Error", "Unable to unbind command!"))
     }
 }
 
@@ -402,9 +401,9 @@ pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> BindResult {
 /// # }
 /// ```
 pub fn bind_keyseq(keyseq: &str, f: CommandFunction) -> BindResult {
+    let cskeyseq = try!(CString::new(keyseq));
     unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
-        genresult(ext_binding::rl_bind_keyseq(ptr, f),
+        genresult(ext_binding::rl_bind_keyseq(cskeyseq.as_ptr(), f),
                   "Unable to bind key sequence!")
     }
 }
@@ -440,9 +439,9 @@ pub fn bind_keyseq(keyseq: &str, f: CommandFunction) -> BindResult {
 /// # }
 /// ```
 pub fn bind_keyseq_in_map(keyseq: &str, f: CommandFunction, map: Keymap) -> BindResult {
+    let cskeyseq = try!(CString::new(keyseq));
     unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
-        genresult(ext_binding::rl_bind_keyseq_in_map(ptr, f, map),
+        genresult(ext_binding::rl_bind_keyseq_in_map(cskeyseq.as_ptr(), f, map),
                   "Unable to bind key sequence!")
     }
 }
@@ -476,9 +475,9 @@ pub fn bind_keyseq_in_map(keyseq: &str, f: CommandFunction, map: Keymap) -> Bind
 /// # }
 /// ```
 pub fn set_key(keyseq: &str, f: CommandFunction, map: Keymap) -> BindResult {
+    let cskeyseq = try!(CString::new(keyseq));
     unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
-        genresult(ext_binding::rl_set_key(ptr, f, map),
+        genresult(ext_binding::rl_set_key(cskeyseq.as_ptr(), f, map),
                   "Unable to bind key sequence!")
     }
 }
@@ -513,9 +512,9 @@ pub fn set_key(keyseq: &str, f: CommandFunction, map: Keymap) -> BindResult {
 /// # }
 /// ```
 pub fn bind_keyseq_if_unbound(keyseq: &str, f: CommandFunction) -> BindResult {
+    let cskeyseq = try!(CString::new(keyseq));
     unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
-        genresult(ext_binding::rl_bind_keyseq_if_unbound(ptr, f),
+        genresult(ext_binding::rl_bind_keyseq_if_unbound(cskeyseq.as_ptr(), f),
                   "Unable to bind key sequence!")
     }
 }
@@ -555,9 +554,9 @@ pub fn bind_keyseq_if_unbound(keyseq: &str, f: CommandFunction) -> BindResult {
 /// # }
 /// ```
 pub fn bind_keyseq_if_unbound_in_map(keyseq: &str, f: CommandFunction, map: Keymap) -> BindResult {
+    let cskeyseq = try!(CString::new(keyseq));
     unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
-        genresult(ext_binding::rl_bind_keyseq_if_unbound_in_map(ptr, f, map),
+        genresult(ext_binding::rl_bind_keyseq_if_unbound_in_map(cskeyseq.as_ptr(), f, map),
                   "Unable to bind key sequence!")
     }
 }
@@ -602,34 +601,38 @@ pub fn bind_keyseq_if_unbound_in_map(keyseq: &str, f: CommandFunction, map: Keym
 ///     Err(_)  => assert!(false),
 /// }
 ///
-/// let macr = CString::new("\\C-e | less\\C-m").unwrap().as_ptr();
+/// let macr = CString::new("\\C-e | less\\C-m").unwrap();
 ///
-/// match binding::generic_bind("C-M-l", BindType::Macr(macr), km) {
+/// match binding::generic_bind("C-M-l", BindType::Macr(macr.as_ptr()), km) {
 ///     Ok(res) => assert!(res == 0),
 ///     Err(_)  => assert!(false),
 /// }
 /// # }
 /// ```
 pub fn generic_bind(keyseq: &str, bind_type: BindType, map: Keymap) -> BindResult {
-    unsafe {
-        let str_ptr = try!(CString::new(keyseq)).as_ptr();
+    let cskeyseq = try!(CString::new(keyseq));
 
-        match bind_type {
-            Func(func_ptr) => {
-                let fn_ptr = if func_ptr.is_some() {
-                    func_ptr.expect("Unable to get function pointer") as *mut i8
-                } else {
-                    ::std::ptr::null_mut() as *mut i8
-                };
-                genresult(ext_binding::rl_generic_bind(0, str_ptr, fn_ptr, map),
+    match bind_type {
+        Func(func_ptr) => {
+            let fn_ptr = if func_ptr.is_some() {
+                func_ptr.expect("Unable to get function pointer") as *mut i8
+            } else {
+                ::std::ptr::null_mut() as *mut i8
+            };
+            unsafe {
+                genresult(ext_binding::rl_generic_bind(0, cskeyseq.as_ptr(), fn_ptr, map),
                           "Unable to bind to function!")
             }
-            Kmap(km) => {
-                genresult(ext_binding::rl_generic_bind(1, str_ptr, km as *mut i8, map),
+        }
+        Kmap(km) => {
+            unsafe {
+                genresult(ext_binding::rl_generic_bind(1, cskeyseq.as_ptr(), km as *mut i8, map),
                           "Unable to bind to keymap!")
             }
-            Macr(m) => {
-                genresult(ext_binding::rl_generic_bind(2, str_ptr, m as *mut i8, map),
+        }
+        Macr(m) => {
+            unsafe {
+                genresult(ext_binding::rl_generic_bind(2, cskeyseq.as_ptr(), m as *mut i8, map),
                           "Unable to bind to macro!")
             }
         }
@@ -693,9 +696,9 @@ pub fn parse_and_bind(line: &str) -> BindResult {
 /// # }
 /// ```
 pub fn read_init_file(path: &Path) -> BindResult {
+    let cspath = try!(CString::new(path.to_string_lossy().into_owned()));
     unsafe {
-        let ptr = try!(CString::new(path.to_string_lossy().into_owned())).as_ptr();
-        genresult(ext_binding::rl_read_init_file(ptr),
+        genresult(ext_binding::rl_read_init_file(cspath.as_ptr()),
                   "Unable to read init file!")
     }
 }
