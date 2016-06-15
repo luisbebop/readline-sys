@@ -80,14 +80,14 @@ pub fn expand(s: &str) -> Result<(isize, String), ::HistoryError> {
 /// ```
 pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, ::HistoryError> {
     init();
-    let ptr = try!(CString::new(s)).as_ptr();
+    let cs = try!(CString::new(s));
     let ch = match delim {
         Some(c) => c as c_int,
         None => 0 as c_int,
     };
 
     unsafe {
-        let char_ptr = ext_expand::get_history_event(ptr, idx as *mut c_int, ch);
+        let char_ptr = ext_expand::get_history_event(cs.as_ptr(), idx as *mut c_int, ch);
 
         if char_ptr.is_null() {
             Err(::HistoryError::new("History Error", "Null pointer returned!"))
@@ -115,12 +115,12 @@ pub fn get_event(s: &str, idx: &mut i32, delim: Option<char>) -> Result<String, 
 /// ```
 pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
     init();
-    let ptr = try!(CString::new(s)).as_ptr();
+    let cs = try!(CString::new(s));
     let mut res = Vec::new();
 
     unsafe {
         // Returns a char **.  The last entry is 0x0.
-        let arr_ptr = ext_expand::history_tokenize(ptr);
+        let arr_ptr = ext_expand::history_tokenize(cs.as_ptr());
 
         if arr_ptr.is_null() {
             Err(::HistoryError::new("History Error", "Null pointer returned!"))
@@ -165,9 +165,9 @@ pub fn tokenize(s: &str) -> Result<Vec<String>, ::HistoryError> {
 /// ```
 pub fn arg_extract(s: &str, first: i32, last: i32) -> Result<String, ::HistoryError> {
     init();
-    let ptr = try!(CString::new(s)).as_ptr();
+    let cs = try!(CString::new(s));
     unsafe {
-        let char_ptr = ext_expand::history_arg_extract(first, last, ptr);
+        let char_ptr = ext_expand::history_arg_extract(first, last, cs.as_ptr());
 
         if char_ptr.is_null() {
             Err(::HistoryError::new("History Error", "Null pointer returned!"))

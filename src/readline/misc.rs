@@ -50,10 +50,10 @@ pub fn macro_dumper(readable: bool) -> () {
 /// assert!(misc::variable_bind("comment-begin", "<").is_ok());
 /// ```
 pub fn variable_bind(name: &str, val: &str) -> Result<i32, ::ReadlineError> {
-    let name_ptr = try!(CString::new(name)).as_ptr();
-    let val_ptr = try!(CString::new(val)).as_ptr();
+    let csname = try!(CString::new(name));
+    let csval = try!(CString::new(val));
 
-    unsafe { Ok(ext_misc::rl_variable_bind(name_ptr, val_ptr)) }
+    unsafe { Ok(ext_misc::rl_variable_bind(csname.as_ptr(), csval.as_ptr())) }
 }
 
 /// Return a string representing the value of the Readline variable `name`. For boolean variables,
@@ -78,17 +78,16 @@ pub fn variable_bind(name: &str, val: &str) -> Result<i32, ::ReadlineError> {
 /// }
 /// ```
 pub fn variable_value(name: &str) -> Result<String, ::ReadlineError> {
-    let name_ptr = try!(CString::new(name)).as_ptr();
+    let csname = try!(CString::new(name));
 
-    unsafe {
-        let val_ptr = ext_misc::rl_variable_value(name_ptr);
-
-        if val_ptr.is_null() {
-            Err(::ReadlineError::new("Misc Error",
-                                     "Null pointer returned from rl_variable_value!"))
-        } else {
-            Ok(CStr::from_ptr(val_ptr).to_string_lossy().into_owned())
-        }
+    let val_ptr = unsafe {
+        ext_misc::rl_variable_value(csname.as_ptr())
+    };
+    if val_ptr.is_null() {
+        Err(::ReadlineError::new("Misc Error",
+                                 "Null pointer returned from rl_variable_value!"))
+    } else {
+        Ok(unsafe { CStr::from_ptr(val_ptr).to_string_lossy().into_owned() })
     }
 }
 
@@ -154,16 +153,15 @@ pub fn set_paren_blink_timeout(us: i32) -> Result<i32, ::ReadlineError> {
 /// }
 /// ```
 pub fn get_termcap(cap: &str) -> Result<String, ::ReadlineError> {
-    let ptr = try!(CString::new(cap)).as_ptr();
+    let cscap = try!(CString::new(cap));
 
-    unsafe {
-        let cap_ptr = ext_misc::rl_get_termcap(ptr);
-
-        if cap_ptr.is_null() {
-            Err(::ReadlineError::new("Misc Error", "rl_get_termcap returned a null pointer!"))
-        } else {
-            Ok(CStr::from_ptr(cap_ptr).to_string_lossy().into_owned())
-        }
+    let cap_ptr = unsafe {
+        ext_misc::rl_get_termcap(cscap.as_ptr())
+    };
+    if cap_ptr.is_null() {
+        Err(::ReadlineError::new("Misc Error", "rl_get_termcap returned a null pointer!"))
+    } else {
+        Ok(unsafe { CStr::from_ptr(cscap.as_ptr()).to_string_lossy().into_owned() })
     }
 }
 

@@ -100,17 +100,18 @@ pub fn tty_unset_default_bindings(kmap: Keymap) -> () {
 /// assert!(termmgmt::reset_terminal(None).is_ok());
 /// ```
 pub fn reset_terminal(name: Option<&str>) -> Result<i32, ::ReadlineError> {
-    let ptr = match name {
-        Some(s) => try!(CString::new(s)).as_ptr(),
-        None => ptr::null(),
-    };
-    unsafe {
-        let res = ext_termmgmt::rl_reset_terminal(ptr);
-
-        if res == 0 {
-            Ok(res)
-        } else {
-            Err(::ReadlineError::new("Termmgmt Error", "Unable to reset terminal!"))
+    let res = match name {
+        Some(s) => {
+            let cs = try!(CString::new(s));
+            unsafe { ext_termmgmt::rl_reset_terminal(cs.as_ptr()) }
+        },
+        None => {
+            unsafe { ext_termmgmt::rl_reset_terminal(ptr::null()) }
         }
+    };
+    if res == 0 {
+        Ok(res)
+    } else {
+        Err(::ReadlineError::new("Termmgmt Error", "Unable to reset terminal!"))
     }
 }

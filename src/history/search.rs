@@ -56,8 +56,8 @@ pub fn search<T>(s: &str, dir: T) -> Result<isize, ::HistoryError>
     where T: Into<i32>
 {
     init();
-    let ptr = try!(CString::new(s)).as_ptr();
-    unsafe { Ok(ext_search::history_search(ptr, dir.into()) as isize) }
+    let cs = try!(CString::new(s));
+    unsafe { Ok(ext_search::history_search(cs.as_ptr(), dir.into()) as isize) }
 }
 
 /// Search the history for string, starting at the current history offset. The search is anchored:
@@ -82,8 +82,8 @@ pub fn search_prefix<T>(s: &str, dir: T) -> Result<isize, ::HistoryError>
     where T: Into<i32>
 {
     init();
-    let ptr = try!(CString::new(s)).as_ptr();
-    unsafe { Ok(ext_search::history_search_prefix(ptr, dir.into()) as isize) }
+    let cs = try!(CString::new(s));
+    unsafe { Ok(ext_search::history_search_prefix(cs.as_ptr(), dir.into()) as isize) }
 }
 
 /// Search for string in the history list, starting at pos, an absolute index into the list. If
@@ -104,6 +104,6 @@ pub fn search_pos<T>(s: &str, dir: T, pos: i32) -> Result<isize, ::HistoryError>
     where T: Into<i32>
 {
     init();
-    let ptr = try!(CString::new(s)).as_ptr();
-    unsafe { Ok(ext_search::history_search_pos(ptr, dir.into(), pos) as isize) }
+    let cs = try!(CString::new(s));
+    unsafe { Ok(ext_search::history_search_pos(cs.as_ptr(), dir.into(), pos) as isize) }
 }

@@ -39,15 +39,14 @@ mod ext_funmap {
 /// assert!(funmap::named_function("self-insert").is_ok())
 /// ```
 pub fn named_function(name: &str) -> Result<CommandFunction, ::ReadlineError> {
-    unsafe {
-        let ptr = try!(CString::new(name)).as_ptr();
-        let func_ptr = ext_funmap::rl_named_function(ptr);
-
-        if func_ptr.is_none() {
-            Err(::ReadlineError::new("Funmap Error", "Unable to find name function!"))
-        } else {
-            Ok(func_ptr.expect("Unable to get function pointer"))
-        }
+    let csname = try!(CString::new(name));
+    let func_ptr = unsafe {
+        ext_funmap::rl_named_function(csname.as_ptr())
+    };
+    if func_ptr.is_none() {
+        Err(::ReadlineError::new("Funmap Error", "Unable to find name function!"))
+    } else {
+        Ok(func_ptr.expect("Unable to get function pointer"))
     }
 }
 
@@ -74,24 +73,23 @@ pub fn function_of_keyseq
      map: Option<Keymap>,
      add_type: bool)
      -> Result<(Option<CommandFunction>, Option<BindType>), ::ReadlineError> {
-    unsafe {
-        let ptr = try!(CString::new(keyseq)).as_ptr();
-        let km = match map {
-            Some(km) => km,
-            None => ptr::null_mut(),
-        };
-        let bind_type: *mut i32 = if add_type { &mut 1 } else { ptr::null_mut() };
 
-        let func_ptr = ext_funmap::rl_function_of_keyseq(ptr, km, bind_type);
-
-        if func_ptr.is_none() {
-            Err(::ReadlineError::new("Funmap Error",
-                                     "Unable to get function associated with keyseq!"))
-        } else if add_type {
-            Ok((func_ptr, Some(BindType::from(*bind_type))))
-        } else {
-            Ok((func_ptr, None))
-        }
+    let cskeyseq = try!(CString::new(keyseq));
+    let km = match map {
+        Some(km) => km,
+        None => ptr::null_mut(),
+    };
+    let bind_type: *mut i32 = if add_type { &mut 1 } else { ptr::null_mut() };
+    let func_ptr = unsafe {
+        ext_funmap::rl_function_of_keyseq(cskeyseq.as_ptr(), km, bind_type)
+    };
+    if func_ptr.is_none() {
+        Err(::ReadlineError::new("Funmap Error",
+                                 "Unable to get function associated with keyseq!"))
+    } else if add_type {
+        Ok((func_ptr, Some(BindType::from(unsafe { *bind_type }))))
+    } else {
+        Ok((func_ptr, None))
     }
 }
 
@@ -226,15 +224,14 @@ pub fn list_funmap_names() -> () {
 /// # }
 /// ```
 pub fn add_funmap_entry(name: &str, cmd: CommandFunction) -> Result<i32, ::ReadlineError> {
-    unsafe {
-        let ptr = try!(CString::new(name)).as_ptr();
-        let res = ext_funmap::rl_add_funmap_entry(ptr, cmd);
-
-        if res >= 0 {
-            Ok(res)
-        } else {
-            Err(::ReadlineError::new("Funmap Error", "Unable to add funmap entry!"))
-        }
+    let csname = try!(CString::new(name));
+    let res = unsafe {
+        ext_funmap::rl_add_funmap_entry(csname.as_ptr(), cmd)
+    };
+    if res >= 0 {
+        Ok(res)
+    } else {
+        Err(::ReadlineError::new("Funmap Error", "Unable to add funmap entry!"))
     }
 }
 

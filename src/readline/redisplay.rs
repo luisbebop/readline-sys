@@ -228,8 +228,8 @@ pub fn show_char(c: char) -> Result<i32, ::ReadlineError> {
 /// assert!(redisplay::clear_message().is_ok());
 /// ```
 pub fn message(message: &str) -> Result<i32, ::ReadlineError> {
-    let ptr = try!(CString::new(message)).as_ptr();
-    unsafe { genresult(ext_redisplay::rl_message(ptr), "Unable to show message!") }
+    let csmessage = try!(CString::new(message));
+    unsafe { genresult(ext_redisplay::rl_message(csmessage.as_ptr()), "Unable to show message!") }
 }
 
 /// Clear the message in the echo area. If the prompt was saved with a call to `rl_save_prompt`
@@ -313,9 +313,9 @@ pub fn rl_restore_prompt() -> () {
 /// assert!(redisplay::expand_prompt("test message").is_ok());
 /// ```
 pub fn expand_prompt(prompt: &str) -> Result<i32, ::ReadlineError> {
-    let ptr = try!(CString::new(prompt)).as_ptr();
+    let csprompt = try!(CString::new(prompt));
     unsafe {
-        let res = ext_redisplay::rl_expand_prompt(ptr);
+        let res = ext_redisplay::rl_expand_prompt(csprompt.as_ptr());
 
         if res > 0 {
             Ok(res)
@@ -338,6 +338,6 @@ pub fn expand_prompt(prompt: &str) -> Result<i32, ::ReadlineError> {
 /// assert!(redisplay::set_prompt("NEW PROMPT: ").is_ok());
 /// ```
 pub fn set_prompt(prompt: &str) -> Result<i32, ::ReadlineError> {
-    let ptr = try!(CString::new(prompt)).as_ptr();
-    unsafe { genresult(ext_redisplay::rl_set_prompt(ptr), "Unable to set prompt!") }
+    let csprompt = try!(CString::new(prompt));
+    unsafe { genresult(ext_redisplay::rl_set_prompt(csprompt.as_ptr()), "Unable to set prompt!") }
 }
