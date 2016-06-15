@@ -323,9 +323,7 @@ impl Default for UndoList {
 pub fn readline(prompt: &str) -> Result<Option<String>, ::ReadlineError> {
     let csprompt = try!(CString::new(prompt));
 
-    let ret = unsafe {
-        ext_readline::readline(csprompt.as_ptr())
-    };
+    let ret = unsafe { ext_readline::readline(csprompt.as_ptr()) };
     if ret.is_null() {
         // user pressed Ctrl-D
         Ok(None)

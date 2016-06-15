@@ -80,9 +80,7 @@ pub fn variable_bind(name: &str, val: &str) -> Result<i32, ::ReadlineError> {
 pub fn variable_value(name: &str) -> Result<String, ::ReadlineError> {
     let csname = try!(CString::new(name));
 
-    let val_ptr = unsafe {
-        ext_misc::rl_variable_value(csname.as_ptr())
-    };
+    let val_ptr = unsafe { ext_misc::rl_variable_value(csname.as_ptr()) };
     if val_ptr.is_null() {
         Err(::ReadlineError::new("Misc Error",
                                  "Null pointer returned from rl_variable_value!"))
@@ -155,9 +153,7 @@ pub fn set_paren_blink_timeout(us: i32) -> Result<i32, ::ReadlineError> {
 pub fn get_termcap(cap: &str) -> Result<String, ::ReadlineError> {
     let cscap = try!(CString::new(cap));
 
-    let cap_ptr = unsafe {
-        ext_misc::rl_get_termcap(cscap.as_ptr())
-    };
+    let cap_ptr = unsafe { ext_misc::rl_get_termcap(cscap.as_ptr()) };
     if cap_ptr.is_null() {
         Err(::ReadlineError::new("Misc Error", "rl_get_termcap returned a null pointer!"))
     } else {

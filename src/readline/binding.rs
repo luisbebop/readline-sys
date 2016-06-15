@@ -365,9 +365,7 @@ pub fn unbind_function_in_map(f: CommandFunction, map: Keymap) -> BindResult {
 /// ```
 pub fn unbind_command_in_map(cmd: &str, map: Keymap) -> BindResult {
     let cscmd = try!(CString::new(cmd));
-    let res = unsafe {
-        ext_binding::rl_unbind_command_in_map(cscmd.as_ptr(), map)
-    };
+    let res = unsafe { ext_binding::rl_unbind_command_in_map(cscmd.as_ptr(), map) };
     if res == 1 {
         Ok(res)
     } else {
@@ -624,18 +622,14 @@ pub fn generic_bind(keyseq: &str, bind_type: BindType, map: Keymap) -> BindResul
                           "Unable to bind to function!")
             }
         }
-        Kmap(km) => {
-            unsafe {
-                genresult(ext_binding::rl_generic_bind(1, cskeyseq.as_ptr(), km as *mut i8, map),
-                          "Unable to bind to keymap!")
-            }
-        }
-        Macr(m) => {
-            unsafe {
-                genresult(ext_binding::rl_generic_bind(2, cskeyseq.as_ptr(), m as *mut i8, map),
-                          "Unable to bind to macro!")
-            }
-        }
+        Kmap(km) => unsafe {
+            genresult(ext_binding::rl_generic_bind(1, cskeyseq.as_ptr(), km as *mut i8, map),
+                      "Unable to bind to keymap!")
+        },
+        Macr(m) => unsafe {
+            genresult(ext_binding::rl_generic_bind(2, cskeyseq.as_ptr(), m as *mut i8, map),
+                      "Unable to bind to macro!")
+        },
     }
 }
 

@@ -100,14 +100,11 @@ pub fn tty_unset_default_bindings(kmap: Keymap) -> () {
 /// assert!(termmgmt::reset_terminal(None).is_ok());
 /// ```
 pub fn reset_terminal(name: Option<&str>) -> Result<i32, ::ReadlineError> {
-    let res = match name {
-        Some(s) => {
-            let cs = try!(CString::new(s));
-            unsafe { ext_termmgmt::rl_reset_terminal(cs.as_ptr()) }
-        },
-        None => {
-            unsafe { ext_termmgmt::rl_reset_terminal(ptr::null()) }
-        }
+    let res = if let Some(s) = name {
+        let cs = try!(CString::new(s));
+        unsafe { ext_termmgmt::rl_reset_terminal(cs.as_ptr()) }
+    } else {
+        unsafe { ext_termmgmt::rl_reset_terminal(ptr::null()) }
     };
     if res == 0 {
         Ok(res)

@@ -229,7 +229,10 @@ pub fn show_char(c: char) -> Result<i32, ::ReadlineError> {
 /// ```
 pub fn message(message: &str) -> Result<i32, ::ReadlineError> {
     let csmessage = try!(CString::new(message));
-    unsafe { genresult(ext_redisplay::rl_message(csmessage.as_ptr()), "Unable to show message!") }
+    unsafe {
+        genresult(ext_redisplay::rl_message(csmessage.as_ptr()),
+                  "Unable to show message!")
+    }
 }
 
 /// Clear the message in the echo area. If the prompt was saved with a call to `rl_save_prompt`
@@ -339,5 +342,8 @@ pub fn expand_prompt(prompt: &str) -> Result<i32, ::ReadlineError> {
 /// ```
 pub fn set_prompt(prompt: &str) -> Result<i32, ::ReadlineError> {
     let csprompt = try!(CString::new(prompt));
-    unsafe { genresult(ext_redisplay::rl_set_prompt(csprompt.as_ptr()), "Unable to set prompt!") }
+    unsafe {
+        genresult(ext_redisplay::rl_set_prompt(csprompt.as_ptr()),
+                  "Unable to set prompt!")
+    }
 }

@@ -27,7 +27,7 @@ fn with_path_ptr<F>(path: Option<&Path>, f: F) -> Result<i32, ::HistoryError>
         match p.to_str() {
             Some(p) => {
                 if let Ok(cs) = CString::new(p) {
-                    return f(cs.as_ptr())
+                    return f(cs.as_ptr());
                 }
             }
             None => return Err(::HistoryError::new("History Error", "Unable to determine path!")),
@@ -68,9 +68,8 @@ fn gen_result(res: i32) -> Result<i32, ::HistoryError> {
 /// assert!(fs::remove_file(path).is_ok());
 pub fn read(path: Option<&Path>) -> Result<i32, ::HistoryError> {
     init();
-    with_path_ptr(path, |ptr| {
-        unsafe { gen_result(ext_histfile::read_history(ptr)) }
-    })
+    with_path_ptr(path,
+                  |ptr| { unsafe { gen_result(ext_histfile::read_history(ptr)) } })
 }
 
 /// Read a range of lines from filename, adding them to the history list. Start reading at line
@@ -95,9 +94,8 @@ pub fn read(path: Option<&Path>) -> Result<i32, ::HistoryError> {
 /// assert!(fs::remove_file(path).is_ok());
 pub fn read_range(path: Option<&Path>, from: i32, to: i32) -> Result<i32, ::HistoryError> {
     init();
-    with_path_ptr(path, |ptr| {
-        unsafe { gen_result(ext_histfile::read_history_range(ptr, from, to)) }
-    })
+    with_path_ptr(path,
+                  |ptr| { unsafe { gen_result(ext_histfile::read_history_range(ptr, from, to)) } })
 }
 
 /// Write the current history to `filename`, overwriting `filename` if necessary. If `filename` is
@@ -120,9 +118,8 @@ pub fn read_range(path: Option<&Path>, from: i32, to: i32) -> Result<i32, ::Hist
 /// ```
 pub fn write(path: Option<&Path>) -> Result<i32, ::HistoryError> {
     init();
-    with_path_ptr(path, |ptr| {
-        unsafe { gen_result(ext_histfile::write_history(ptr)) }
-    })
+    with_path_ptr(path,
+                  |ptr| { unsafe { gen_result(ext_histfile::write_history(ptr)) } })
 }
 
 /// Append the last `n` elements of the history list to `filename`. If `filename` is None, then
@@ -146,9 +143,8 @@ pub fn write(path: Option<&Path>) -> Result<i32, ::HistoryError> {
 /// ```
 pub fn append(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
     init();
-    with_path_ptr(path, |ptr| {
-        unsafe { gen_result(ext_histfile::append_history(n, ptr)) }
-    })
+    with_path_ptr(path,
+                  |ptr| { unsafe { gen_result(ext_histfile::append_history(n, ptr)) } })
 }
 
 /// Truncate the history file `filename`, leaving only the last `n` lines. If `filename` is None,
@@ -175,7 +171,6 @@ pub fn append(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
 /// ```
 pub fn truncate(path: Option<&Path>, n: i32) -> Result<i32, ::HistoryError> {
     init();
-    with_path_ptr(path, |ptr| {
-        unsafe { gen_result(ext_histfile::history_truncate_file(ptr, n)) }
-    })
+    with_path_ptr(path,
+                  |ptr| { unsafe { gen_result(ext_histfile::history_truncate_file(ptr, n)) } })
 }

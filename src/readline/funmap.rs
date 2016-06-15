@@ -40,9 +40,7 @@ mod ext_funmap {
 /// ```
 pub fn named_function(name: &str) -> Result<CommandFunction, ::ReadlineError> {
     let csname = try!(CString::new(name));
-    let func_ptr = unsafe {
-        ext_funmap::rl_named_function(csname.as_ptr())
-    };
+    let func_ptr = unsafe { ext_funmap::rl_named_function(csname.as_ptr()) };
     if func_ptr.is_none() {
         Err(::ReadlineError::new("Funmap Error", "Unable to find name function!"))
     } else {
@@ -80,9 +78,7 @@ pub fn function_of_keyseq
         None => ptr::null_mut(),
     };
     let bind_type: *mut i32 = if add_type { &mut 1 } else { ptr::null_mut() };
-    let func_ptr = unsafe {
-        ext_funmap::rl_function_of_keyseq(cskeyseq.as_ptr(), km, bind_type)
-    };
+    let func_ptr = unsafe { ext_funmap::rl_function_of_keyseq(cskeyseq.as_ptr(), km, bind_type) };
     if func_ptr.is_none() {
         Err(::ReadlineError::new("Funmap Error",
                                  "Unable to get function associated with keyseq!"))
@@ -225,9 +221,7 @@ pub fn list_funmap_names() -> () {
 /// ```
 pub fn add_funmap_entry(name: &str, cmd: CommandFunction) -> Result<i32, ::ReadlineError> {
     let csname = try!(CString::new(name));
-    let res = unsafe {
-        ext_funmap::rl_add_funmap_entry(csname.as_ptr(), cmd)
-    };
+    let res = unsafe { ext_funmap::rl_add_funmap_entry(csname.as_ptr(), cmd) };
     if res >= 0 {
         Ok(res)
     } else {
