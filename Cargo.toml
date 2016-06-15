@@ -9,7 +9,7 @@ license = "MIT"
 links = "readline"
 name = "rl-sys"
 repository = "https://github.com/rustyhorde/readline-sys.git"
-version = "0.5.1-pre.0"
+version = "0.5.1"
 
 [build-dependencies]
 pkg-config = "~0.3.6"
