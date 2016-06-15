@@ -24,7 +24,7 @@ time = "~0.1.34"
 
 [dependencies.clippy]
 optional = true
-version = "~0.0.30"
+version = "~0.0.76"
 
 [dev-dependencies]
 sodium-sys = "~0.0.4"
