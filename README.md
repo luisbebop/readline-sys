@@ -56,4 +56,4 @@ To work on this crate, remember to `git clone --recursive` or `git submodule
 init && git submodule update`.
 
 ## License
-Distributed under the [MIT License](LICENSE).
+Distributed under the [GNU General Public License](https://www.gnu.org/licenses/gpl.html).
