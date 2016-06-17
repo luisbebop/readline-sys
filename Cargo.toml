@@ -22,11 +22,11 @@ description = "Native bindings to libreadline."
 documentation = "https://rustyhorde.github.io/readline-sys/readline-sys/rl_sys/index.html"
 homepage = "https://rustyhorde.github.io/readline-sys/index.html"
 keywords = ["readline", "readline-sys", "rl-sys"]
-license = "GPL"
+license = "GPL-3.0"
 links = "readline"
 name = "rl-sys"
 repository = "https://github.com/rustyhorde/readline-sys.git"
-version = "0.5.2-pre.0"
+version = "0.5.3-pre.0"
 
 [build-dependencies]
 pkg-config = "~0.3.6"
