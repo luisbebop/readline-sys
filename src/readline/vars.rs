@@ -234,7 +234,7 @@ extern "C" {
 
 /// Get the Readline state flags.
 pub fn get_state() -> Option<ReadlineState> {
-    ReadlineState::from_bits(rl_readline_state)
+    unsafe { ReadlineState::from_bits(rl_readline_state) }
 }
 
 /// The version number of this revision of the library.
